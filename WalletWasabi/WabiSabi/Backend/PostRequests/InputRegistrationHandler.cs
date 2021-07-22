@@ -82,7 +82,7 @@ namespace WalletWasabi.WabiSabi.Backend.PostRequests
 				throw new WabiSabiProtocolException(WabiSabiProtocolErrorCode.WrongOwnershipProof);
 			}
 
-			var alice = new Alice(coin, ownershipProof);
+			var alice = new Alice(coin, ownershipProof, round);
 
 			if (alice.TotalInputAmount < round.MinRegistrableAmount)
 			{

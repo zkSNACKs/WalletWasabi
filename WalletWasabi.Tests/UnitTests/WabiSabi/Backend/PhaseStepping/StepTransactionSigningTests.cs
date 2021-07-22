@@ -198,7 +198,7 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PhaseStepping
 			var (round, aliceClient1, aliceClient2) = await CreateRoundWithOutputsReadyToSignAsync(arena, key1, coin1, key2, coin2);
 
 			// Make sure not all alices signed.
-			var alice3 = WabiSabiFactory.CreateAlice();
+			var alice3 = WabiSabiFactory.CreateAlice(round);
 			alice3.ConfirmedConnection = true;
 			round.Alices.Add(alice3);
 			round.CoinjoinState = round.Assert<ConstructionState>().AddInput(alice3.Coin);

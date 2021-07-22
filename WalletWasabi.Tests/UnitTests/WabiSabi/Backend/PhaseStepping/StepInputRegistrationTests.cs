@@ -17,15 +17,15 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PhaseStepping
 			var round = WabiSabiFactory.CreateRound(cfg);
 			using Arena arena = await WabiSabiFactory.CreateAndStartArenaAsync(cfg, round);
 
-			round.Alices.Add(WabiSabiFactory.CreateAlice());
+			round.Alices.Add(WabiSabiFactory.CreateAlice(round));
 			await arena.TriggerAndWaitRoundAsync(TimeSpan.FromSeconds(21));
 			Assert.Equal(Phase.InputRegistration, round.Phase);
 
-			round.Alices.Add(WabiSabiFactory.CreateAlice());
+			round.Alices.Add(WabiSabiFactory.CreateAlice(round));
 			await arena.TriggerAndWaitRoundAsync(TimeSpan.FromSeconds(21));
 			Assert.Equal(Phase.InputRegistration, round.Phase);
 
-			round.Alices.Add(WabiSabiFactory.CreateAlice());
+			round.Alices.Add(WabiSabiFactory.CreateAlice(round));
 			await arena.TriggerAndWaitRoundAsync(TimeSpan.FromSeconds(21));
 			Assert.Equal(Phase.ConnectionConfirmation, round.Phase);
 
@@ -41,9 +41,9 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PhaseStepping
 				MinInputCountByRoundMultiplier = 0.5
 			};
 			var round = WabiSabiFactory.CreateRound(cfg);
-			var alice1 = WabiSabiFactory.CreateAlice();
-			var alice2 = WabiSabiFactory.CreateAlice();
-			var alice3 = WabiSabiFactory.CreateAlice();
+			var alice1 = WabiSabiFactory.CreateAlice(round);
+			var alice2 = WabiSabiFactory.CreateAlice(round);
+			var alice3 = WabiSabiFactory.CreateAlice(round);
 			round.Alices.Add(alice1);
 			round.Alices.Add(alice2);
 			round.Alices.Add(alice3);
@@ -76,8 +76,8 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PhaseStepping
 				MinInputCountByRoundMultiplier = 0.5
 			};
 			var round = WabiSabiFactory.CreateRound(cfg);
-			round.Alices.Add(WabiSabiFactory.CreateAlice());
-			round.Alices.Add(WabiSabiFactory.CreateAlice());
+			round.Alices.Add(WabiSabiFactory.CreateAlice(round));
+			round.Alices.Add(WabiSabiFactory.CreateAlice(round));
 
 			using Arena arena = await WabiSabiFactory.CreateAndStartArenaAsync(cfg, round);
 			await arena.TriggerAndWaitRoundAsync(TimeSpan.FromSeconds(21));
@@ -97,9 +97,9 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PhaseStepping
 				MinInputCountByRoundMultiplier = 0.5
 			};
 			var round = WabiSabiFactory.CreateRound(cfg);
-			var alice1 = WabiSabiFactory.CreateAlice();
-			var alice2 = WabiSabiFactory.CreateAlice();
-			var alice3 = WabiSabiFactory.CreateAlice();
+			var alice1 = WabiSabiFactory.CreateAlice(round);
+			var alice2 = WabiSabiFactory.CreateAlice(round);
+			var alice3 = WabiSabiFactory.CreateAlice(round);
 			round.Alices.Add(alice1);
 			round.Alices.Add(alice2);
 			round.Alices.Add(alice3);
@@ -126,7 +126,7 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PhaseStepping
 			var round = WabiSabiFactory.CreateRound(cfg);
 			using Arena arena = await WabiSabiFactory.CreateAndStartArenaAsync(cfg, round);
 
-			round.Alices.Add(WabiSabiFactory.CreateAlice());
+			round.Alices.Add(WabiSabiFactory.CreateAlice(round));
 			await arena.TriggerAndWaitRoundAsync(TimeSpan.FromSeconds(21));
 			Assert.Equal(Phase.Ended, round.Phase);
 			Assert.DoesNotContain(round, arena.ActiveRounds);
@@ -148,8 +148,8 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PhaseStepping
 				MinInputCountByRoundMultiplier = 0.5
 			};
 			var round = WabiSabiFactory.CreateRound(cfg);
-			var alice1 = WabiSabiFactory.CreateAlice();
-			var alice2 = WabiSabiFactory.CreateAlice();
+			var alice1 = WabiSabiFactory.CreateAlice(round);
+			var alice2 = WabiSabiFactory.CreateAlice(round);
 			round.Alices.Add(alice1);
 			round.Alices.Add(alice2);
 			var blameRound = WabiSabiFactory.CreateBlameRound(round, cfg);
@@ -175,8 +175,8 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PhaseStepping
 			var round = WabiSabiFactory.CreateRound(cfg);
 			using Arena arena = await WabiSabiFactory.CreateAndStartArenaAsync(cfg, round);
 
-			round.Alices.Add(WabiSabiFactory.CreateAlice());
-			round.Alices.Add(WabiSabiFactory.CreateAlice());
+			round.Alices.Add(WabiSabiFactory.CreateAlice(round));
+			round.Alices.Add(WabiSabiFactory.CreateAlice(round));
 			await arena.TriggerAndWaitRoundAsync(TimeSpan.FromSeconds(21));
 			Assert.Equal(Phase.InputRegistration, round.Phase);
 

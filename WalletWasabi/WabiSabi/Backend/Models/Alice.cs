@@ -2,19 +2,22 @@ using NBitcoin;
 using System;
 using WalletWasabi.Crypto;
 using WalletWasabi.Crypto.StrobeProtocol;
+using WalletWasabi.WabiSabi.Backend.Rounds;
 
 namespace WalletWasabi.WabiSabi.Backend.Models
 {
 	public class Alice
 	{
-		public Alice(Coin coin, OwnershipProof ownershipProof)
+		public Alice(Coin coin, OwnershipProof ownershipProof, Round round)
 		{
 			// TODO init syntax?
+			Round = round;
 			Coin = coin;
 			OwnershipProof = ownershipProof;
 			Id = CalculateHash();
 		}
 
+		public Round Round { get; }
 		public uint256 Id { get; }
 		public DateTimeOffset Deadline { get; set; } = DateTimeOffset.UtcNow;
 		public Coin Coin { get; }

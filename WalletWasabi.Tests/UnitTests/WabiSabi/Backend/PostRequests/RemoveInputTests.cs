@@ -24,7 +24,7 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PostRequests
 			WabiSabiConfig cfg = new();
 			var round = WabiSabiFactory.CreateRound(cfg);
 			var initialRemaining = round.RemainingInputVsizeAllocation;
-			var alice = WabiSabiFactory.CreateAlice();
+			var alice = WabiSabiFactory.CreateAlice(round);
 			round.Alices.Add(alice);
 			Assert.True(round.RemainingInputVsizeAllocation < initialRemaining);
 
