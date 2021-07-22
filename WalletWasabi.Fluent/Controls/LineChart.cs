@@ -384,7 +384,8 @@ namespace WalletWasabi.Fluent.Controls
 			{
 				if (xAxisValues[i] <= xAxisCurrentValue)
 				{
-					return areaWidth / xAxisValues.Count * i;
+					var cursorPosition = i == 0 ? 0.0 : areaWidth / (xAxisValues.Count - 1) * i;
+					return cursorPosition;
 				}
 			}
 

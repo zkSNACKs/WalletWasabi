@@ -132,14 +132,16 @@
               DockPanel.Dock="Bottom"
               Classes="cursor"
               Focusable="True"
-              Minimum="{Binding XAxisMinValue}"
-              Maximum="{Binding XAxisMaxValue}"
-              Value="{Binding XAxisCurrentValueIndex}" />
+              IsSnapToTickEnabled="True"
+              TickFrequency="1"
+              Minimum="{Binding SliderMinimum}"
+              Maximum="{Binding SliderMaximum}"
+              Value="{Binding SliderValue}" />
       <c:LineChart Classes="cursor border xAxisLabels yAxis yAxisTitle area"
-                   XAxisLabels="{Binding XAxisLabels}"
-                   XAxisValues="{Binding XAxisValues}"
-                   XAxisCurrentValue="{Binding XAxisCurrentValue, Mode=TwoWay}"
-                   YAxisValues="{Binding YAxisValues}">
+                   XAxisLabels="{Binding ConfirmationTargetLabels}"
+                   XAxisValues="{Binding ConfirmationTargetValues}"
+                   XAxisCurrentValue="{Binding CurrentConfirmationTarget, Mode=TwoWay}"
+                   YAxisValues="{Binding SatoshiPerByteValues}">
         <c:LineChart.Styles>
           <Style Selector="c|LineChart">
             <Setter Property="XAxisPlotMode" Value="EvenlySpaced"/>
