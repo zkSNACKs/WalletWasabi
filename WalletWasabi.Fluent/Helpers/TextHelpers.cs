@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NBitcoin;
 
 namespace WalletWasabi.Fluent.Helpers
@@ -78,5 +79,7 @@ namespace WalletWasabi.Fluent.Helpers
 
 			return moneyString;
 		}
+
+		public static string ParseLabel(this string text) => Regex.Replace(text, @"\s+", " ").Trim();
 	}
 }

@@ -14,6 +14,7 @@ using Avalonia.Interactivity;
 using Avalonia.Metadata;
 using Avalonia.Threading;
 using ReactiveUI;
+using WalletWasabi.Fluent.Helpers;
 using WalletWasabi.Helpers;
 
 namespace WalletWasabi.Fluent.Controls
@@ -34,6 +35,9 @@ namespace WalletWasabi.Fluent.Controls
 
 		public static readonly StyledProperty<bool> SuggestionsAreCaseSensitiveProperty =
 			AvaloniaProperty.Register<TagsBox, bool>(nameof(SuggestionsAreCaseSensitive), defaultValue: true);
+
+		public static readonly StyledProperty<bool> AllowDuplicationProperty =
+			AvaloniaProperty.Register<TagsBox, bool>(nameof(AllowDuplication));
 
 		public static readonly DirectProperty<TagsBox, IEnumerable<string>?> ItemsProperty =
 			AvaloniaProperty.RegisterDirect<TagsBox, IEnumerable<string>?>(nameof(Items),
@@ -121,6 +125,12 @@ namespace WalletWasabi.Fluent.Controls
 		{
 			get => GetValue(SuggestionsAreCaseSensitiveProperty);
 			set => SetValue(SuggestionsAreCaseSensitiveProperty, value);
+		}
+
+		public bool AllowDuplication
+		{
+			get => GetValue(AllowDuplicationProperty);
+			set => SetValue(AllowDuplicationProperty, value);
 		}
 
 		protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -217,7 +227,7 @@ namespace WalletWasabi.Fluent.Controls
 		{
 			if (_watermark is { } && _autoCompleteBox is { })
 			{
-				if ((Items is null || (Items is { } && !Items.Any())) && string.IsNullOrWhiteSpace(_autoCompleteBox?.Text))
+				if ((Items is null || (Items is { } && !Items.Any())) && string.IsNullOrEmpty(_autoCompleteBox?.Text))
 				{
 					_watermark.IsVisible = true;
 				}
@@ -458,7 +468,14 @@ namespace WalletWasabi.Fluent.Controls
 					return;
 				}
 
-				x.Add(tag);
+				var finalTag = tag.ParseLabel();
+
+				if (!AllowDuplication && x.Contains(finalTag))
+				{
+					return;
+				}
+
+				x.Add(finalTag);
 			}
 
 			InvalidateWatermark();

@@ -288,28 +288,24 @@ namespace WalletWasabi.Fluent.ViewModels.Wallets.Send
 				.Subscribe(x => ExchangeRate = x)
 				.DisposeWith(disposables);
 
-			_wallet.TransactionProcessor.WhenAnyValue(x => x.Coins)
+			_wallet.TransactionProcessor.WhenAnyValue(x => x.Coins).Select(_ => Unit.Default)
+				.Merge(this.WhenAnyValue(x => x.Labels.Count).Select(_ => Unit.Default))
 				.ObserveOn(RxApp.MainThreadScheduler)
-				.Subscribe(x =>
-				{
-					PriorLabels.AddRange(x.SelectMany(coin => coin.HdPubKey.Label.Labels));
-
-					PriorLabels = new ObservableCollection<string>(PriorLabels.Distinct());
-				})
+				.Subscribe(_ => UpdateSuggestedLabels())
 				.DisposeWith(disposables);
-
-			PriorLabels.AddRange(_wallet
-				.KeyManager
-				.GetLabels()
-				.Select(x => x.ToString()
-					.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
-					.SelectMany(x => x));
-
-			PriorLabels = new ObservableCollection<string>(PriorLabels.Distinct());
 
 			RxApp.MainThreadScheduler.Schedule(async () => await OnAutoPasteAsync());
 
 			base.OnNavigatedTo(inHistory, disposables);
+		}
+
+		private void UpdateSuggestedLabels()
+		{
+			var enteredLabels = Labels;
+			var allLabels = WalletHelpers.GetLabels();
+			var newSuggestedLabels = allLabels.Except(enteredLabels).Distinct();
+
+			PriorLabels = new ObservableCollection<string>(newSuggestedLabels);
 		}
 	}
 }
