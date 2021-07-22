@@ -35,12 +35,13 @@ namespace WalletWasabi.WabiSabi.Client
 			IEnumerable<long> vsizes,
 			Money effectiveValue,
 			int vsizeValue,
+			RoundStateUpdater roundStateUpdater,
 			CancellationToken cancellationToken)
 		{
 			var amountsToRequest = AddExtraCredentialRequests(amounts, effectiveValue.Satoshi);
 			var vsizesToRequest = AddExtraCredentialRequests(vsizes, vsizeValue);
 
-			await aliceClient.ConfirmConnectionAsync(connectionConfirmationTimeout, amountsToRequest, vsizesToRequest, cancellationToken).ConfigureAwait(false);
+			await aliceClient.ConfirmConnectionAsync(connectionConfirmationTimeout, amountsToRequest, vsizesToRequest, roundStateUpdater, cancellationToken).ConfigureAwait(false);
 
 			// TODO keep extra credentials
 			var (amountCredentials, _) = SeparateExtraCredentials(aliceClient.IssuedAmountCredentials, amounts);

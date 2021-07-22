@@ -9,6 +9,7 @@ using WalletWasabi.Crypto.ZeroKnowledge;
 using WalletWasabi.Helpers;
 using WalletWasabi.Logging;
 using WalletWasabi.WabiSabi.Backend.Models;
+using WalletWasabi.WabiSabi.Backend.Rounds;
 
 namespace WalletWasabi.WabiSabi.Client
 {
@@ -48,12 +49,28 @@ namespace WalletWasabi.WabiSabi.Client
 			Logger.LogInfo($"Round ({RoundId}), Alice ({AliceId}): Registered an input.");
 		}
 
-		public async Task ConfirmConnectionAsync(TimeSpan connectionConfirmationTimeout, IEnumerable<long> amountsToRequest, IEnumerable<long> vsizesToRequest, CancellationToken cancellationToken)
+		public async Task ConfirmConnectionAsync(TimeSpan connectionConfirmationTimeout, IEnumerable<long> amountsToRequest, IEnumerable<long> vsizesToRequest, RoundStateUpdater roundStatusUpdater, CancellationToken cancellationToken)
 		{
-			while (!await TryConfirmConnectionAsync(amountsToRequest, vsizesToRequest, cancellationToken).ConfigureAwait(false))
+			do
 			{
-				await Task.Delay(connectionConfirmationTimeout / 2, cancellationToken).ConfigureAwait(false);
+				using CancellationTokenSource timeout = new(connectionConfirmationTimeout / 2);
+				using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token);
+
+				try
+				{
+					await roundStatusUpdater
+						.CreateRoundAwaiter(
+							RoundId,
+							roundState => roundState.Phase == Phase.ConnectionConfirmation,
+							cts.Token)
+						.ConfigureAwait(false);
+				}
+				catch (OperationCanceledException)
+				{
+					cancellationToken.ThrowIfCancellationRequested();
+				}
 			}
+			while (!await TryConfirmConnectionAsync(amountsToRequest, vsizesToRequest, cancellationToken).ConfigureAwait(false));
 		}
 
 		private async Task<bool> TryConfirmConnectionAsync(IEnumerable<long> amountsToRequest, IEnumerable<long> vsizesToRequest, CancellationToken cancellationToken)
