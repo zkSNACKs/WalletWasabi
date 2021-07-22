@@ -40,9 +40,20 @@
                                 ToolTip.Tip="Paste"
                                 NormalIcon="{StaticResource paste_regular}"
                                 ClickIcon="{StaticResource copy_confirmed}" />
+              <c:AnimatedButton KeyboardNavigation.IsTabStop="False"
+                                Focusable="False"
+                                Command="{Binding QRCommand}"
+                                ToolTip.Tip="QRReader"
+                                NormalIcon="{StaticResource qr_code_regular}" />
             </StackPanel>
           </TextBox.InnerRightContent>
         </TextBox>
+      </DockPanel>
+      <!-- QR Camera -->
+      <DockPanel  DockPanel.Dock="Top" Margin="0,0,0,6" IsVisible="{Binding IsQrPanelVisible}">
+        <Label DockPanel.Dock="Left" Content="_QR Camera:" Target="qrcamera" />
+        <Label DockPanel.Dock="Left" IsVisible="{Binding IsCameraLoadingAnimationVisible}" Content="_Loading camera..." Opacity="0.6"></Label>
+        <Image Source="{Binding QrImage}" Width="275" Height="275" Name="qrImage" />
       </DockPanel>
       <!-- Amount -->
       <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">

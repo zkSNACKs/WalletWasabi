@@ -41,38 +41,20 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="UnitTests\QrCode\QrTestResources\AddressTest1.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		<None Update="UnitTests\QrDecode\QrResources\AddressTest1.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="UnitTests\QrCode\QrTestResources\AddressTest2.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		<None Update="UnitTests\QrDecode\QrResources\AddressTest2.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="UnitTests\QrCode\QrTestResources\mouseOverQR.jpg">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		<None Update="UnitTests\QrDecode\QrResources\qr-embed-logos.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="UnitTests\QrCode\QrTestResources\DoubleQRCode.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		<None Update="UnitTests\QrDecode\QrResources\QrByPhone.jpg">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="UnitTests\QrCode\QrTestResources\NotBitcoinAddress.jpg">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="UnitTests\QrCode\QrTestResources\Payment_details_included.jpg">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="UnitTests\QrCode\QrTestResources\QRBrick.jpg">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="UnitTests\QrCode\QrTestResources\QrByPhone.jpg">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="UnitTests\QrCode\QrTestResources\QRwithZebraBackground.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="UnitTests\QrCode\QrTestResources\Random_address_starting_with_1.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="UnitTests\QrCode\QrTestResources\Text_QR-code.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		<None Update="UnitTests\QrDecode\QrResources\QRwithZebraBackground.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="xunit.runner.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>

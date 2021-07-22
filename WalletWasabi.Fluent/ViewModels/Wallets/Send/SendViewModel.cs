@@ -9,19 +9,15 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Threading;
+using Avalonia.Media.Imaging;
 using DynamicData;
 using DynamicData.Binding;
 using NBitcoin;
 using NBitcoin.Payment;
 using ReactiveUI;
 using WalletWasabi.Blockchain.Analysis.Clustering;
-using WalletWasabi.Exceptions;
-using WalletWasabi.Fluent.Helpers;
 using WalletWasabi.Fluent.Models;
 using WalletWasabi.Fluent.Validation;
-using WalletWasabi.Fluent.ViewModels.Dialogs;
-using WalletWasabi.Fluent.ViewModels.Dialogs.Base;
-using WalletWasabi.Fluent.ViewModels.NavBar;
 using WalletWasabi.Fluent.ViewModels.Navigation;
 using WalletWasabi.Logging;
 using WalletWasabi.Models;
@@ -31,6 +27,7 @@ using WalletWasabi.Userfacing;
 using WalletWasabi.Wallets;
 using WalletWasabi.WebClients.PayJoin;
 using Constants = WalletWasabi.Helpers.Constants;
+using System.Reactive.Concurrency;
 
 namespace WalletWasabi.Fluent.ViewModels.Wallets.Send
 {
@@ -45,7 +42,6 @@ namespace WalletWasabi.Fluent.ViewModels.Wallets.Send
 	{
 		private readonly Wallet _wallet;
 		private readonly TransactionInfo _transactionInfo;
-
 		[AutoNotify] private string _to;
 		[AutoNotify] private decimal _amountBtc;
 		[AutoNotify] private decimal _exchangeRate;
@@ -54,7 +50,11 @@ namespace WalletWasabi.Fluent.ViewModels.Wallets.Send
 		[AutoNotify] private ObservableCollection<string> _labels;
 		[AutoNotify] private bool _isPayJoin;
 		[AutoNotify] private string? _payJoinEndPoint;
+		[AutoNotify] private WriteableBitmap? _qrImage;
+		[AutoNotify] private bool _isQrPanelVisible;
+		[AutoNotify] private bool _isCameraLoadingAnimationVisible;
 
+		private WebcamQrReader _qrReader;
 		private bool _parsingUrl;
 
 		public SendViewModel(Wallet wallet)
@@ -63,9 +63,44 @@ namespace WalletWasabi.Fluent.ViewModels.Wallets.Send
 			_wallet = wallet;
 			_transactionInfo = new TransactionInfo();
 			_labels = new ObservableCollection<string>();
-
+			_isQrPanelVisible = false;
+			_isCameraLoadingAnimationVisible = false;
+			_qrReader = new(_wallet.Network);
 			ExchangeRate = _wallet.Synchronizer.UsdExchangeRate;
 			PriorLabels = new();
+
+			Observable.FromEventPattern<WriteableBitmap>(_qrReader, nameof(_qrReader.NewImageArrived))
+				.ObserveOn(RxApp.MainThreadScheduler)
+				.Subscribe(args =>
+				{
+					if (IsCameraLoadingAnimationVisible == true)
+					{
+						IsCameraLoadingAnimationVisible = false;
+					}
+					QrImage = args.EventArgs;
+				});
+
+			Observable.FromEventPattern<string>(_qrReader, nameof(_qrReader.CorrectAddressFound))
+				.ObserveOn(RxApp.MainThreadScheduler)
+				.Subscribe(async args =>
+				{
+					To = args.EventArgs;
+					await _qrReader.StopScanningAsync();
+					IsQrPanelVisible = false;
+				});
+
+			Observable.FromEventPattern<string>(_qrReader, nameof(_qrReader.InvalidAddressFound))
+				.ObserveOn(RxApp.MainThreadScheduler)
+				.Subscribe(args => To = args.EventArgs);
+
+			Observable.FromEventPattern<Exception>(_qrReader, nameof(_qrReader.ErrorOccured))
+				.ObserveOn(RxApp.MainThreadScheduler)
+				.Subscribe(async args =>
+			   {
+				   IsQrPanelVisible = false;
+				   await _qrReader.StopScanningAsync();
+				   await ShowErrorAsync(Title, args.EventArgs.Message, "Something went wrong");
+			   });
 
 			this.ValidateProperty(x => x.To, ValidateToField);
 			this.ValidateProperty(x => x.AmountBtc, ValidateAmount);
@@ -97,6 +132,15 @@ namespace WalletWasabi.Fluent.ViewModels.Wallets.Send
 
 			PasteCommand = ReactiveCommand.CreateFromTask(async () => await OnPasteAsync());
 			AutoPasteCommand = ReactiveCommand.CreateFromTask(async () => await OnAutoPasteAsync());
+			QRCommand = ReactiveCommand.Create(async () =>
+			{
+				if (!_qrReader.IsRunning)
+				{
+					IsCameraLoadingAnimationVisible = true;
+					IsQrPanelVisible = true;
+					await _qrReader.StartScanningAsync();
+				}
+			});
 
 			var nextCommandCanExecute =
 				this.WhenAnyValue(x => x.Labels, x => x.AmountBtc, x => x.To).Select(_ => Unit.Default)
@@ -120,6 +164,8 @@ namespace WalletWasabi.Fluent.ViewModels.Wallets.Send
 		public ICommand PasteCommand { get; }
 
 		public ICommand AutoPasteCommand { get; }
+
+		public ICommand QRCommand { get; }
 
 		private async Task OnAutoPasteAsync()
 		{
@@ -148,7 +194,7 @@ namespace WalletWasabi.Fluent.ViewModels.Wallets.Send
 		private IPayjoinClient? GetPayjoinClient(string endPoint)
 		{
 			if (!string.IsNullOrWhiteSpace(endPoint) &&
-			    Uri.IsWellFormedUriString(endPoint, UriKind.Absolute))
+				Uri.IsWellFormedUriString(endPoint, UriKind.Absolute))
 			{
 				var payjoinEndPointUri = new Uri(endPoint);
 				if (!Services.Config.UseTor)
@@ -310,6 +356,19 @@ namespace WalletWasabi.Fluent.ViewModels.Wallets.Send
 			RxApp.MainThreadScheduler.Schedule(async () => await OnAutoPasteAsync());
 
 			base.OnNavigatedTo(inHistory, disposables);
+		}
+
+		protected override void OnNavigatedFrom(bool isInHistory)
+		{
+			try
+			{
+				RxApp.MainThreadScheduler.Schedule(async () => await _qrReader.StopScanningAsync());
+				base.OnNavigatedFrom(isInHistory);
+			}
+			catch (Exception exc)
+			{
+				Logger.LogError(exc);
+			}
 		}
 	}
 }
