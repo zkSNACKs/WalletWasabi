@@ -20,16 +20,16 @@
                  EnableBack="{Binding EnableBack}"
                  EnableNext="True" NextContent="Continue"
                  EnableSkip="{Binding IsSkipEnable}">
-    <ScrollViewer>
-      <ItemsControl HorizontalAlignment="Center" VerticalAlignment="Center" Items="{Binding ConfirmationWords}">
+    <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Center" MaxWidth="350">
+      <ItemsControl Items="{Binding ConfirmationWords}">
         <i:Interaction.Behaviors>
           <behaviors:FocusFirstTextBoxInItemsControlBehavior />
         </i:Interaction.Behaviors>
         <ItemsControl.ItemTemplate>
           <DataTemplate>
-            <DockPanel HorizontalAlignment="Left">
+            <DockPanel>
               <Label Content="{Binding Index, StringFormat=Recovery word {0}}" DockPanel.Dock="Top" />
-              <TextBox Watermark="Type the word here..." Classes="hasCheckMarkBoolean" validation:CheckMarkStatus.IsEnabled="{Binding IsConfirmed}" Text="{Binding Input}" IsEnabled="{Binding !IsConfirmed}" DockPanel.Dock="Top" Width="350">
+              <TextBox Watermark="Type the word here..." Classes="hasCheckMarkBoolean" validation:CheckMarkStatus.IsEnabled="{Binding IsConfirmed}" Text="{Binding Input}" IsEnabled="{Binding !IsConfirmed}" DockPanel.Dock="Top">
                 <i:Interaction.Behaviors>
                   <behaviors:FocusNextItemBehavior IsFocused="{Binding !IsConfirmed}" />
                 </i:Interaction.Behaviors>

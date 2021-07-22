@@ -3,6 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:c="using:WalletWasabi.Fluent.Controls"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:behaviors="using:WalletWasabi.Fluent.Behaviors"
              xmlns:hardwareWallet="using:WalletWasabi.Fluent.ViewModels.AddWallet.HardwareWallet"
              xmlns:conv="clr-namespace:WalletWasabi.Fluent.Converters"
              mc:Ignorable="d" d:DesignWidth="428" d:DesignHeight="371"
@@ -17,23 +19,28 @@
                  EnableBack="{Binding EnableBack}"
                  EnableNext="{Binding ConfirmationRequired}" NextContent="Continue"
                  ScrollViewer.VerticalScrollBarVisibility="Disabled">
-    <Grid RowDefinitions="*,3*,Auto">
-      <Viewbox MaxHeight="150" Grid.Row="0" DockPanel.Dock="Top" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0 30 0 0">
-        <StackPanel Spacing="40" Orientation="Horizontal">
+    <DockPanel>
+      <Viewbox MaxHeight="150" DockPanel.Dock="Top" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0 30 0 0">
+        <i:Interaction.Behaviors>
+          <behaviors:DynamicHeightBehavior HeightMultiplier="0.3" HideThresholdHeight="50"/>
+        </i:Interaction.Behaviors>
+        <StackPanel Orientation="Horizontal">
           <Image Height="100" Source="{Binding Ledger, Converter={x:Static conv:WalletIconConverter.WalletTypeToImage}}" />
           <Image Height="100" Source="{Binding Coldcard, Converter={x:Static conv:WalletIconConverter.WalletTypeToImage}}" />
           <Image Height="100" Source="{Binding Trezor, Converter={x:Static conv:WalletIconConverter.WalletTypeToImage}}" />
           <Image Height="100" Source="{Binding Generic, Converter={x:Static conv:WalletIconConverter.WalletTypeToImage}}" />
         </StackPanel>
       </Viewbox>
-      <Panel HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1">
+      <Button Command="{Binding OpenBrowserCommand}" Content="More information and help with Hardware Wallets" Classes="h8 plain activeHyperLink" HorizontalAlignment="Center" DockPanel.Dock="Bottom" VerticalAlignment="Bottom"/>
+      <Panel HorizontalAlignment="Center" VerticalAlignment="Center">
         <DockPanel>
           <TextBlock Text="{Binding Message}" TextWrapping="Wrap" TextAlignment="Center" DockPanel.Dock="Top"/>
-          <Button IsVisible="{Binding ExistingWalletFound}" Margin="0 15 0 0" Command="{Binding NavigateToExistingWalletLoginCommand}" Content="Open wallet" Classes="h7 plain activeHyperLink" HorizontalAlignment="Center" VerticalAlignment="Bottom" DockPanel.Dock="Bottom"/>
+          <Button IsVisible="{Binding ExistingWalletFound}" Margin="0 5 0 0" Command="{Binding NavigateToExistingWalletLoginCommand}" Content="Open wallet" Classes="h7 plain activeHyperLink" HorizontalAlignment="Center" VerticalAlignment="Bottom" DockPanel.Dock="Bottom"/>
         </DockPanel>
-        <c:ProgressRing IsVisible="{Binding !ConfirmationRequired}" Margin="15" IsIndeterminate="True" Height="100" Width="100" />
+        <Viewbox IsVisible="{Binding !ConfirmationRequired}" MaxHeight="100" Margin="15">
+          <c:ProgressRing IsIndeterminate="True" Height="100" Width="100" />
+        </Viewbox>
       </Panel>
-      <Button Command="{Binding OpenBrowserCommand}" Content="More information and help with Hardware Wallets" Classes="h8 plain activeHyperLink" HorizontalAlignment="Center" Grid.Row="2"/>
-    </Grid>
+    </DockPanel>
   </c:ContentArea>
 </UserControl>

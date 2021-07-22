@@ -13,7 +13,8 @@
                  CancelContent="Cancel"
                  EnableCancel="{Binding EnableCancel}"
                  EnableBack="{Binding EnableBack}"
-                 EnableNext="True" NextContent="Continue" FocusNext="True">
+                 EnableNext="True" NextContent="Continue" FocusNext="True"
+                 ScrollViewer.HorizontalScrollBarVisibility="Auto">
     <ItemsControl Items="{Binding MnemonicWords}" VerticalAlignment="Center" HorizontalAlignment="Center">
       <ItemsControl.Styles>
         <Style Selector="TextBlock">
