@@ -155,7 +155,7 @@ namespace WalletWasabi.WabiSabi.Client
 					Array.Empty<TaskCompletionSource<Credential>>());
 
 				var task = smartRequestNode
-					.StartOutputRegistrationAsync(bobClient, node.EffectiveCost, txOut.ScriptPubKey, cancellationToken)
+					.StartOutputRegistrationAsync(bobClient, txOut.ScriptPubKey, cancellationToken)
 					.ContinueWith((t) =>
 					{
 						if (t.IsFaulted && t.Exception is { } exception)

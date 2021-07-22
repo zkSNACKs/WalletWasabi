@@ -71,7 +71,6 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Client
 			var bobClient = new BobClient(round.Id, bobArenaClient);
 
 			await bobClient.RegisterOutputAsync(
-				Money.Coins(0.25m),
 				destination,
 				aliceClient.IssuedAmountCredentials.Take(ProtocolConstants.CredentialNumber),
 				aliceClient.IssuedVsizeCredentials.Take(ProtocolConstants.CredentialNumber),
@@ -79,7 +78,9 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Client
 
 			var bob = Assert.Single(round.Bobs);
 			Assert.Equal(destination, bob.Script);
-			Assert.Equal(25_000_000, bob.CredentialAmount);
+
+			var credentialAmountSum = aliceClient.IssuedAmountCredentials.Take(ProtocolConstants.CredentialNumber).Sum(x => x.Value);
+			Assert.Equal(credentialAmountSum, bob.CredentialAmount);
 		}
 	}
 }

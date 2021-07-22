@@ -224,7 +224,7 @@ namespace WalletWasabi.Tests.Helpers
 				new[] { alice.CalculateRemainingAmountCredentials(round.FeeRate).Satoshi },
 				amZeroCredentials, // FIXME doesn't make much sense
 				CancellationToken.None);
-			long startingVsizeCredentialAmount = alice.CalculateRemainingVsizeCredentials(round.MaxVsizeAllocationPerAlice);
+			long startingVsizeCredentialAmount = vsize ?? alice.CalculateRemainingVsizeCredentials(round.MaxVsizeAllocationPerAlice);
 			var (vsCredentialRequest, weValid) = vsClient.CreateRequest(
 				new[] { startingVsizeCredentialAmount },
 				vsZeroCredentials, // FIXME doesn't make much sense
@@ -236,22 +236,11 @@ namespace WalletWasabi.Tests.Helpers
 			var vsizeCredentials = vsClient.HandleResponse(weResp, weValid);
 
 			script ??= BitcoinFactory.CreateScript();
-			var (realAmountCredentialRequest, _) = amClient.CreateRequest(
-				Array.Empty<long>(),
+			var (realAmountCredentialRequest, _) = amClient.CreatePresentationRequest(
 				amountCredentials,
 				CancellationToken.None);
 
-			try
-			{
-				vsize ??= script.EstimateOutputVsize();
-			}
-			catch (NotImplementedException)
-			{
-				vsize = 25;
-			}
-
-			var (realVsizeCredentialRequest, _) = vsClient.CreateRequest(
-				new[] { startingVsizeCredentialAmount - (long)vsize },
+			var (realVsizeCredentialRequest, _) = vsClient.CreatePresentationRequest(
 				vsizeCredentials,
 				CancellationToken.None);
 

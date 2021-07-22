@@ -39,7 +39,6 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PhaseStepping
 			var bobClient = new BobClient(round.Id, arenaClient);
 			using var destKey1 = new Key();
 			await bobClient.RegisterOutputAsync(
-				coin1.Amount - round.FeeRate.GetFee(coin1.ScriptPubKey.EstimateInputVsize()),
 				destKey1.PubKey.WitHash.ScriptPubKey,
 				amountCredentials1.Take(ProtocolConstants.CredentialNumber),
 				vsizeCredentials1.Take(ProtocolConstants.CredentialNumber),
@@ -47,7 +46,6 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PhaseStepping
 
 			using var destKey2 = new Key();
 			await bobClient.RegisterOutputAsync(
-				coin2.Amount - round.FeeRate.GetFee(coin2.ScriptPubKey.EstimateInputVsize()),
 				destKey2.PubKey.WitHash.ScriptPubKey,
 				amountCredentials2.Take(ProtocolConstants.CredentialNumber),
 				vsizeCredentials2.Take(ProtocolConstants.CredentialNumber),
@@ -91,7 +89,6 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PhaseStepping
 			var bobClient = new BobClient(round.Id, arenaClient);
 			using var destKey = new Key();
 			await bobClient.RegisterOutputAsync(
-				coin1.Amount - round.FeeRate.GetFee(coin1.ScriptPubKey.EstimateInputVsize()),
 				destKey.PubKey.WitHash.ScriptPubKey,
 				amountCredentials1.Take(ProtocolConstants.CredentialNumber),
 				vsizeCredentials1.Take(ProtocolConstants.CredentialNumber),
@@ -132,14 +129,12 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PhaseStepping
 			using var destKey1 = new Key();
 			using var destKey2 = new Key();
 			await bobClient.RegisterOutputAsync(
-				coin1.Amount - round.FeeRate.GetFee(coin1.ScriptPubKey.EstimateInputVsize()),
 				destKey1.PubKey.WitHash.ScriptPubKey,
 				amountCredentials1.Take(ProtocolConstants.CredentialNumber),
 				vsizeCredentials1.Take(ProtocolConstants.CredentialNumber),
 				CancellationToken.None);
 
 			await bobClient.RegisterOutputAsync(
-				coin2.Amount - round.FeeRate.GetFee(coin2.ScriptPubKey.EstimateInputVsize()),
 				destKey2.PubKey.WitHash.ScriptPubKey,
 				amountCredentials2.Take(ProtocolConstants.CredentialNumber),
 				vsizeCredentials2.Take(ProtocolConstants.CredentialNumber),
@@ -186,7 +181,6 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PhaseStepping
 			var bobClient = new BobClient(round.Id, arenaClient);
 			using var destKey = new Key();
 			await bobClient.RegisterOutputAsync(
-				coin1.Amount - round.FeeRate.GetFee(coin1.ScriptPubKey.EstimateInputVsize()),
 				destKey.PubKey.WitHash.ScriptPubKey,
 				amountCredentials1.Take(ProtocolConstants.CredentialNumber),
 				vsizeCredentials1.Take(ProtocolConstants.CredentialNumber),

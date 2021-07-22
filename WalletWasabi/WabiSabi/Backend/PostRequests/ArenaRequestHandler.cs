@@ -57,12 +57,12 @@ namespace WalletWasabi.WabiSabi.Backend.PostRequests
 			}
 		}
 
-		public async Task<OutputRegistrationResponse> RegisterOutputAsync(OutputRegistrationRequest request, CancellationToken cancellationToken)
+		public async Task RegisterOutputAsync(OutputRegistrationRequest request, CancellationToken cancellationToken)
 		{
 			DisposeGuard();
 			using (RunningTasks.RememberWith(RunningRequests))
 			{
-				return await Arena.RegisterOutputAsync(request).ConfigureAwait(false);
+				await Arena.RegisterOutputAsync(request).ConfigureAwait(false);
 			}
 		}
 

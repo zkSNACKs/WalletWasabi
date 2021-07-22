@@ -87,16 +87,6 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Models
 		}
 
 		[Fact]
-		public void OutputRegistrationResponseMessageSerialization()
-		{
-			var message = new OutputRegistrationResponse(
-				CreateCredentialsResponse(),
-				CreateCredentialsResponse());
-
-			AssertSerialization(message);
-		}
-
-		[Fact]
 		public void ReissueCredentialRequestMessageSerialization()
 		{
 			var message = new ReissueCredentialRequest(

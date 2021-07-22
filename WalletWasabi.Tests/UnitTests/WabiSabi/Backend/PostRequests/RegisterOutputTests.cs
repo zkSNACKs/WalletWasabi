@@ -26,11 +26,8 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PostRequests
 			await using ArenaRequestHandler handler = new(cfg, new Prison(), arena, new MockRpcClient());
 
 			var req = WabiSabiFactory.CreateOutputRegistrationRequest(round);
-			var resp = await handler.RegisterOutputAsync(req, CancellationToken.None);
+			await handler.RegisterOutputAsync(req, CancellationToken.None);
 			Assert.NotEmpty(round.Bobs);
-			Assert.NotNull(resp);
-			Assert.NotNull(resp.AmountCredentials);
-			Assert.NotNull(resp.VsizeCredentials);
 
 			await arena.StopAsync(CancellationToken.None);
 		}

@@ -40,8 +40,8 @@ namespace WalletWasabi.WabiSabi.Client
 		public Task<ConnectionConfirmationResponse> ConfirmConnectionAsync(ConnectionConfirmationRequest request, CancellationToken cancellationToken) =>
 			SendAndReceiveAsync<ConnectionConfirmationRequest, ConnectionConfirmationResponse>(RemoteAction.ConfirmConnection, request, cancellationToken);
 
-		public Task<OutputRegistrationResponse> RegisterOutputAsync(OutputRegistrationRequest request, CancellationToken cancellationToken) =>
-			SendAndReceiveAsync<OutputRegistrationRequest, OutputRegistrationResponse>(RemoteAction.RegisterOutput, request, cancellationToken);
+		public Task RegisterOutputAsync(OutputRegistrationRequest request, CancellationToken cancellationToken) =>
+			SendAndReceiveAsync<OutputRegistrationRequest>(RemoteAction.RegisterOutput, request, cancellationToken);
 
 		public Task<ReissueCredentialResponse> ReissueCredentialAsync(ReissueCredentialRequest request, CancellationToken cancellationToken) =>
 			SendAndReceiveAsync<ReissueCredentialRequest, ReissueCredentialResponse>(RemoteAction.ReissueCredential, request, cancellationToken);

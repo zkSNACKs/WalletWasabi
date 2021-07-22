@@ -43,7 +43,7 @@ namespace WalletWasabi.Backend.Controllers
 
 		[HttpPost("output-registration")]
 		[Idempotent]
-		public Task<OutputRegistrationResponse> RegisterOutputAsync(OutputRegistrationRequest request, CancellationToken cancellableToken)
+		public Task RegisterOutputAsync(OutputRegistrationRequest request, CancellationToken cancellableToken)
 		{
 			return RequestHandler.RegisterOutputAsync(request, cancellableToken);
 		}

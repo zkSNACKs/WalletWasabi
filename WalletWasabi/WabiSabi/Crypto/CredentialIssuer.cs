@@ -108,6 +108,7 @@ namespace WalletWasabi.WabiSabi.Crypto
 			var presented = registrationRequest.Presented ?? Enumerable.Empty<CredentialPresentation>();
 
 			var requestedCount = requested.Count();
+			var requiredNumberOfRequested = registrationRequest.IsPresentationOnlyRequest ? 0 : NumberOfCredentials;
 			if (requestedCount != NumberOfCredentials)
 			{
 				throw new WabiSabiCryptoException(

@@ -62,6 +62,12 @@ namespace WalletWasabi.WabiSabi.Crypto.CredentialRequesting
 		internal bool IsNullRequest => Delta == 0 && !Presented.Any();
 
 		/// <summary>
+		/// Is request for credential presentation only.
+		/// </summary>
+		[JsonIgnore]
+		internal bool IsPresentationOnlyRequest => Delta < 0 && !Requested.Any();
+
+		/// <summary>
 		/// Serial numbers used in the credential presentations.
 		/// </summary>
 		[JsonIgnore]
