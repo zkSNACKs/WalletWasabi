@@ -80,7 +80,7 @@ namespace WalletWasabi.WabiSabi.Backend.PostRequests
 			DisposeGuard();
 			using (RunningTasks.RememberWith(RunningRequests))
 			{
-				return await Arena.ReissuanceAsync(request).ConfigureAwait(false);
+				return Arena.ReissueCredentials(request);
 			}
 		}
 

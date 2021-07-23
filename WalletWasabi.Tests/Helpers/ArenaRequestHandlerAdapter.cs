@@ -29,7 +29,7 @@ namespace WalletWasabi.Tests.Helpers
 			=> arena.RegisterOutputAsync(request);
 
 		public Task<ReissueCredentialResponse> ReissueCredentialAsync(ReissueCredentialRequest request, CancellationToken cancellationToken)
-			=> arena.ReissuanceAsync(request);
+			=> Task.FromResult(arena.ReissueCredentials(request));
 
 		public Task RemoveInputAsync(InputsRemovalRequest request, CancellationToken cancellationToken)
 			=> arena.RemoveInputAsync(request);

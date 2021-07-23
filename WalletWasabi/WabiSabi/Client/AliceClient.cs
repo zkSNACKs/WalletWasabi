@@ -1,14 +1,12 @@
 using NBitcoin;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletWasabi.Crypto;
+using WalletWasabi.Crypto.StrobeProtocol;
 using WalletWasabi.Crypto.ZeroKnowledge;
-using WalletWasabi.Helpers;
 using WalletWasabi.Logging;
-using WalletWasabi.WabiSabi.Backend.Models;
 
 namespace WalletWasabi.WabiSabi.Client
 {
@@ -111,7 +109,12 @@ namespace WalletWasabi.WabiSabi.Client
 			var ownershipProof = OwnershipProof.GenerateCoinJoinInputProof(
 				bitcoinSecret.PrivateKey,
 				new CoinJoinInputCommitmentData("CoinJoinCoordinatorIdentifier", roundId));
-			return new Alice(coin, ownershipProof).Id;
+
+			return StrobeHasher.Create(ProtocolConstants.AliceStrobeDomain)
+				.Append(ProtocolConstants.AliceCoinTxOutStrobeLabel, coin.TxOut)
+				.Append(ProtocolConstants.AliceCoinOutpointStrobeLabel, coin.Outpoint)
+				.Append(ProtocolConstants.AliceOwnershipProofStrobeLabel, ownershipProof)
+				.GetHash();
 		}
 	}
 }

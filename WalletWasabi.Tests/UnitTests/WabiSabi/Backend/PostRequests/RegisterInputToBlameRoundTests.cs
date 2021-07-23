@@ -19,7 +19,7 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PostRequests
 		{
 			WabiSabiConfig cfg = new();
 			var round = WabiSabiFactory.CreateRound(cfg);
-			round.Alices.Add(WabiSabiFactory.CreateAlice());
+			round.Alices.Add(WabiSabiFactory.CreateAlice(round));
 			Round blameRound = WabiSabiFactory.CreateBlameRound(round, cfg);
 			using Arena arena = await WabiSabiFactory.CreateAndStartArenaAsync(cfg, round, blameRound);
 			using Key key = new();
@@ -36,9 +36,9 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PostRequests
 		[Fact]
 		public async Task InputWhitelistedAsync()
 		{
-			var alice = WabiSabiFactory.CreateAlice();
 			WabiSabiConfig cfg = new();
 			var round = WabiSabiFactory.CreateRound(cfg);
+			var alice = WabiSabiFactory.CreateAlice(round);
 			round.Alices.Add(alice);
 			Round blameRound = WabiSabiFactory.CreateBlameRound(round, cfg);
 			using Arena arena = await WabiSabiFactory.CreateAndStartArenaAsync(cfg, round, blameRound);
@@ -58,12 +58,13 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PostRequests
 		[Fact]
 		public async Task InputWhitelistedButBannedAsync()
 		{
-			using Key key = new();
-			var alice = WabiSabiFactory.CreateAlice(key);
-			var bannedCoin = alice.Coin.Outpoint;
-
 			WabiSabiConfig cfg = new();
 			var round = WabiSabiFactory.CreateRound(cfg);
+
+			using Key key = new();
+			var alice = WabiSabiFactory.CreateAlice(key, round);
+			var bannedCoin = alice.Coin.Outpoint;
+
 			round.Alices.Add(alice);
 			Round blameRound = WabiSabiFactory.CreateBlameRound(round, cfg);
 			var mockRpc = WabiSabiFactory.CreatePreconfiguredRpcClient(alice.Coin);

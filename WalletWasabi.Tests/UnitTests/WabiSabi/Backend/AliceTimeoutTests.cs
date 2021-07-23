@@ -18,7 +18,7 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend
 		public async Task AliceTimesoutAsync()
 		{
 			// Alice times out when its deadline is reached.
-			WabiSabiConfig cfg = new();
+			WabiSabiConfig cfg = new() { ConnectionConfirmationTimeout = TimeSpan.FromSeconds(5) };
 			var round = WabiSabiFactory.CreateRound(cfg);
 			using Key key = new();
 			var coin = WabiSabiFactory.CreateCoin(key);
@@ -33,8 +33,8 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend
 			await aliceClient.RegisterInputAsync(CancellationToken.None);
 
 			var alice = Assert.Single(round.Alices);
-			alice.Deadline = DateTimeOffset.UtcNow - TimeSpan.FromMilliseconds(1);
-			await arena.TriggerAndWaitRoundAsync(TimeSpan.FromSeconds(21));
+
+			await Task.Delay(TimeSpan.FromSeconds(10));
 			Assert.Empty(round.Alices);
 
 			await arena.StopAsync(CancellationToken.None);
@@ -48,7 +48,7 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend
 			WabiSabiConfig cfg = new();
 			var round = WabiSabiFactory.CreateRound(cfg);
 			round.SetPhase(Phase.ConnectionConfirmation);
-			var alice = WabiSabiFactory.CreateAlice();
+			var alice = WabiSabiFactory.CreateAlice(round);
 			round.Alices.Add(alice);
 			using Arena arena = await WabiSabiFactory.CreateAndStartArenaAsync(cfg, round);
 
@@ -72,7 +72,7 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend
 			// even though the deadline is reached and still in input reg.
 			WabiSabiConfig cfg = new() { StandardInputRegistrationTimeout = TimeSpan.Zero };
 			var round = WabiSabiFactory.CreateRound(cfg);
-			var alice = WabiSabiFactory.CreateAlice();
+			var alice = WabiSabiFactory.CreateAlice(round);
 			round.Alices.Add(alice);
 			using Arena arena = await WabiSabiFactory.CreateAndStartArenaAsync(cfg, round);
 
@@ -96,10 +96,10 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend
 			// even though the deadline is reached and still in input reg.
 			WabiSabiConfig cfg = new() { MaxInputCountByRound = 3 };
 			var round = WabiSabiFactory.CreateRound(cfg);
-			var alice = WabiSabiFactory.CreateAlice();
+			var alice = WabiSabiFactory.CreateAlice(round);
 			round.Alices.Add(alice);
-			round.Alices.Add(WabiSabiFactory.CreateAlice());
-			round.Alices.Add(WabiSabiFactory.CreateAlice());
+			round.Alices.Add(WabiSabiFactory.CreateAlice(round));
+			round.Alices.Add(WabiSabiFactory.CreateAlice(round));
 			using Arena arena = await WabiSabiFactory.CreateAndStartArenaAsync(cfg, round);
 
 			var req = WabiSabiFactory.CreateConnectionConfirmationRequest(round);
@@ -121,7 +121,7 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend
 			// Alice's deadline is updated by connection confirmation.
 			WabiSabiConfig cfg = new();
 			var round = WabiSabiFactory.CreateRound(cfg);
-			var alice = WabiSabiFactory.CreateAlice();
+			var alice = WabiSabiFactory.CreateAlice(round);
 			round.Alices.Add(alice);
 			using Arena arena = await WabiSabiFactory.CreateAndStartArenaAsync(cfg, round);
 

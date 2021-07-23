@@ -99,24 +99,26 @@ namespace WalletWasabi.Tests.Helpers
 			{
 				arena.Rounds.Add(round);
 			}
+
 			await arena.StartAsync(CancellationToken.None).ConfigureAwait(false);
+			await arena.TriggerAndWaitRoundAsync(TimeSpan.FromSeconds(10)).ConfigureAwait(false); // FIXME remove
 			return arena;
 		}
 
-		public static Alice CreateAlice(Coin coin, OwnershipProof ownershipProof)
-			=> new(coin, ownershipProof) { Deadline = DateTimeOffset.UtcNow + TimeSpan.FromHours(1) };
+		public static Alice CreateAlice(Coin coin, OwnershipProof ownershipProof, Round round)
+			=> new(coin, ownershipProof, round) { Deadline = DateTimeOffset.UtcNow + TimeSpan.FromHours(1) };
 
-		public static Alice CreateAlice(Key key, Money amount)
-			=> CreateAlice(CreateCoin(key, amount), CreateOwnershipProof(key));
+		public static Alice CreateAlice(Key key, Money amount, Round round)
+			=> CreateAlice(CreateCoin(key, amount), CreateOwnershipProof(key), round);
 
-		public static Alice CreateAlice(Money amount)
-			=> CreateAlice(new Key(), amount);
+		public static Alice CreateAlice(Money amount, Round round)
+			=> CreateAlice(new Key(), amount, round);
 
-		public static Alice CreateAlice(Key key)
-			=> CreateAlice(key, Money.Coins(1));
+		public static Alice CreateAlice(Key key, Round round)
+			=> CreateAlice(key, Money.Coins(1), round);
 
-		public static Alice CreateAlice()
-			=> CreateAlice(new Key(), Money.Coins(1));
+		public static Alice CreateAlice(Round round)
+			=> CreateAlice(new Key(), Money.Coins(1), round);
 
 		public static ArenaClient CreateArenaClient(Arena arena)
 		{
@@ -185,7 +187,7 @@ namespace WalletWasabi.Tests.Helpers
 		{
 			var (amClient, vsClient, _, _, amZeroCredentials, vsZeroCredentials) = CreateWabiSabiClientsAndIssuers(round);
 
-			var alice = round.Alices.FirstOrDefault() ?? CreateAlice();
+			var alice = round.Alices.FirstOrDefault() ?? CreateAlice(round);
 			var (realAmountCredentialRequest, _) = amClient.CreateRequest(
 				new[] { amount?.Satoshi ?? alice.CalculateRemainingAmountCredentials(round.FeeRate).Satoshi },
 				amZeroCredentials,
@@ -219,7 +221,7 @@ namespace WalletWasabi.Tests.Helpers
 		{
 			var (amClient, vsClient, amIssuer, vsIssuer, amZeroCredentials, vsZeroCredentials) = CreateWabiSabiClientsAndIssuers(round);
 
-			var alice = round.Alices.FirstOrDefault() ?? CreateAlice();
+			var alice = round.Alices.FirstOrDefault() ?? CreateAlice(round);
 			var (amCredentialRequest, amValid) = amClient.CreateRequest(
 				new[] { alice.CalculateRemainingAmountCredentials(round.FeeRate).Satoshi },
 				amZeroCredentials, // FIXME doesn't make much sense

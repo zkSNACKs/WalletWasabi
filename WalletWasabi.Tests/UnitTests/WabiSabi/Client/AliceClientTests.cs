@@ -44,12 +44,23 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Client
 				roundState.CreateAmountCredentialClient(insecureRandom),
 				roundState.CreateVsizeCredentialClient(insecureRandom),
 				wabiSabiApi);
-			Assert.Equal(Phase.InputRegistration, arena.Rounds.First().Phase);
+			Assert.Equal(Phase.InputRegistration, arena.Rounds.Single().Phase);
 
 			var bitcoinSecret = km.GetSecrets("", coin1.ScriptPubKey).Single().PrivateKey.GetBitcoinSecret(Network.Main);
 
 			var aliceClient = new AliceClient(round.Id, arenaClient, coin1.Coin, round.FeeRate, bitcoinSecret);
 			await aliceClient.RegisterInputAsync(CancellationToken.None);
+
+			Assert.Equal(Phase.InputRegistration, arena.Rounds.Single().Phase);
+
+			await arena.TriggerAndWaitRoundAsync(TimeSpan.FromMinutes(1));
+
+			Assert.Equal(Phase.ConnectionConfirmation, round.Phase);
+			Assert.Equal(1, arena.Rounds.Count(r => r.Phase == Phase.ConnectionConfirmation));
+
+			// Another round is also created
+			Assert.Equal(1, arena.Rounds.Count(r => r.Phase == Phase.InputRegistration));
+			Assert.Equal(2, arena.Rounds.Count);
 
 			Task confirmationTask = aliceClient.ConfirmConnectionAsync(
 				TimeSpan.FromSeconds(1),
@@ -60,7 +71,7 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Client
 			await arena.TriggerAndWaitRoundAsync(TimeSpan.FromMinutes(1));
 			await confirmationTask;
 
-			Assert.Equal(Phase.ConnectionConfirmation, arena.Rounds.First().Phase);
+			Assert.Equal(Phase.OutputRegistration, round.Phase);
 		}
 	}
 }

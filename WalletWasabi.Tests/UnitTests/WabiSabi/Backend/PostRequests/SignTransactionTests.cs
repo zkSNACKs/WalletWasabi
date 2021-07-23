@@ -23,7 +23,7 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PostRequests
 			WabiSabiConfig cfg = new();
 			var round = WabiSabiFactory.CreateRound(cfg);
 			using Key key = new();
-			Alice alice = WabiSabiFactory.CreateAlice(key: key);
+			Alice alice = WabiSabiFactory.CreateAlice(key: key, round: round);
 			round.Alices.Add(alice);
 			round.CoinjoinState = round.AddInput(alice.Coin).Finalize();
 			round.SetPhase(Phase.TransactionSigning);
@@ -79,9 +79,9 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PostRequests
 			WabiSabiConfig cfg = new();
 			var round = WabiSabiFactory.CreateRound(cfg);
 			using Key key1 = new();
-			Alice alice1 = WabiSabiFactory.CreateAlice(key: key1);
+			Alice alice1 = WabiSabiFactory.CreateAlice(key: key1, round: round);
 			using Key key2 = new();
-			Alice alice2 = WabiSabiFactory.CreateAlice(key: key2);
+			Alice alice2 = WabiSabiFactory.CreateAlice(key: key2, round: round);
 			round.Alices.Add(alice1);
 			round.Alices.Add(alice2);
 			round.CoinjoinState = round.Assert<ConstructionState>().AddInput(alice1.Coin).AddInput(alice2.Coin).Finalize();

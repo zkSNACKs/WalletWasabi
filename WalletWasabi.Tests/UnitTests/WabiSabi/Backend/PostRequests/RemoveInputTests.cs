@@ -24,7 +24,7 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PostRequests
 			WabiSabiConfig cfg = new();
 			var round = WabiSabiFactory.CreateRound(cfg);
 			var initialRemaining = round.RemainingInputVsizeAllocation;
-			var alice = WabiSabiFactory.CreateAlice();
+			var alice = WabiSabiFactory.CreateAlice(round);
 			round.Alices.Add(alice);
 			Assert.True(round.RemainingInputVsizeAllocation < initialRemaining);
 
@@ -64,11 +64,13 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Backend.PostRequests
 		public async Task WrongPhaseAsync()
 		{
 			WabiSabiConfig cfg = new();
-			using Arena arena = await WabiSabiFactory.CreateAndStartArenaAsync(cfg);
-			await arena.TriggerAndWaitRoundAsync(TimeSpan.FromSeconds(21));
-			var round = arena.Rounds.First();
+			var round = WabiSabiFactory.CreateRound(cfg);
+			var alice = WabiSabiFactory.CreateAlice(round);
+			round.Alices.Add(alice);
+			using Arena arena = await WabiSabiFactory.CreateAndStartArenaAsync(cfg, round);
+			await arena.TriggerAndWaitRoundAsync(TimeSpan.FromSeconds(21)).ConfigureAwait(false);
 
-			var req = new InputsRemovalRequest(round.Id, BitcoinFactory.CreateUint256());
+			var req = new InputsRemovalRequest(round.Id, alice.Id);
 			foreach (Phase phase in Enum.GetValues(typeof(Phase)))
 			{
 				if (phase != Phase.InputRegistration)
