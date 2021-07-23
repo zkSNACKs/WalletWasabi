@@ -7,6 +7,8 @@ using WalletWasabi.Fluent.Helpers;
 using WalletWasabi.Gui;
 using WalletWasabi.Gui.Models;
 using WalletWasabi.Logging;
+using System.Windows.Input;
+using DynamicData;
 
 namespace WalletWasabi.Fluent.ViewModels.Settings
 {
@@ -55,22 +57,20 @@ namespace WalletWasabi.Fluent.ViewModels.Settings
 				.Skip(1)
 				.Subscribe(x => Services.UiConfig.Autocopy = x);
 
-			this.WhenAnyValue(x => x.RunOnSystemStartup)
-				.ObserveOn(RxApp.MainThreadScheduler)
-				.Skip(1)
-				.Subscribe(async runOnStartup =>
+			StartUpCommand = ReactiveCommand.Create(async () =>
+			{
+				try
 				{
-					try
-					{
-						await StartupHelper.ModifyStartupSettingAsync(runOnStartup);
-						Services.UiConfig.RunOnSystemStartup = runOnStartup;
-					}
-					catch (Exception ex)
-					{
-						Logger.LogError(ex);
-						await ShowErrorAsync(Title, "Couldn't save your change, please see the logs for further information.", "Error occured.");
-					}
-				});
+					await StartupHelper.ModifyStartupSettingAsync(RunOnSystemStartup);
+					Services.UiConfig.RunOnSystemStartup = RunOnSystemStartup;
+				}
+				catch (Exception ex)
+				{
+					Logger.LogError(ex);
+					RunOnSystemStartup = !RunOnSystemStartup;
+					await ShowErrorAsync(Title, "Couldn't save your change, please see the logs for further information.", "Error occured.");
+				}
+			});
 
 			this.WhenAnyValue(x => x.CustomFee)
 				.ObserveOn(RxApp.TaskpoolScheduler)
@@ -87,6 +87,8 @@ namespace WalletWasabi.Fluent.ViewModels.Settings
 				.Skip(1)
 				.Subscribe(x => Services.UiConfig.FeeDisplayFormat = (int)x);
 		}
+
+		public ICommand StartUpCommand { get; }
 
 		public IEnumerable<FeeDisplayFormat> FeeDisplayFormats =>
 			Enum.GetValues(typeof(FeeDisplayFormat)).Cast<FeeDisplayFormat>();

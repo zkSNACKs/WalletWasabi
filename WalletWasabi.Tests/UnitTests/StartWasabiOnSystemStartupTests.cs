@@ -18,8 +18,8 @@ namespace WalletWasabi.Tests.UnitTests
 			}
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
-				await Assert.ThrowsAsync<NotImplementedException>(async () => await StartupHelper.ModifyStartupSettingAsync(true));
-				await Assert.ThrowsAsync<NotImplementedException>(async () => await StartupHelper.ModifyStartupSettingAsync(false));
+				await StartupHelper.ModifyStartupSettingAsync(true);
+				await StartupHelper.ModifyStartupSettingAsync(false);
 			}
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 			{

@@ -17,7 +17,7 @@
 
     <DockPanel>
       <TextBlock Text="Start Wasabi with the system" />
-      <ToggleSwitch IsChecked="{Binding RunOnSystemStartup}" />
+      <ToggleSwitch IsChecked="{Binding RunOnSystemStartup}" Command="{Binding StartUpCommand}" />
     </DockPanel>
 
     <DockPanel>
