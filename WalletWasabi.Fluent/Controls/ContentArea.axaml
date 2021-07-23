@@ -87,10 +87,34 @@
 
     <Style Selector="c|ContentArea /template/ StackPanel#PART_Header">
         <Setter Property="Margin" Value="31 0 31 0" />
+        <Style.Animations>
+          <Animation Duration="0:0:0.3" Easing="{StaticResource FluentEasing}">
+            <KeyFrame Cue="0%">
+              <Setter Property="Opacity" Value="0.0" />
+              <Setter Property="TranslateTransform.X" Value="-25"/>
+            </KeyFrame>
+            <KeyFrame Cue="100%">
+              <Setter Property="Opacity" Value="1.0" />
+              <Setter Property="TranslateTransform.X" Value="0"/>
+            </KeyFrame>
+          </Animation>
+        </Style.Animations>
     </Style>
 
     <Style Selector="c|ContentArea /template/ ScrollViewer#PART_ScrollViewer">
         <Setter Property="Margin" Value="31 31 31 21" />
+        <Style.Animations>
+          <Animation Duration="0:0:0.3" Delay="0:0:0.1" Easing="{StaticResource FluentEasing}">
+            <KeyFrame Cue="0%">
+              <Setter Property="Opacity" Value="0.0" />
+              <Setter Property="TranslateTransform.X" Value="-25"/>
+            </KeyFrame>
+            <KeyFrame Cue="100%">
+              <Setter Property="Opacity" Value="1.0" />
+              <Setter Property="TranslateTransform.X" Value="0"/>
+            </KeyFrame>
+          </Animation>
+        </Style.Animations>
     </Style>
 
     <Style Selector="c|ContentArea /template/ Panel#PART_ButtonArea">
