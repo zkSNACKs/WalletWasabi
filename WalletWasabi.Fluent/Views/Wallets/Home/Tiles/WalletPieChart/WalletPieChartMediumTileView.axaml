@@ -32,11 +32,11 @@
                     <StackLayout />
                 </ItemsRepeater.Layout>
             </ItemsRepeater>
-            <controls:RingChartControl Grid.Column="1"
-                                       Margin="16,0,0,0"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Center"
-                                       DataPoints="{Binding TestDataPoints}" />
+            <controls:PrivacyContentControl Grid.Column="1" Margin="16,0,0,0">
+                <controls:RingChartControl VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           DataPoints="{Binding TestDataPoints}" />
+            </controls:PrivacyContentControl>
         </Grid>
     </DockPanel>
 </UserControl>

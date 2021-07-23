@@ -12,8 +12,11 @@
     <DockPanel LastChildFill="True">
         <TextBlock Text="Wallet Privacy Status" DockPanel.Dock="Top" />
         <Grid ColumnDefinitions="*,*">
-            <controls:RingChartControl Grid.ColumnSpan="1" Margin="12,28,28,28" VerticalAlignment="Center"
+          <controls:PrivacyContentControl Grid.ColumnSpan="1">
+            <controls:RingChartControl Margin="12,28,28,28" VerticalAlignment="Center"
                                        HorizontalAlignment="Center" DataPoints="{Binding TestDataPoints}" />
+          </controls:PrivacyContentControl>
+
             <ItemsRepeater Grid.Column="1" VerticalAlignment="Center" Margin="0,0, 0, -16"
                            Items="{Binding TestDataPointsLegend}">
                 <ItemsRepeater.ItemTemplate>

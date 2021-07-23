@@ -38,9 +38,11 @@
                 </ItemsRepeater.Layout>
             </ItemsRepeater>
             <Separator DockPanel.Dock="Bottom" Margin="-16 5" HorizontalAlignment="Stretch" />
-            <Panel Margin="8" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <controls:PrivacyContentControl>
+              <Panel Margin="8" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <controls:RingChartControl DataPoints="{Binding TestDataPoints}" />
-            </Panel>
+              </Panel>
+            </controls:PrivacyContentControl>
         </DockPanel>
     </DockPanel>
 </UserControl>

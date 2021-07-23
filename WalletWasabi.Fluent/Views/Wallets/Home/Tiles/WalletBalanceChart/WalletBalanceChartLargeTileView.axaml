@@ -32,14 +32,16 @@
 
     <Separator DockPanel.Dock="Top" Margin="-16 15" />
 
-    <c:LineChart x:CompileBindings="True" x:DataType="vm:WalletBalanceChartTileViewModel" x:Name="GradientLineChart"
-                 DockPanel.Dock="Bottom" Margin="30 10 15 30"
-                 Classes="area border xAxis xAxisLabels yAxis yAxisLabels"
-                 SmoothCurve="True"
-                 XAxisMinimum="{Binding XMinimum}"
-                 XAxisValues="{Binding XValues}"
-                 XAxisLabels="{Binding XLabels}"
-                 YAxisValues="{Binding YValues}"
-                 YAxisLabels="{Binding YLabels}" />
+    <c:PrivacyContentControl DockPanel.Dock="Bottom">
+      <c:LineChart x:CompileBindings="True" x:DataType="vm:WalletBalanceChartTileViewModel" x:Name="GradientLineChart"
+                   Classes="area border xAxis xAxisLabels yAxis yAxisLabels"
+                   Margin="30 10 15 30"
+                   SmoothCurve="True"
+                   XAxisMinimum="{Binding XMinimum}"
+                   XAxisValues="{Binding XValues}"
+                   XAxisLabels="{Binding XLabels}"
+                   YAxisValues="{Binding YValues}"
+                   YAxisLabels="{Binding YLabels}" />
+    </c:PrivacyContentControl>
   </DockPanel>
 </UserControl>

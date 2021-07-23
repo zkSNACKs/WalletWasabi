@@ -33,6 +33,7 @@
     <StyleInclude Source="avares://WalletWasabi.Fluent/Controls/AdorningContentControl.axaml" />
     <StyleInclude Source="avares://WalletWasabi.Fluent/Controls/TileControl.axaml" />
     <StyleInclude Source="avares://WalletWasabi.Fluent/Controls/StatusItem.axaml" />
+    <StyleInclude Source="avares://WalletWasabi.Fluent/Controls/PrivacyContentControl.axaml" />
   </Application.Styles>
   <NativeMenu.Menu>
     <NativeMenu>

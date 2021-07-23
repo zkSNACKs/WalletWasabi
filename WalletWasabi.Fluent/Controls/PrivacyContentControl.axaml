@@ -1,0 +1,46 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:WalletWasabi.Fluent.Controls"
+        xmlns:conv="clr-namespace:WalletWasabi.Fluent.Converters">
+  <Design.PreviewWith>
+    <controls:PrivacyContentControl />
+  </Design.PreviewWith>
+
+  <Style Selector="controls|PrivacyContentControl">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <ContentPresenter Name="PART_Content"
+                            Opacity="{Binding !#PART_PrivacyIconViewBox.IsVisible, Converter={x:Static conv:BoolOpacityConverters.BoolToOpacity}}"
+                            IsVisible="{Binding $self.Opacity, Converter={x:Static conv:BoolOpacityConverters.OpacityToBool}}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Content="{TemplateBinding Content}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
+          <Viewbox Opacity="{TemplateBinding PrivacyModeEnabled, Converter={x:Static conv:BoolOpacityConverters.BoolToOpacity}}"
+                   IsVisible="{Binding $self.Opacity, Converter={x:Static conv:BoolOpacityConverters.OpacityToBool}}"
+                   Name="PART_PrivacyIconViewBox" Margin="25">
+            <PathIcon Data="{StaticResource incognito_filled}" Opacity="0.15"/>
+          </Viewbox>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="controls|PrivacyContentControl /template/ Viewbox#PART_PrivacyIconViewBox">
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.3" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+  <Style Selector="controls|PrivacyContentControl /template/ ContentPresenter#PART_Content">
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.3" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+</Styles>
