@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -280,9 +281,14 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Integration
 
 				foreach (var participant in participants)
 				{
-					await participant.InitializeAsync(NumberOfCoinsPerParticipant, cts.Token);
+					await participant.GenerateSourceCoinAsync(cts.Token);
 				}
 				using var dummyKey = new Key();
+				await rpc.GenerateToAddressAsync(101, dummyKey.PubKey.GetAddress(ScriptPubKeyType.Segwit, rpc.Network));
+				foreach (var participant in participants)
+				{
+					await participant.GenerateCoinsAsync(NumberOfCoinsPerParticipant, cts.Token);
+				}
 				await rpc.GenerateToAddressAsync(101, dummyKey.PubKey.GetAddress(ScriptPubKeyType.Segwit, rpc.Network));
 
 				var tasks = participants.Select(x => x.StartParticipatingAsync(cts.Token)).ToArray();

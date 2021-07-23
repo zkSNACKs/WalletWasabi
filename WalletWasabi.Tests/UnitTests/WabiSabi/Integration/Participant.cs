@@ -27,17 +27,48 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Integration
 		public IRPCClient Rpc { get; }
 		public WabiSabiHttpApiClient ApiClient { get; }
 
-		public async Task InitializeAsync(int numberOfCoins, CancellationToken cancellationToken)
+		private Coin? SourceCoin { get; set; }
+
+		public async Task GenerateSourceCoinAsync(CancellationToken cancellationToken)
 		{
-			var keys = KeyManager.GetKeys().Take(numberOfCoins).ToArray();
-			foreach (var key in keys)
+			var minerKey = KeyManager.GetNextReceiveKey("coinbase", out _);
+			var blockIds = await Rpc.GenerateToAddressAsync(1, minerKey.GetP2wpkhAddress(Rpc.Network)).ConfigureAwait(false);
+			var block = await Rpc.GetBlockAsync(blockIds.First()).ConfigureAwait(false);
+			SourceCoin = block.Transactions[0].Outputs.GetCoins(minerKey.P2wpkhScript).First();
+			minerKey.SetKeyState(KeyState.Used);
+		}
+
+		public async Task GenerateCoinsAsync(int numberOfCoins, CancellationToken cancellationToken)
+		{
+			var feeRate = new FeeRate(4.0m);
+			var splitTx = Transaction.Create(Rpc.Network);
+			splitTx.Inputs.Add(new TxIn(SourceCoin!.Outpoint));
+
+			var rnd = new Random();
+			var sampling = Enumerable
+				.Range(0, numberOfCoins-1)
+				.Select(_ => rnd.NextDouble())
+				.Prepend(0)
+				.Prepend(1)
+				.OrderBy(x => x)
+				.ToArray();
+
+			var amounts = sampling
+				.Zip(sampling.Skip(1), (x, y) => y - x)
+				.Select(x => x * SourceCoin.Amount.Satoshi)
+				.Select(x => Money.Satoshis((long)x));
+
+			foreach (var amount in amounts)
 			{
-				cancellationToken.ThrowIfCancellationRequested();
-				var blockIds = await Rpc.GenerateToAddressAsync(1, key.GetP2wpkhAddress(Rpc.Network)).ConfigureAwait(false);
-				var block = await Rpc.GetBlockAsync(blockIds.First()).ConfigureAwait(false);
-				var coin = block.Transactions[0].Outputs.GetCoins(key.P2wpkhScript).First();
-				Coins.Add(coin);
+				var key = KeyManager.GetNextReceiveKey("no-label", out _);
+				var scriptPubKey = key.P2wpkhScript;
+				var effectiveOutputValue = amount - feeRate.GetFee(scriptPubKey.EstimateOutputVsize());
+				splitTx.Outputs.Add(new TxOut(effectiveOutputValue, scriptPubKey));
 			}
+			var minerKey = KeyManager.GetSecrets("", SourceCoin.ScriptPubKey).First();
+			splitTx.Sign(minerKey.PrivateKey.GetBitcoinSecret(Rpc.Network), SourceCoin);
+			Coins.AddRange(splitTx.Outputs.AsCoins());
+			await Rpc.SendRawTransactionAsync(splitTx).ConfigureAwait(false);
 		}
 
 		public async Task StartParticipatingAsync(CancellationToken cancellationToken)
