@@ -35,11 +35,13 @@ namespace WalletWasabi.WabiSabi.Backend.Models
 			Deadline = DateTimeOffset.UtcNow + (connectionConfirmationTimeout * 0.9);
 		}
 
-		private uint256 CalculateHash()
+		private uint256 CalculateHash() => CalculateHash(Coin, OwnershipProof);
+
+		public static uint256 CalculateHash(Coin coin, OwnershipProof ownershipProof)
 			=> StrobeHasher.Create(ProtocolConstants.AliceStrobeDomain)
-				.Append(ProtocolConstants.AliceCoinTxOutStrobeLabel, Coin.TxOut)
-				.Append(ProtocolConstants.AliceCoinOutpointStrobeLabel, Coin.Outpoint)
-				.Append(ProtocolConstants.AliceOwnershipProofStrobeLabel, OwnershipProof)
+				.Append(ProtocolConstants.AliceCoinTxOutStrobeLabel, coin.TxOut)
+				.Append(ProtocolConstants.AliceCoinOutpointStrobeLabel, coin.Outpoint)
+				.Append(ProtocolConstants.AliceOwnershipProofStrobeLabel, ownershipProof)
 				.GetHash();
 	}
 }
