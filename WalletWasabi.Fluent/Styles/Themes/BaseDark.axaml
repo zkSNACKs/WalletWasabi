@@ -3,25 +3,27 @@
   <Styles.Resources>
     <Color x:Key="LineChartAreaGradientStartStopColor">#FF78A827</Color>
     <Color x:Key="LineChartAreaGradientEndStopColor">#0078A827</Color>
+    <Color x:Key="LineChartAreaGradientCursorStrokeColor">#F078A827</Color>
     <Color x:Key="LineChartLineColor">#78A827</Color>
 
-    <SolidColorBrush x:Key="TextControlBackground">#1A8093AE</SolidColorBrush>
-    <SolidColorBrush x:Key="TextControlBackgroundFocused">#1A8093AE</SolidColorBrush>
-    <SolidColorBrush x:Key="TextControlBackgroundPointerOver">#1A8093AE</SolidColorBrush>
+    <Color x:Key="TextControlBackground">#1A8093AE</Color>
+    <Color x:Key="TextControlBackgroundFocused">#1A8093AE</Color>
+    <Color x:Key="TextControlBackgroundPointerOver">#1A8093AE</Color>
 
-    <SolidColorBrush x:Key="TextControlBorderBrushFocused">#FF8093AE</SolidColorBrush>
+    <Color x:Key="TextControlForeground">#FFFFFF</Color>
+    <Color x:Key="TextForegroundColor">#FFFFFF</Color>
+
     <SolidColorBrush x:Key="TextControlBorderBrush">#338093AE</SolidColorBrush>
     <SolidColorBrush x:Key="TextControlBorderBrushPointerOver">#4d8093AE</SolidColorBrush>
+    <SolidColorBrush x:Key="TextControlBorderBrushFocused">#FF8093AE</SolidColorBrush>
 
-    <SolidColorBrush x:Key="TextControlForeground">#FFFFFF</SolidColorBrush>
-    <SolidColorBrush x:Key="TextForegroundColor">#FFFFFF</SolidColorBrush>
     <SolidColorBrush x:Key="StatusBarControlBackground">#191919</SolidColorBrush>
     <SolidColorBrush x:Key="StatusBarControlForeground">#A3A3A3</SolidColorBrush>
     <SolidColorBrush x:Key="InvisibleButtonBackgroundColor">Transparent</SolidColorBrush>
     <SolidColorBrush x:Key="InvisibleButtonPointerOverBackgroundColor">#2FFFFFFF</SolidColorBrush>
     <SolidColorBrush x:Key="InvisibleButtonPressedBackgroundColor">#3FFFFFFF</SolidColorBrush>
 
-    <SolidColorBrush x:Key="OptionButtonBackground">#313131</SolidColorBrush>
+    <SolidColorBrush x:Key="OptionButtonBackground">#1A273C</SolidColorBrush>
     <SolidColorBrush x:Key="OptionButtonBorderBrush">#7FFFFFFF</SolidColorBrush>
 
     <SolidColorBrush x:Key="DialogOverlayColor">#7F2E2E2E</SolidColorBrush>
