@@ -69,7 +69,7 @@ namespace WalletWasabi.Microservices
 		}
 
 		/// <inheritdoc cref="Process.Kill()"/>
-		public void Kill()
+		public virtual void Kill()
 		{
 			Process.Kill();
 		}

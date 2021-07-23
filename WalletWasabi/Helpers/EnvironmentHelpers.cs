@@ -153,21 +153,11 @@ namespace WalletWasabi.Helpers
 		/// </summary>
 		public static async Task ShellExecAsync(string cmd, bool waitForExit = true)
 		{
-			var escapedArgs = cmd.Replace("\"", "\\\"");
-
-			var startInfo = new ProcessStartInfo
-			{
-				FileName = "/usr/bin/env",
-				Arguments = $"sh -c \"{escapedArgs}\"",
-				RedirectStandardOutput = true,
-				UseShellExecute = false,
-				CreateNoWindow = true,
-				WindowStyle = ProcessWindowStyle.Hidden
-			};
+			ProcessStartInfo startInfo = GetShellProcessStartInfo(cmd);
 
 			if (waitForExit)
 			{
-				using var process = new ProcessAsync(startInfo);
+				using ProcessAsync process = new(startInfo);
 				process.Start();
 
 				await process.WaitForExitAsync(CancellationToken.None).ConfigureAwait(false);
@@ -181,6 +171,23 @@ namespace WalletWasabi.Helpers
 			{
 				using var process = Process.Start(startInfo);
 			}
+		}
+
+		public static ProcessStartInfo GetShellProcessStartInfo(string cmd)
+		{
+			string escapedArgs = cmd.Replace("\"", "\\\"");
+
+			ProcessStartInfo startInfo = new()
+			{
+				FileName = "/usr/bin/env",
+				Arguments = $"sh -c \"{escapedArgs}\"",
+				RedirectStandardOutput = true,
+				UseShellExecute = false,
+				CreateNoWindow = true,
+				WindowStyle = ProcessWindowStyle.Hidden
+			};
+
+			return startInfo;
 		}
 
 		public static bool IsFileTypeAssociated(string fileExtension)

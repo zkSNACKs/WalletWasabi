@@ -12,7 +12,7 @@ namespace WalletWasabi.Tests.UnitTests.Crypto
 		[Fact]
 		public void BasicTests()
 		{
-			// Make sure byte array comparision works within hashset and that the underlying API won't pull the floor out.
+			// Make sure byte array comparison works within hashset and that the underlying API won't pull the floor out.
 			var byteArray = new byte[] { 1, 2, 3 };
 			var sameByteArray = new byte[] { 1, 2, 3 };
 			var differentByteArray = new byte[] { 4, 5, 6 };
@@ -110,10 +110,10 @@ namespace WalletWasabi.Tests.UnitTests.Crypto
 		{
 			var mockRandom = new MockRandom();
 
-			// The random should not overfow.
+			// The random should not overflow.
 			mockRandom.GetBytesResults.Add(EC.N.ToBytes());
 
-			// The random should not overfow.
+			// The random should not overflow.
 			mockRandom.GetBytesResults.Add(new Scalar(uint.MaxValue, uint.MaxValue, uint.MaxValue, uint.MaxValue, uint.MaxValue, uint.MaxValue, uint.MaxValue, uint.MaxValue).ToBytes());
 
 			mockRandom.GetBytesResults.Add(Scalar.Zero.ToBytes());
