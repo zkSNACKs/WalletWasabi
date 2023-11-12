@@ -65,17 +65,37 @@
 
       <Separator IsVisible="{Binding IsFeeVisible}" />
 
-      <!-- Status -->
-      <c:PreviewItem Icon="{StaticResource copy_confirmed}"
-                     Label="Status">
-        <StackPanel Orientation="Horizontal">
-          <Panel>
-            <TextBlock Text="Confirmed" IsVisible="{Binding IsConfirmed}" />
-            <TextBlock Text="Pending" IsVisible="{Binding !IsConfirmed}" />
-          </Panel>
-          <TextBlock IsVisible="{Binding IsConfirmed}" Margin="4 0 0 0 " Text="{Binding Confirmations, StringFormat='({0} confirmations)'}" />
+      <!-- Block height, Block Hash, Status -->
+      <StackPanel IsVisible="{Binding IsConfirmed}" Orientation="Horizontal">
+        <!-- Status -->
+        <c:PreviewItem Margin="5" Icon="{StaticResource copy_confirmed}"
+                       Label="Status">
+          <StackPanel Orientation="Horizontal">
+            <Panel>
+              <TextBlock Text="Confirmed" IsVisible="{Binding IsConfirmed}" />
+              <TextBlock Text="Pending" IsVisible="{Binding !IsConfirmed}" />
+            </Panel>
+            <TextBlock IsVisible="{Binding IsConfirmed}" Margin="4 0 0 0 " Text="{Binding Confirmations, StringFormat='({0} confirmations)'}" />
+          </StackPanel>
+        </c:PreviewItem>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+          <!-- Block hash -->
+          <c:PreviewItem Margin="5"
+                         Icon="{StaticResource block_id}"
+                         Label="Block hash"
+                         CopyableContent="{Binding BlockHash}"
+                         IsVisible="{Binding IsConfirmed}" Width="200" MaxWidth="220">
+            <TextBlock Text="{Binding BlockHash}"  TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+          </c:PreviewItem>
+          <!-- Block height -->
+          <c:PreviewItem Icon="{StaticResource block_height}"
+                         Label="Block height"
+                         CopyableContent="{Binding BlockHeight}"
+                         IsVisible="{Binding IsConfirmed}">
+            <TextBlock Text="{Binding BlockHeight}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+          </c:PreviewItem>
         </StackPanel>
-      </c:PreviewItem>
+      </StackPanel>
 
       <Separator />
 
@@ -98,25 +118,6 @@
         <c:PrivacyContentControl>
           <TextBlock Text="{Binding TransactionId}" Classes="monoSpaced" />
         </c:PrivacyContentControl>
-      </c:PreviewItem>
-
-      <Separator IsVisible="{Binding IsConfirmed}" />
-
-      <!-- Block hash -->
-      <c:PreviewItem Icon="{StaticResource block_id}"
-                     Label="Block hash"
-                     CopyableContent="{Binding BlockHash}"
-                     IsVisible="{Binding IsConfirmed}">
-        <TextBlock Text="{Binding BlockHash}" />
-      </c:PreviewItem>
-      <Separator IsVisible="{Binding IsConfirmed}" />
-
-      <!-- Block height -->
-      <c:PreviewItem Icon="{StaticResource block_height}"
-                     Label="Block height"
-                     CopyableContent="{Binding BlockHeight}"
-                     IsVisible="{Binding IsConfirmed}">
-        <TextBlock Text="{Binding BlockHeight}" />
       </c:PreviewItem>
 
       <!-- Labels -->
