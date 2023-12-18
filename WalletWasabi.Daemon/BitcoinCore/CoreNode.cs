@@ -2,27 +2,31 @@ using NBitcoin;
 using NBitcoin.DataEncoders;
 using NBitcoin.Protocol;
 using NBitcoin.RPC;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using WalletWasabi.BitcoinCore;
 using WalletWasabi.BitcoinCore.Configuration;
 using WalletWasabi.BitcoinCore.Configuration.Whitening;
-using WalletWasabi.BitcoinCore.Processes;
 using WalletWasabi.BitcoinCore.Rpc;
 using WalletWasabi.Blockchain.Mempool;
+using WalletWasabi.Daemon.BitcoinCore.Processes;
 using WalletWasabi.Extensions;
 using WalletWasabi.Helpers;
 using WalletWasabi.Logging;
 using WalletWasabi.Userfacing;
 
-namespace WalletWasabi.BitcoinCore;
+namespace WalletWasabi.Daemon.BitcoinCore;
 
 public class CoreNode
 {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public CoreNode(string dataDir, Network network, MempoolService mempoolService, CoreConfig config, EndPoint p2pEndPoint, EndPoint rpcEndPoint, IRPCClient rpcClient)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	{
 		DataDir = dataDir;
 		Network = network;

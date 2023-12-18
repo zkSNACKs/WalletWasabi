@@ -4,7 +4,7 @@ using WalletWasabi.BitcoinCore.Endpointing;
 using WalletWasabi.Blockchain.Mempool;
 using WalletWasabi.Helpers;
 
-namespace WalletWasabi.BitcoinCore;
+namespace WalletWasabi.Daemon.BitcoinCore;
 
 public class CoreNodeParams
 {

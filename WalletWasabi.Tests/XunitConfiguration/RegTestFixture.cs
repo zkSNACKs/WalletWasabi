@@ -9,7 +9,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletWasabi.Backend;
-using WalletWasabi.BitcoinCore;
+using WalletWasabi.Daemon.BitcoinCore;
 using WalletWasabi.Helpers;
 using WalletWasabi.Logging;
 using WalletWasabi.Tests.Helpers;
