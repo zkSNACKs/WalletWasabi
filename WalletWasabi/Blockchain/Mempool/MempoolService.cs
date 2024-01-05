@@ -100,14 +100,15 @@ public class MempoolService
 
 			Logger.LogInfo("Start cleaning out mempool...");
 			{
-				var compactness = 10;
-				var allMempoolHashes = await httpClientFactory.SharedWasabiClient.GetMempoolHashesAsync(compactness).ConfigureAwait(false);
+				var mempoolFilter = await httpClientFactory.SharedWasabiClient.GetMempoolFilterAsync().ConfigureAwait(false);
+				var zero = uint256.Zero.ToBytes();
+				var key = zero[..16];
 
 				int removedTxCount;
 
 				lock (ProcessedLock)
 				{
-					removedTxCount = ProcessedTransactionHashes.RemoveWhere(x => !allMempoolHashes.Contains(x.ToString()[..compactness]));
+					removedTxCount = ProcessedTransactionHashes.RemoveWhere(x => !mempoolFilter.Match(x.ToBytes(), key));
 				}
 
 				Logger.LogInfo($"{removedTxCount} transactions were removed from mempool.");

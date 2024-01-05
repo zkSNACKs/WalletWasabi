@@ -514,15 +514,14 @@ public class Wallet : BackgroundService, IWallet
 			try
 			{
 				var client = Synchronizer.HttpClientFactory.SharedWasabiClient;
-				var compactness = 10;
 
-				var mempoolHashes = await client.GetMempoolHashesAsync(compactness).ConfigureAwait(false);
-
+				var mempoolFilter = await client.GetMempoolFilterAsync().ConfigureAwait(false);
+				var filterKey = uint256.Zero.ToBytes();
 				var txsToProcess = new List<SmartTransaction>();
 				foreach (var tx in BitcoinStore.TransactionStore.MempoolStore.GetTransactions())
 				{
 					uint256 hash = tx.GetHash();
-					if (mempoolHashes.Contains(hash.ToString()[..compactness]))
+					if (mempoolFilter.Match(hash.ToBytes(), filterKey[..16]))
 					{
 						txsToProcess.Add(tx);
 						Logger.LogInfo($"'{WalletName}': Transaction was successfully tested against the backend's mempool hashes: {hash}.");

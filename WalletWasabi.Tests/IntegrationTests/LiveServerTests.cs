@@ -65,26 +65,6 @@ public class LiveServerTests : IAsyncLifetime
 
 	[Theory]
 	[MemberData(nameof(GetNetworks))]
-	public async Task GetTransactionsAsync(Network network)
-	{
-		using CancellationTokenSource ctsTimeout = new(TimeSpan.FromMinutes(2));
-
-		WasabiClient client = MakeWasabiClient(network);
-		IEnumerable<uint256> randomTxIds = Enumerable.Range(0, 20).Select(_ => RandomUtils.GetUInt256());
-
-		// We don't really expect that the random strings represent some actual transactions.
-		IEnumerable<Transaction> retrievedTxs = await client.GetTransactionsAsync(network, randomTxIds.Take(4), ctsTimeout.Token);
-		Assert.Empty(retrievedTxs);
-
-		var mempoolTxIds = await client.GetMempoolHashesAsync(ctsTimeout.Token);
-		randomTxIds = Enumerable.Range(0, 5).Select(_ => mempoolTxIds.RandomElement(InsecureRandom.Instance)!).Distinct().ToArray();
-		var txs = await client.GetTransactionsAsync(network, randomTxIds, ctsTimeout.Token);
-		var returnedTxIds = txs.Select(tx => tx.GetHash());
-		Assert.Equal(returnedTxIds.OrderBy(x => x).ToArray(), randomTxIds.OrderBy(x => x).ToArray());
-	}
-
-	[Theory]
-	[MemberData(nameof(GetNetworks))]
 	public async Task GetVersionsTestsAsync(Network network)
 	{
 		using CancellationTokenSource ctsTimeout = new(TimeSpan.FromMinutes(2));

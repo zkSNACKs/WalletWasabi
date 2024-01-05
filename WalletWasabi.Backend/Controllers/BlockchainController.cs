@@ -82,6 +82,23 @@ public class BlockchainController : ControllerBase
 	}
 
 	/// <summary>
+	/// Gets mempool compact filter.
+	/// </summary>
+	[HttpGet("mempool-filter")]
+	[ResponseCache(Duration = 5)]
+	public async Task<IActionResult> GetMempoolCompactFilterAsync(CancellationToken cancellationToken = default)
+	{
+		var txIds = await Global.RpcClient.GetRawMempoolAsync(cancellationToken).ConfigureAwait(false);
+		var filter = new GolombRiceFilterBuilder()
+			.SetP(20)
+			.SetM(1 << 20)
+			.SetKey(uint256.Zero)
+			.AddEntries(txIds.Select(x => x.ToBytes()))
+			.Build();
+		return Ok(filter);
+	}
+
+	/// <summary>
 	/// Gets mempool hashes.
 	/// </summary>
 	/// <param name="compactness">Can strip the last x characters from the hashes.</param>

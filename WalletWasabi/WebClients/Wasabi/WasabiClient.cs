@@ -158,11 +158,11 @@ public class WasabiClient
 		await BroadcastAsync(transaction.Transaction).ConfigureAwait(false);
 	}
 
-	public async Task<IEnumerable<uint256>> GetMempoolHashesAsync(CancellationToken cancel = default)
+	public async Task<GolombRiceFilter> GetMempoolFilterAsync(CancellationToken cancel = default)
 	{
 		using HttpResponseMessage response = await HttpClient.SendAsync(
 			HttpMethod.Get,
-			$"api/v{ApiVersion}/btc/blockchain/mempool-hashes",
+			$"api/v{ApiVersion}/btc/blockchain/mempool-filter",
 			cancellationToken: cancel).ConfigureAwait(false);
 
 		if (response.StatusCode != HttpStatusCode.OK)
@@ -171,32 +171,8 @@ public class WasabiClient
 		}
 
 		using HttpContent content = response.Content;
-		var strings = await content.ReadAsJsonAsync<IEnumerable<string>>().ConfigureAwait(false);
-		var ret = strings.Select(x => new uint256(x));
-
-		return ret;
-	}
-
-	/// <summary>
-	/// Gets mempool hashes, but strips the last x characters of each hash.
-	/// </summary>
-	/// <param name="compactness">1 to 64</param>
-	public async Task<ISet<string>> GetMempoolHashesAsync(int compactness, CancellationToken cancel = default)
-	{
-		using HttpResponseMessage response = await HttpClient.SendAsync(
-			HttpMethod.Get,
-			$"api/v{ApiVersion}/btc/blockchain/mempool-hashes?compactness={compactness}",
-			cancellationToken: cancel).ConfigureAwait(false);
-
-		if (response.StatusCode != HttpStatusCode.OK)
-		{
-			await response.ThrowRequestExceptionFromContentAsync(cancel).ConfigureAwait(false);
-		}
-
-		using HttpContent content = response.Content;
-		var strings = await content.ReadAsJsonAsync<ISet<string>>().ConfigureAwait(false);
-
-		return strings;
+		var filter = await content.ReadAsJsonAsync<GolombRiceFilter>().ConfigureAwait(false);
+		return filter;
 	}
 
 	#endregion blockchain
