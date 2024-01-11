@@ -41,6 +41,29 @@ public class WasabiApplication
 		TerminateService = new(TerminateApplicationAsync, AppConfig.Terminate);
 	}
 
+	public void RunAsyncMobile(Action afterStarting)
+	{
+		if (AppConfig.MustCheckSingleInstance)
+		{
+			// TODO:
+		}
+
+		try
+		{
+			// TODO:
+			// TerminateService.Activate();
+
+			BeforeStarting();
+
+			afterStarting();
+		}
+		finally
+		{
+			// TODO:
+			// BeforeStopping();
+		}
+	}
+
 	public async Task<ExitCode> RunAsync(Func<Task> afterStarting)
 	{
 		if (AppConfig.Arguments.Contains("--version"))

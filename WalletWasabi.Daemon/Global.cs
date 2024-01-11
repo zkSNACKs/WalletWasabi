@@ -47,8 +47,9 @@ public class Global
 		DataDir = dataDir;
 		ConfigFilePath = configFilePath;
 		Config = config;
-		TorSettings = new TorSettings(DataDir, distributionFolderPath: EnvironmentHelpers.GetFullBaseDirectory(), Config.TerminateTorOnExit, Environment.ProcessId);
-
+		TorSettings = IsTorEnabled
+			? new TorSettings(DataDir, distributionFolderPath: EnvironmentHelpers.GetFullBaseDirectory(), Config.TerminateTorOnExit, Environment.ProcessId)
+			: null;
 		HostedServices = new HostedServices();
 
 		var networkWorkFolderPath = Path.Combine(DataDir, "BitcoinStore", Network.ToString());
@@ -87,7 +88,7 @@ public class Global
 				var p2p = new P2pNetwork(
 						Network,
 						Config.GetBitcoinP2pEndPoint(),
-						Config.UseTor ? TorSettings.SocksEndpoint : null,
+						Config.UseTor ? TorSettings?.SocksEndpoint : null,
 						Path.Combine(DataDir, "BitcoinP2pNetwork"),
 						BitcoinStore);
 				if (!Config.BlockOnlyMode)
@@ -126,8 +127,10 @@ public class Global
 	/// <summary>Cancellation token to cancel <see cref="InitializeNoWalletAsync(TerminateService)"/> processing.</summary>
 	private CancellationTokenSource StoppingCts { get; } = new();
 
+	public static bool IsTorEnabled = true;
+
 	public string DataDir { get; }
-	public TorSettings TorSettings { get; }
+	public TorSettings? TorSettings { get; }
 	public BitcoinStore BitcoinStore { get; }
 
 	/// <summary>HTTP client factory for sending HTTP requests.</summary>
@@ -163,7 +166,7 @@ public class Global
 
 	private WasabiHttpClientFactory BuildHttpClientFactory(Func<Uri> backendUriGetter) =>
 		new(
-			Config.UseTor ? TorSettings.SocksEndpoint : null,
+			Config.UseTor ? TorSettings?.SocksEndpoint : null,
 			backendUriGetter);
 
 	public async Task InitializeNoWalletAsync(TerminateService terminateService, CancellationToken cancellationToken)
@@ -278,6 +281,10 @@ public class Global
 		{
 			using (BenchmarkLogger.Measure(operationName: "TorProcessManager.Start"))
 			{
+				if (TorSettings is null)
+				{
+					return;
+				}
 				TorManager = new TorProcessManager(TorSettings);
 				await TorManager.StartAsync(attempts: 3, cancellationToken).ConfigureAwait(false);
 				Logger.LogInfo($"{nameof(TorProcessManager)} is initialized.");

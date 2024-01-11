@@ -38,6 +38,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletWasabi.Fluent", "Wall
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletWasabi.Daemon", "WalletWasabi.Daemon\WalletWasabi.Daemon.csproj", "{29599048-B3F1-48B9-AEBB-1A32D64BC4F5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletWasabi.Fluent.Android", "WalletWasabi.Fluent.Android\WalletWasabi.Fluent.Android.csproj", "{64309B33-48A2-4D90-B524-112E40DB1346}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletWasabi.Fluent.iOS", "WalletWasabi.Fluent.iOS\WalletWasabi.Fluent.iOS.csproj", "{A4ACA4C0-1C1A-4B7A-A7D5-A8271ED0F0AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -115,6 +119,22 @@ Global
 		{29599048-B3F1-48B9-AEBB-1A32D64BC4F5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{29599048-B3F1-48B9-AEBB-1A32D64BC4F5}.Release|x64.ActiveCfg = Release|Any CPU
 		{29599048-B3F1-48B9-AEBB-1A32D64BC4F5}.Release|x64.Build.0 = Release|Any CPU
+		{64309B33-48A2-4D90-B524-112E40DB1346}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64309B33-48A2-4D90-B524-112E40DB1346}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64309B33-48A2-4D90-B524-112E40DB1346}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{64309B33-48A2-4D90-B524-112E40DB1346}.Debug|x64.Build.0 = Debug|Any CPU
+		{64309B33-48A2-4D90-B524-112E40DB1346}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64309B33-48A2-4D90-B524-112E40DB1346}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64309B33-48A2-4D90-B524-112E40DB1346}.Release|x64.ActiveCfg = Release|Any CPU
+		{64309B33-48A2-4D90-B524-112E40DB1346}.Release|x64.Build.0 = Release|Any CPU
+		{A4ACA4C0-1C1A-4B7A-A7D5-A8271ED0F0AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4ACA4C0-1C1A-4B7A-A7D5-A8271ED0F0AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4ACA4C0-1C1A-4B7A-A7D5-A8271ED0F0AF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A4ACA4C0-1C1A-4B7A-A7D5-A8271ED0F0AF}.Debug|x64.Build.0 = Debug|Any CPU
+		{A4ACA4C0-1C1A-4B7A-A7D5-A8271ED0F0AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4ACA4C0-1C1A-4B7A-A7D5-A8271ED0F0AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4ACA4C0-1C1A-4B7A-A7D5-A8271ED0F0AF}.Release|x64.ActiveCfg = Release|Any CPU
+		{A4ACA4C0-1C1A-4B7A-A7D5-A8271ED0F0AF}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

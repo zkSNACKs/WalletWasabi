@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0-ios</TargetFramework>
+		<SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
+		<ProvisioningType>manual</ProvisioningType>
+		<Nullable>enable</Nullable>
+		<UseInterpreter>True</UseInterpreter>
+		<IsPackable>False</IsPackable>
+		<RootNamespace>WalletWasabi.Fluent.IOS</RootNamespace>
+		<DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+		<DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+	</PropertyGroup>
+	<PropertyGroup>
+		<!-- Error NETSDK1150 : The referenced project '../WalletWasabi.Daemon/WalletWasabi.Daemon.csproj' is a non self-contained executable.  A non self-contained executable cannot be referenced by a self-contained executable.  For more information, see https://aka.ms/netsdk1150 -->
+		<ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Avalonia.iOS" />
+		<PackageReference Include="Avalonia.Themes.Fluent" />
+		<PackageReference Include="Avalonia.Fonts.Inter" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\WalletWasabi.Fluent\WalletWasabi.Fluent.csproj" />
+		<!--<ProjectReference Include="..\WalletWasabi\WalletWasabi.csproj" />-->
+	</ItemGroup>
+</Project>

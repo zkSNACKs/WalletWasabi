@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0-android</TargetFramework>
+		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+		<Nullable>enable</Nullable>
+		<ApplicationId>com.wasabiwallet.android</ApplicationId>
+		<ApplicationVersion>1</ApplicationVersion>
+		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+		<AndroidPackageFormat>apk</AndroidPackageFormat>
+		<IsPackable>False</IsPackable>
+		<DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+		<DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+	</PropertyGroup>
+	<ItemGroup>
+		<AndroidResource Include="Icon.png">
+			<Link>Resources\drawable\Icon.png</Link>
+		</AndroidResource>
+	</ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<!-- TODO: This should be enabled, for now disabled for debuging purposes -->
+		<RunAOTCompilation>True</RunAOTCompilation>
+		<!--<EnableLLVM>True</EnableLLVM>-->
+		<!--<AndroidEnableProfiledAot>True</AndroidEnableProfiledAot>-->
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Xamarin.AndroidX.AppCompat"/>
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModel"/>
+		<PackageReference Include="Avalonia.Android"/>
+		<PackageReference Include="Avalonia.Themes.Fluent"/>
+		<PackageReference Include="Avalonia.Fonts.Inter"/>
+	</ItemGroup>
+	<ItemGroup>
+		<AvaloniaResource Include="Icon.png"/>
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\WalletWasabi.Fluent\WalletWasabi.Fluent.csproj" />
+	  <!--<ProjectReference Include="..\WalletWasabi\WalletWasabi.csproj" />-->
+	</ItemGroup>
+</Project>

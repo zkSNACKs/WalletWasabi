@@ -40,8 +40,8 @@
     <PackageVersion Include="DynamicData" Version="8.1.1" />
     <!-- UI Mobile. -->
     <PackageVersion Include="Avalonia.Android" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Xamarin.AndroidX.AppCompat" Version="1.3.1.3" />
-    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.ViewModel" Version="2.3.1.3" />
+    <PackageVersion Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.5" />
+    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.ViewModel" Version="2.6.2.2" />
     <PackageVersion Include="Avalonia.iOS" Version="$(AvaloniaVersion)" />
     <!-- UI Testing. -->
     <PackageVersion Include="Avalonia.Headless.XUnit" Version="$(AvaloniaVersion)" />

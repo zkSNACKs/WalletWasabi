@@ -7,12 +7,18 @@ variables:
 jobs:
 - job: macOS
   pool:
-    vmImage: 'macOS-11'
+    vmImage: 'macOS-13'
   steps:
   - task: UseDotNet@2
     displayName: 'Install .NET'
     inputs:
       version: 8.0.x
+  - task: DotNetCoreCLI@2
+    displayName: 'Workloads'
+    inputs:
+      command: 'custom'
+      custom: 'workload'
+      arguments: 'install android ios'
   - task: DotNetCoreCLI@2
     displayName: 'Restore'
     inputs:

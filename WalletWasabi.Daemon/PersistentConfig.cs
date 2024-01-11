@@ -83,21 +83,21 @@ public record PersistentConfig : IConfigNg
 	[System.Text.Json.Serialization.JsonPropertyName("LocalBitcoinCoreDataDir")]
 	public string LocalBitcoinCoreDataDir { get; init; } = EnvironmentHelpers.GetDefaultBitcoinCoreDataDirOrEmptyString();
 
-	[JsonProperty(PropertyName = "MainNetBitcoinP2pEndPoint")]
+	// [JsonProperty(PropertyName = "MainNetBitcoinP2pEndPoint")]
 	[System.Text.Json.Serialization.JsonPropertyName("MainNetBitcoinP2pEndPoint")]
-	[JsonConverter(typeof(EndPointJsonConverter), Constants.DefaultMainNetBitcoinP2pPort)]
+	// [JsonConverter(typeof(EndPointJsonConverter), Constants.DefaultMainNetBitcoinP2pPort)]
 	[System.Text.Json.Serialization.JsonConverter(typeof(MainNetBitcoinP2pEndPointConverterNg))]
 	public EndPoint MainNetBitcoinP2pEndPoint { get; init; } = new IPEndPoint(IPAddress.Loopback, Constants.DefaultMainNetBitcoinP2pPort);
 
-	[JsonProperty(PropertyName = "TestNetBitcoinP2pEndPoint")]
+	// [JsonProperty(PropertyName = "TestNetBitcoinP2pEndPoint")]
 	[System.Text.Json.Serialization.JsonPropertyName("TestNetBitcoinP2pEndPoint")]
-	[JsonConverter(typeof(EndPointJsonConverter), Constants.DefaultTestNetBitcoinP2pPort)]
+	// [JsonConverter(typeof(EndPointJsonConverter), Constants.DefaultTestNetBitcoinP2pPort)]
 	[System.Text.Json.Serialization.JsonConverter(typeof(TestNetBitcoinP2pEndPointConverterNg))]
 	public EndPoint TestNetBitcoinP2pEndPoint { get; init; } = new IPEndPoint(IPAddress.Loopback, Constants.DefaultTestNetBitcoinP2pPort);
 
-	[JsonProperty(PropertyName = "RegTestBitcoinP2pEndPoint")]
+	// [JsonProperty(PropertyName = "RegTestBitcoinP2pEndPoint")]
 	[System.Text.Json.Serialization.JsonPropertyName("RegTestBitcoinP2pEndPoint")]
-	[JsonConverter(typeof(EndPointJsonConverter), Constants.DefaultRegTestBitcoinP2pPort)]
+	// JsonConverter(typeof(EndPointJsonConverter), Constants.DefaultRegTestBitcoinP2pPort)]
 	[System.Text.Json.Serialization.JsonConverter(typeof(RegTestBitcoinP2pEndPointConverterNg))]
 	public EndPoint RegTestBitcoinP2pEndPoint { get; init; } = new IPEndPoint(IPAddress.Loopback, Constants.DefaultRegTestBitcoinP2pPort);
 

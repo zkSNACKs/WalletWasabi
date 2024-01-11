@@ -8,9 +8,9 @@ using WalletWasabi.Logging;
 
 namespace WalletWasabi.Fluent.Desktop.Extensions;
 
-public static class AppBuilderExtension
+public static class AppBuilderDesktopExtension
 {
-	public static AppBuilder SetupAppBuilder(this AppBuilder appBuilder)
+	public static AppBuilder SetupAppBuilder(AppBuilder appBuilder)
 	{
 		bool enableGpu = Services.PersistentConfig is null ? false : Services.PersistentConfig.EnableGpu;
 

@@ -14,6 +14,18 @@ jobs:
     inputs:
       version: 8.0.x
   - task: DotNetCoreCLI@2
+    displayName: 'Remove iOS project'
+    inputs:
+      command: 'custom'
+      custom: 'sln'
+      arguments: 'remove WalletWasabi.Fluent.iOS/WalletWasabi.Fluent.iOS.csproj'
+  - task: DotNetCoreCLI@2
+    displayName: 'Workloads'
+    inputs:
+      command: 'custom'
+      custom: 'workload'
+      arguments: 'install android'
+  - task: DotNetCoreCLI@2
     displayName: 'Restore'
     inputs:
       command: 'restore'

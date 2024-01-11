@@ -6,7 +6,9 @@
 		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 		<DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
 		<PathMap>$(MSBuildProjectDirectory)\=WalletWasabi.Daemon</PathMap>
-		<OutputType>Exe</OutputType>
+		<!-- TODO: For mobile projects (iOS/Android) we need OutputType=Library -->
+		<!--<OutputType>Exe</OutputType>-->
+		<OutputType>Library</OutputType>
 	</PropertyGroup>
 
 	<PropertyGroup>
