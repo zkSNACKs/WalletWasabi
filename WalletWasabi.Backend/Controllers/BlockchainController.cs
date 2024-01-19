@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using NBitcoin;
 using NBitcoin.RPC;
+using Nito.AsyncEx.Synchronous;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -415,5 +416,67 @@ public class BlockchainController : ControllerBase
 		}
 
 		return status;
+	}
+
+	[HttpGet("get-transaction-fee-rate")]
+	[ProducesResponseType(200)]
+	[ProducesResponseType(400)]
+	public async Task<FeeRate> GetTransactionEffectiveFeeRateAsync([FromQuery, Required] string transactionId, CancellationToken cancellationToken)
+	{
+		uint256 txId = new(transactionId);
+
+		var cacheKey = $"{nameof(GetTransactionEffectiveFeeRateAsync)}_{txId}";
+		var cacheOptions = new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3) };
+
+		return await Cache.GetCachedResponseAsync(
+			cacheKey,
+			action: (string request, CancellationToken token) => GetTransactionEffectiveFeeRateNoChacheAsync(txId, token),
+			options: cacheOptions,
+			cancellationToken);
+	}
+
+	private async Task<FeeRate> GetTransactionEffectiveFeeRateNoChacheAsync(uint256 txId, CancellationToken cancellationToken)
+	{
+		Dictionary<uint256, Transaction> parentTransactionsLocalCache = new();
+
+		// TODO: Use Transaction cache.
+		var requestedTransaction = await RpcClient.GetRawTransactionAsync(txId, true, cancellationToken);
+
+		List<(int Size, Money Fee)> unconfirmedTxsChain = new();
+		List<Transaction> toFetchFeeList = new() { requestedTransaction };
+
+		while (toFetchFeeList.Count > 0)
+		{
+			List<Coin> inputs = new();
+			HashSet<Transaction> parentTxs = new();
+
+			var currentTx = toFetchFeeList.First();
+			foreach (var input in currentTx.Inputs)
+			{
+				if (!parentTransactionsLocalCache.TryGetValue(input.PrevOut.Hash, out var parentTx))
+				{
+					parentTx = await RpcClient.GetRawTransactionAsync(input.PrevOut.Hash, true, cancellationToken);
+					parentTransactionsLocalCache.Add(input.PrevOut.Hash, parentTx);
+				}
+
+				// TODO: if child pays less fee than the parent, don't take it into account,
+				// because miners won't consider it to be part of the CPFP chain.
+				parentTxs.Add(parentTx);
+				TxOut txOut = parentTx.Outputs[input.PrevOut.N];
+				inputs.Add(new Coin(input.PrevOut, txOut));
+			}
+
+			unconfirmedTxsChain.Add((currentTx.GetVirtualSize(), currentTx.GetFee(inputs.ToArray())));
+
+			// Remove the item we worked on.
+			toFetchFeeList.Remove(currentTx);
+
+			// Fee and size of all unconfirmed parents have to be known to get effective fee rate of the child.
+			toFetchFeeList.AddRange(
+				parentTxs
+					.Where(x => Global.MempoolMirror.GetMempoolHashes().Contains(x.GetHash())));
+		}
+
+		return new FeeRate(unconfirmedTxsChain.Sum(x => x.Fee), unconfirmedTxsChain.Sum(x => x.Size));
 	}
 }

@@ -61,6 +61,7 @@ public class ReplaceByFeeTxTest : IClassFixture<RegTestFixture>
 		await using WasabiHttpClientFactory httpClientFactory = new(torEndPoint: null, backendUriGetter: () => new Uri(RegTestFixture.BackendEndPoint));
 		WasabiSynchronizer synchronizer = new(requestInterval: TimeSpan.FromSeconds(3), 10000, bitcoinStore, httpClientFactory);
 		HybridFeeProvider feeProvider = new(synchronizer, null);
+		TransactionFeeProvider transactionFeeProvider = new(httpClientFactory);
 
 		// 4. Create key manager service.
 		var keyManager = KeyManager.CreateNew(out _, password, network);
@@ -78,7 +79,7 @@ public class ReplaceByFeeTxTest : IClassFixture<RegTestFixture>
 			new P2PBlockProvider(network, nodes, httpClientFactory.IsTorEnabled),
 			cache);
 
-		using var wallet = Wallet.CreateAndRegisterServices(network, bitcoinStore, keyManager, synchronizer, workDir, serviceConfiguration, feeProvider, blockProvider);
+		using var wallet = Wallet.CreateAndRegisterServices(network, bitcoinStore, keyManager, synchronizer, workDir, serviceConfiguration, feeProvider, blockProvider, transactionFeeProvider);
 		wallet.NewFiltersProcessed += setup.Wallet_NewFiltersProcessed;
 
 		Assert.Empty(wallet.Coins);
@@ -143,6 +144,7 @@ public class ReplaceByFeeTxTest : IClassFixture<RegTestFixture>
 			await feeProvider.StopAsync(CancellationToken.None);
 			nodes?.Dispose();
 			node?.Disconnect();
+			transactionFeeProvider.Dispose();
 		}
 	}
 }

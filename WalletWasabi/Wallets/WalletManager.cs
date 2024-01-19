@@ -33,7 +33,8 @@ public class WalletManager : IWalletProvider
 		WasabiSynchronizer synchronizer,
 		HybridFeeProvider feeProvider,
 		IBlockProvider blockProvider,
-		ServiceConfiguration serviceConfiguration)
+		ServiceConfiguration serviceConfiguration,
+		TransactionFeeProvider transactionFeeProvider)
 	{
 		using IDisposable _ = BenchmarkLogger.Measure();
 
@@ -46,6 +47,7 @@ public class WalletManager : IWalletProvider
 		FeeProvider = feeProvider;
 		BlockProvider = blockProvider;
 		ServiceConfiguration = serviceConfiguration;
+		TransactionFeeProvider = transactionFeeProvider;
 		CancelAllTasksToken = CancelAllTasks.Token;
 
 		RefreshWalletList();
@@ -82,6 +84,7 @@ public class WalletManager : IWalletProvider
 	private BitcoinStore BitcoinStore { get; }
 	private WasabiSynchronizer Synchronizer { get; }
 	private ServiceConfiguration ServiceConfiguration { get; }
+	private TransactionFeeProvider TransactionFeeProvider { get; }
 	private bool IsInitialized { get; set; }
 
 	private HybridFeeProvider FeeProvider { get; }
@@ -321,13 +324,14 @@ public class WalletManager : IWalletProvider
 	}
 
 	private Wallet CreateWalletInstance(KeyManager keyManager)
-		=> new(WorkDir, Network, keyManager, BitcoinStore, Synchronizer, ServiceConfiguration, FeeProvider, BlockProvider);
+		=> new(WorkDir, Network, keyManager, BitcoinStore, Synchronizer, ServiceConfiguration, FeeProvider, BlockProvider, TransactionFeeProvider);
 
 	public bool WalletExists(HDFingerprint? fingerprint) => GetWallets().Any(x => fingerprint is { } && x.KeyManager.MasterFingerprint == fingerprint);
 
 	private void TransactionProcessor_WalletRelevantTransactionProcessed(object? sender, ProcessedResult e)
 	{
 		WalletRelevantTransactionProcessed?.Invoke(sender, e);
+		TransactionFeeProvider.BeginRequestTransactionFee(e.Transaction);
 	}
 
 	private void Wallet_StateChanged(object? sender, WalletState e)

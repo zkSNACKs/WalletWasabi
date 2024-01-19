@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using WalletWasabi.Blockchain.Analysis.FeesEstimation;
 using WalletWasabi.Blockchain.Transactions;
 using WalletWasabi.Fluent.Helpers;
+using WalletWasabi.Wallets;
 
 namespace WalletWasabi.Fluent.Extensions;
 
@@ -17,5 +18,5 @@ public static class TransactionSummaryExtensions
 		=> model.Transaction.GetConfirmations((int)Services.SmartHeaderChain.ServerTipHeight);
 
 	public static bool TryGetConfirmationTime(this TransactionSummary model, [NotNullWhen(true)] out TimeSpan? estimate)
-		=> TransactionFeeHelper.TryEstimateConfirmationTime(Services.HostedServices.Get<HybridFeeProvider>(), Services.WalletManager.Network, model.Transaction, out estimate);
+		=> TransactionFeeHelper.TryEstimateConfirmationTime(Services.HostedServices.Get<HybridFeeProvider>(), Services.WalletManager.Network, model.Transaction, Services.HostedServices.Get<TransactionFeeProvider>(), out estimate);
 }

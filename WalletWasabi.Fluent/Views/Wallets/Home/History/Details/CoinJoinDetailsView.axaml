@@ -49,6 +49,18 @@
 
       <Separator />
 
+      <!-- Fee Rate-->
+      <c:PreviewItem IsVisible="{Binding FeeRateVisible}"
+                     Icon="{StaticResource paper_cash_regular}"
+                     Label="Fee Rate"
+                     CopyableContent="{Binding FeeRate.SatoshiPerByte}">
+        <c:PrivacyContentControl>
+          <TextBlock Text="{Binding FeeRate.SatoshiPerByte, StringFormat='{}{0:F1} sat/vByte'}" />
+        </c:PrivacyContentControl>
+      </c:PreviewItem>
+
+      <Separator IsVisible="{Binding FeeRateVisible}" />
+
       <!-- CJ fee  -->
       <c:PreviewItem Icon="{StaticResource btc_logo}"
                      Label="Fees"
@@ -67,7 +79,6 @@
       </c:PreviewItem>
 
       <Separator IsVisible="{Binding IsConfirmationTimeVisible}" />
-
     </StackPanel>
   </c:ContentArea>
 </UserControl>

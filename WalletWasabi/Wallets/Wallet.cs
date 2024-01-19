@@ -39,7 +39,8 @@ public class Wallet : BackgroundService, IWallet
 		WasabiSynchronizer syncer,
 		ServiceConfiguration serviceConfiguration,
 		HybridFeeProvider feeProvider,
-		IBlockProvider blockProvider)
+		IBlockProvider blockProvider,
+		TransactionFeeProvider transactionFeeProvider)
 	{
 		Guard.NotNullOrEmptyOrWhitespace(nameof(dataDir), dataDir);
 		Network = network;
@@ -49,6 +50,7 @@ public class Wallet : BackgroundService, IWallet
 		ServiceConfiguration = serviceConfiguration;
 		FeeProvider = feeProvider;
 		BlockProvider = blockProvider;
+		TransactionFeeProvider = transactionFeeProvider;
 
 		RuntimeParams.SetDataDir(dataDir);
 
@@ -109,7 +111,7 @@ public class Wallet : BackgroundService, IWallet
 	public WalletFilterProcessor WalletFilterProcessor { get; }
 	public FilterModel? LastProcessedFilter => WalletFilterProcessor.LastProcessedFilter;
 	public IBlockProvider BlockProvider { get; }
-
+	public TransactionFeeProvider TransactionFeeProvider { get; }
 	public bool IsLoggedIn { get; private set; }
 
 	public Kitchen Kitchen { get; } = new();
@@ -181,7 +183,8 @@ public class Wallet : BackgroundService, IWallet
 			}
 			else
 			{
-				mapByTxid.Add(coin.TransactionId, new TransactionSummary(coin.Transaction, coin.Amount));
+				TransactionFeeProvider.TryGetFeeRateFromCache(coin.TransactionId, out FeeRate? fetchedFeeRate);
+				mapByTxid.Add(coin.TransactionId, new TransactionSummary(coin.Transaction, coin.Amount, fetchedFeeRate ?? FeeRate.Zero));
 			}
 
 			if (coin.SpenderTransaction is { } spenderTransaction)
@@ -194,7 +197,8 @@ public class Wallet : BackgroundService, IWallet
 				}
 				else
 				{
-					mapByTxid.Add(spenderTxId, new TransactionSummary(spenderTransaction, Money.Zero - coin.Amount));
+					TransactionFeeProvider.TryGetFeeRateFromCache(spenderTransaction.GetHash(), out FeeRate? fetchedFeeRate);
+					mapByTxid.Add(spenderTxId, new TransactionSummary(spenderTransaction, Money.Zero - coin.Amount, fetchedFeeRate ?? FeeRate.Zero));
 				}
 			}
 		}
@@ -566,9 +570,9 @@ public class Wallet : BackgroundService, IWallet
 		State = WalletState.WaitingForInit;
 	}
 
-	public static Wallet CreateAndRegisterServices(Network network, BitcoinStore bitcoinStore, KeyManager keyManager, WasabiSynchronizer synchronizer, string dataDir, ServiceConfiguration serviceConfiguration, HybridFeeProvider feeProvider, IBlockProvider blockProvider)
+	public static Wallet CreateAndRegisterServices(Network network, BitcoinStore bitcoinStore, KeyManager keyManager, WasabiSynchronizer synchronizer, string dataDir, ServiceConfiguration serviceConfiguration, HybridFeeProvider feeProvider, IBlockProvider blockProvider, TransactionFeeProvider transactionFeeProvider)
 	{
-		var wallet = new Wallet(dataDir, network, keyManager, bitcoinStore, synchronizer, serviceConfiguration, feeProvider, blockProvider);
+		var wallet = new Wallet(dataDir, network, keyManager, bitcoinStore, synchronizer, serviceConfiguration, feeProvider, blockProvider, transactionFeeProvider);
 		wallet.Initialize();
 		return wallet;
 	}

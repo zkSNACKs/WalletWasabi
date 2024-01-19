@@ -173,7 +173,7 @@ public class TransactionTreeBuilder
 			DateString = date.ToUserFacingString(),
 			OrderIndex = index,
 			Type = TransactionType.CoinjoinGroup,
-			Status = status,
+			Status = status
 		};
 	}
 
@@ -195,6 +195,7 @@ public class TransactionTreeBuilder
 			Labels = parent.Labels,
 			CanCancelTransaction = transactionSummary.Transaction.IsCancellable(_wallet.KeyManager),
 			CanSpeedUpTransaction = transactionSummary.Transaction.IsSpeedupable(_wallet.KeyManager),
+			FeeRate = transactionSummary.FeeRate(),
 
 			Type = GetItemType(transactionSummary),
 			Status =
@@ -270,7 +271,8 @@ public class TransactionTreeBuilder
 			BlockHeight = transactionSummary.Height.Type == HeightType.Chain ? transactionSummary.Height.Value : 0,
 			BlockHash = transactionSummary.BlockHash,
 			ConfirmedTooltip = GetConfirmationToolTip(status, confirmations, transactionSummary.Transaction),
-			Fee = transactionSummary.GetFee()
+			Fee = transactionSummary.GetFee(),
+			FeeRate = transactionSummary.FeeRate()
 		};
 	}
 
@@ -334,7 +336,7 @@ public class TransactionTreeBuilder
 			return TextHelpers.GetConfirmationText(confirmations);
 		}
 
-		var friendlyString = TransactionFeeHelper.TryEstimateConfirmationTime(_wallet, smartTransaction, out var estimate)
+		var friendlyString = TransactionFeeHelper.TryEstimateConfirmationTime(_wallet.FeeProvider, _wallet.Network, smartTransaction, _wallet.TransactionFeeProvider, out var estimate)
 			? TextHelpers.TimeSpanToFriendlyString(estimate.Value)
 			: "";
 

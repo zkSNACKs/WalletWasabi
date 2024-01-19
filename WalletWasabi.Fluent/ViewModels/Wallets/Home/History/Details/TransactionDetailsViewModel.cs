@@ -27,6 +27,8 @@ public partial class TransactionDetailsViewModel : RoutableViewModel
 	[AutoNotify] private bool _isLabelsVisible;
 	[AutoNotify] private LabelsArray? _labels;
 	[AutoNotify] private Amount? _amount;
+	[AutoNotify] private FeeRate? _feeRate;
+	[AutoNotify] private bool _feeRateVisible;
 
 	public TransactionDetailsViewModel(UiContext uiContext, IWalletModel wallet, TransactionModel model)
 	{
@@ -34,12 +36,11 @@ public partial class TransactionDetailsViewModel : RoutableViewModel
 		_wallet = wallet;
 
 		NextCommand = ReactiveCommand.Create(OnNext);
-		Fee = wallet.AmountProvider.Create(model.Fee);
-		FeeRate = model.FeeRate;
-		IsFeeVisible = model.Fee != null;
 		TransactionId = model.Id;
 		DestinationAddresses = wallet.Transactions.GetDestinationAddresses(model.Id).ToArray();
 		SingleAddress = DestinationAddresses.Count == 1 ? DestinationAddresses.First() : null;
+		Fee = wallet.AmountProvider.Create(model.Fee);
+		IsFeeVisible = model.Fee != null;
 
 		SetupCancel(enableCancel: false, enableCancelOnEscape: true, enableCancelOnPressed: true);
 
@@ -48,13 +49,11 @@ public partial class TransactionDetailsViewModel : RoutableViewModel
 
 	public BitcoinAddress? SingleAddress { get; set; }
 
-	public FeeRate? FeeRate { get; set; }
-
 	public uint256 TransactionId { get; }
 
-	public Amount? Fee { get; }
-
 	public ICollection<BitcoinAddress> DestinationAddresses { get; }
+
+	public Amount? Fee { get; }
 
 	public bool IsFeeVisible { get; }
 
@@ -64,6 +63,8 @@ public partial class TransactionDetailsViewModel : RoutableViewModel
 		Labels = model.Labels;
 		BlockHeight = model.BlockHeight;
 		Confirmations = model.Confirmations;
+		FeeRate = model.FeeRate;
+		FeeRateVisible = FeeRate != FeeRate.Zero;
 
 		var confirmationTime = _wallet.Transactions.TryEstimateConfirmationTime(model);
 		if (confirmationTime is { })
@@ -100,7 +101,7 @@ public partial class TransactionDetailsViewModel : RoutableViewModel
 		base.OnNavigatedTo(isInHistory, disposables);
 
 		_wallet.Transactions.Cache
-			                .Connect()
+							.Connect()
 							.Do(_ => UpdateCurrentTransaction())
 							.Subscribe()
 							.DisposeWith(disposables);

@@ -101,6 +101,7 @@ public class P2pTests
 		await using WasabiHttpClientFactory httpClientFactory = new(Common.TorSocks5Endpoint, backendUriGetter: () => new Uri("http://localhost:12345"));
 		WasabiSynchronizer synchronizer = new(requestInterval: TimeSpan.FromSeconds(3), 10000, bitcoinStore, httpClientFactory);
 		var feeProvider = new HybridFeeProvider(synchronizer, null);
+		var transactionFeeProvider = new TransactionFeeProvider(httpClientFactory);
 
 		ServiceConfiguration serviceConfig = new(new IPEndPoint(IPAddress.Loopback, network.DefaultPort), Money.Coins(Constants.DefaultDustThreshold));
 		using MemoryCache cache = new(new MemoryCacheOptions
@@ -127,7 +128,8 @@ public class P2pTests
 			dataDir,
 			new ServiceConfiguration(new IPEndPoint(IPAddress.Loopback, network.DefaultPort), Money.Coins(Constants.DefaultDustThreshold)),
 			feeProvider,
-			blockProvider);
+			blockProvider,
+			transactionFeeProvider);
 		Assert.True(Directory.Exists(blocks.BlocksFolderPath));
 
 		try
@@ -185,6 +187,7 @@ public class P2pTests
 			addressManager?.SavePeerFile(addressManagerFilePath, network);
 			Logger.LogInfo($"Saved {nameof(AddressManager)} to `{addressManagerFilePath}`.");
 			cache.Dispose();
+			transactionFeeProvider.Dispose();
 		}
 	}
 }
