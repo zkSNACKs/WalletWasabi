@@ -17,6 +17,7 @@ using WalletWasabi.Services;
 using WalletWasabi.Stores;
 using WalletWasabi.Tests.XunitConfiguration;
 using WalletWasabi.Wallets;
+using WalletWasabi.Wallets.FilterProcessor;
 using WalletWasabi.WebClients.Wasabi;
 using Xunit;
 
@@ -73,14 +74,12 @@ public class WalletTests : IClassFixture<RegTestFixture>
 
 		await using SpecificNodeBlockProvider specificNodeBlockProvider = new(network, setup.ServiceConfiguration, httpClientFactory.TorEndpoint);
 
-		SmartBlockProvider blockProvider = new(
+		var blockDownloadService = new BlockDownloadService(
 			bitcoinStore.BlockRepository,
-			rpcBlockProvider: null,
-			specificNodeBlockProvider,
-			new P2PBlockProvider(network, nodes, httpClientFactory.IsTorEnabled),
-			cache);
+			new IBlockProvider[] { specificNodeBlockProvider },
+			new P2PBlockProvider(network, nodes, httpClientFactory.IsTorEnabled));
 
-		using var wallet = Wallet.CreateAndRegisterServices(network, bitcoinStore, keyManager, synchronizer, workDir, setup.ServiceConfiguration, feeProvider, blockProvider);
+		using var wallet = Wallet.CreateAndRegisterServices(network, bitcoinStore, keyManager, synchronizer, workDir, setup.ServiceConfiguration, feeProvider, blockDownloadService);
 		wallet.NewFiltersProcessed += setup.Wallet_NewFiltersProcessed;
 
 		// Get some money, make it confirm.

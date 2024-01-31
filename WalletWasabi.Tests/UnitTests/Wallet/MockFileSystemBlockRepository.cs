@@ -21,7 +21,7 @@ public class MockFileSystemBlockRepository : IFileSystemBlockRepository
 	public Task SaveAsync(Block element, CancellationToken cancellationToken)
 		=> Task.CompletedTask;
 
-	public Task RemoveAsync(uint256 id, CancellationToken cancellationToken)
+	public Task RemoveAsync(uint256 blockHash, CancellationToken cancellationToken)
 		=> Task.CompletedTask;
 
 	public Task<int> CountAsync(CancellationToken cancellationToken)

@@ -13,7 +13,7 @@ namespace WalletWasabi.Wallets.FilterProcessor;
 /// </summary>
 public class BlockFilterIterator
 {
-	public BlockFilterIterator(IIndexStore indexStore, int maxNumberFiltersInMemory = 1000)
+	public BlockFilterIterator(IIndexStore indexStore, int maxNumberFiltersInMemory = 20000)
 	{
 		IndexStore = indexStore;
 		MaxNumberFiltersInMemory = maxNumberFiltersInMemory;
@@ -22,7 +22,7 @@ public class BlockFilterIterator
 	/// <remarks>Internal only to allow modifications in tests.</remarks>
 	internal Dictionary<uint, FilterModel> Cache { get; } = new();
 	private IIndexStore IndexStore { get; }
-	private int MaxNumberFiltersInMemory { get; }
+	public int MaxNumberFiltersInMemory { get; }
 
 	/// <summary>
 	/// Gets block filter for the block of specified height.

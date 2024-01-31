@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace WalletWasabi.Wallets.FilterProcessor;
 
-public record Priority(SyncType SyncType)
+public record Priority(SyncType SyncType, uint BlockHeight = 0)
 {
 	public static readonly Comparer<Priority> Comparer = Comparer<Priority>.Create(
 		(x, y) =>
@@ -18,6 +18,6 @@ public record Priority(SyncType SyncType)
 				return 1;
 			}
 
-			return 0;
+			return x.BlockHeight.CompareTo(y.BlockHeight);
 		});
 }

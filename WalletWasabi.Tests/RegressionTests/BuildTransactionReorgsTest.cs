@@ -21,6 +21,7 @@ using WalletWasabi.Services;
 using WalletWasabi.Stores;
 using WalletWasabi.Tests.XunitConfiguration;
 using WalletWasabi.Wallets;
+using WalletWasabi.Wallets.FilterProcessor;
 using WalletWasabi.WebClients.Wasabi;
 using Xunit;
 
@@ -75,14 +76,12 @@ public class BuildTransactionReorgsTest : IClassFixture<RegTestFixture>
 		using MemoryCache cache = CreateMemoryCache();
 		await using SpecificNodeBlockProvider specificNodeBlockProvider = new(network, serviceConfiguration, httpClientFactory.TorEndpoint);
 
-		var blockProvider = new SmartBlockProvider(
+		var blockDownloadService = new BlockDownloadService(
 			bitcoinStore.BlockRepository,
-			rpcBlockProvider: null,
-			specificNodeBlockProvider,
-			new P2PBlockProvider(network, nodes, httpClientFactory.IsTorEnabled),
-			cache);
+			new IBlockProvider[] { specificNodeBlockProvider },
+			new P2PBlockProvider(network, nodes, httpClientFactory.IsTorEnabled));
 
-		WalletManager walletManager = new(network, workDir, new WalletDirectories(network, workDir), bitcoinStore, synchronizer, feeProvider, blockProvider, serviceConfiguration);
+		WalletManager walletManager = new(network, workDir, new WalletDirectories(network, workDir), bitcoinStore, synchronizer, feeProvider, blockDownloadService, serviceConfiguration);
 		walletManager.Initialize();
 
 		var baseTip = await rpc.GetBestBlockHashAsync();

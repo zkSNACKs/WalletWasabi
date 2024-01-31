@@ -2,6 +2,7 @@ using Microsoft.Extensions.Hosting;
 using NBitcoin;
 using Nito.AsyncEx;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using WalletWasabi.Extensions;
 using WalletWasabi.Logging;
 using WalletWasabi.Models;
 using WalletWasabi.Stores;
+using WalletWasabi.Wallets.BlockProvider;
 using WalletWasabi.Wallets.FilterProcessor;
 
 namespace WalletWasabi.Wallets;
@@ -26,12 +28,12 @@ public class WalletFilterProcessor : BackgroundService
 	/// <remarks>Guarded by <see cref="Lock"/>.</remarks>
 	private FilterModel? _lastProcessedFilter;
 
-	public WalletFilterProcessor(KeyManager keyManager, BitcoinStore bitcoinStore, TransactionProcessor transactionProcessor, IBlockProvider blockProvider)
+	public WalletFilterProcessor(KeyManager keyManager, BitcoinStore bitcoinStore, TransactionProcessor transactionProcessor, BlockDownloadService blockDownloadService)
 	{
 		KeyManager = keyManager;
 		BitcoinStore = bitcoinStore;
 		TransactionProcessor = transactionProcessor;
-		BlockProvider = blockProvider;
+		BlockDownloadService = blockDownloadService;
 
 		FilterIteratorsBySyncType = new()
 		{
@@ -51,7 +53,7 @@ public class WalletFilterProcessor : BackgroundService
 	private KeyManager KeyManager { get; }
 	private BitcoinStore BitcoinStore { get; }
 	private TransactionProcessor TransactionProcessor { get; }
-	private IBlockProvider BlockProvider { get; }
+	private BlockDownloadService BlockDownloadService { get; }
 
 	public FilterModel? LastProcessedFilter
 	{
@@ -62,7 +64,7 @@ public class WalletFilterProcessor : BackgroundService
 				return _lastProcessedFilter;
 			}
 		}
-		set
+		private set
 		{
 			lock (Lock)
 			{
@@ -103,6 +105,9 @@ public class WalletFilterProcessor : BackgroundService
 	{
 		try
 		{
+			// This will store all pre processing tasks per sync type. No need for Priority here as requests are added by successive Heights.
+			Dictionary<SyncType, Queue<FilterPreProcessing>> preProcessTasks = Enum.GetValues<SyncType>().ToDictionary(syncType => syncType, _ => new Queue<FilterPreProcessing>());
+
 			while (true)
 			{
 				await SynchronizationRequestsSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
@@ -134,14 +139,37 @@ public class WalletFilterProcessor : BackgroundService
 							continue;
 						}
 
-						uint currentHeight = (uint)lastHeight.Value + 1;
+						uint toProcessHeight = (uint)lastHeight.Value + 1;
 
-						FilterModel filter = await FilterIteratorsBySyncType[request.SyncType].GetAndRemoveAsync(currentHeight, cancellationToken).ConfigureAwait(false);
-						var matchFound = await ProcessFilterModelAsync(filter, request.SyncType, cancellationToken).ConfigureAwait(false);
+						// MaxNumberFiltersInMemory is also the maximum of pre-process slots because filters are in memory until the end of the task.
+						// This is not 100% true because the filter has to stay in memory until after ProcessFilterModelAsync finishes.
+						var availablePreProcessSlots = Math.Max(0, FilterIteratorsBySyncType[request.SyncType].MaxNumberFiltersInMemory - preProcessTasks[request.SyncType].Count);
 
-						reachedBlockChainTip = currentHeight == BitcoinStore.SmartHeaderChain.TipHeight;
+						// We have to skip all the current tasks.
+						var toPreProcessHeight = toProcessHeight + (uint)preProcessTasks[request.SyncType].Count;
+						for (uint i = 0; i < availablePreProcessSlots; i++)
+						{
+							if (toPreProcessHeight > BitcoinStore.SmartHeaderChain.TipHeight)
+							{
+								break;
+							}
+							var filter = await FilterIteratorsBySyncType[request.SyncType].GetAndRemoveAsync(toPreProcessHeight, cancellationToken).ConfigureAwait(false);
+							preProcessTasks[request.SyncType].Enqueue(new FilterPreProcessing(filter, PreProcessFilterModel(filter, request.SyncType, cancellationToken)));
+							toPreProcessHeight++;
+						}
+
+						if (preProcessTasks[request.SyncType].Count == 0)
+						{
+							// TODO: I believe this must be a problem?
+							continue;
+						}
+
+						// TODO: Reorgs??
+						var matchFound = await ProcessFilterModelAsync(preProcessTasks[request.SyncType].Dequeue(), request.SyncType, cancellationToken).ConfigureAwait(false);
+
+						reachedBlockChainTip = toProcessHeight == BitcoinStore.SmartHeaderChain.TipHeight;
 						bool storeToDisk = matchFound || reachedBlockChainTip;
-						KeyManager.SetBestHeight(request.SyncType, new Height(currentHeight), storeToDisk);
+						KeyManager.SetBestHeight(request.SyncType, new Height(toProcessHeight), storeToDisk);
 					}
 
 					if (reachedBlockChainTip)
@@ -161,7 +189,7 @@ public class WalletFilterProcessor : BackgroundService
 				{
 					if (!request.Tcs.TrySetException(ex))
 					{
-						Logger.LogWarning($"Tried to set exception for {request.SyncType.FriendlyName()} but status was already {request.Tcs.Task.Status}.");
+						Logger.LogWarning($"Tried to set exception for {request.SyncType.ToString()} but status was already {request.Tcs.Task.Status}.");
 					}
 
 					throw;
@@ -224,30 +252,55 @@ public class WalletFilterProcessor : BackgroundService
 		return scriptPubKeyAccordingSyncType.Select(x => x.CompressedScriptPubKey);
 	}
 
-	private async Task<bool> ProcessFilterModelAsync(FilterModel filter, SyncType syncType, CancellationToken cancel)
+	private Task<Block>? PreProcessFilterModel(FilterModel filter, SyncType syncType, CancellationToken cancel)
 	{
 		var height = new Height(filter.Header.Height);
 		var toTestKeys = GetScriptPubKeysToTest(height, syncType);
+		var match = toTestKeys.Any() && filter.Filter.MatchAny(toTestKeys, filter.FilterKey);
+		return match ?
+			KeepTryingToGetBlockAsync(filter.Header.BlockHash, new Priority(syncType, filter.Header.Height), cancel) :
+			null;
+	}
 
-		var matchFound = false;
-		if (toTestKeys.Any())
+	private async Task<bool> ProcessFilterModelAsync(FilterPreProcessing preProcessing, SyncType syncType, CancellationToken cancel)
+	{
+		var preProcessingTask = preProcessing.Task;
+		var filter = preProcessing.Filter;
+
+		bool matchFound;
+		var height = new Height(filter.Header.Height);
+
+		if (preProcessingTask is not null)
 		{
-			var compressedScriptPubKeys = toTestKeys;
-			matchFound = filter.Filter.MatchAny(compressedScriptPubKeys, filter.FilterKey);
+			matchFound = true;
+		}
+		else
+		{
+			// Test against the keys that haven't been used for the preprocessing
+			// TODO: Don't retest against keys that were tested during preprocessing.
+			var toTestKeys = GetScriptPubKeysToTest(height, syncType);
+			matchFound = toTestKeys.Any() && filter.Filter.MatchAny(toTestKeys, filter.FilterKey);
+		}
 
-			if (matchFound)
+		if (matchFound)
+		{
+			Stopwatch sw = Stopwatch.StartNew();
+			Block block = preProcessingTask is not null ?
+				await preProcessingTask.ConfigureAwait(false) :
+				await KeepTryingToGetBlockAsync(
+					filter.Header.BlockHash,
+					new Priority(syncType, filter.Header.Height),
+					cancel).ConfigureAwait(false);
+			Logger.LogError($"{height}: Dl finished at {DateTime.UtcNow} - preprocessed: {preProcessingTask is not null} - waited {sw.ElapsedMilliseconds}ms synchronously");
+
+			var txsToProcess = new List<SmartTransaction>();
+			for (int i = 0; i < block.Transactions.Count; i++)
 			{
-				Block currentBlock = await BlockProvider.GetBlockAsync(filter.Header.BlockHash, cancel).ConfigureAwait(false); // Wait until not downloaded.
-
-				var txsToProcess = new List<SmartTransaction>();
-				for (int i = 0; i < currentBlock.Transactions.Count; i++)
-				{
-					Transaction tx = currentBlock.Transactions[i];
-					txsToProcess.Add(new SmartTransaction(tx, height, currentBlock.GetHash(), i, firstSeen: currentBlock.Header.BlockTime, labels: BitcoinStore.MempoolService.TryGetLabel(tx.GetHash())));
-				}
-
-				TransactionProcessor.Process(txsToProcess);
+				Transaction tx = block.Transactions[i];
+				txsToProcess.Add(new SmartTransaction(tx, height, block.GetHash(), i, firstSeen: block.Header.BlockTime, labels: BitcoinStore.MempoolService.TryGetLabel(tx.GetHash())));
 			}
+
+			TransactionProcessor.Process(txsToProcess);
 		}
 
 		LastProcessedFilter = filter;
@@ -262,19 +315,39 @@ public class WalletFilterProcessor : BackgroundService
 
 			using (await ReorgLock.LockAsync(CancellationToken.None).ConfigureAwait(false))
 			{
-				KeyManager.SetMaxBestHeight(new Height(invalidFilter.Header.Height - 1));
+				var newBestHeight = new Height(invalidFilter.Header.Height - 1);
+				KeyManager.SetMaxBestHeight(newBestHeight);
 				TransactionProcessor.UndoBlock((int)invalidFilter.Header.Height);
 				BitcoinStore.TransactionStore.ReleaseToMempoolFromBlock(invalidBlockHash);
-
-				if (BlockProvider is SmartBlockProvider smartBlockProvider)
-				{
-					await smartBlockProvider.RemoveAsync(invalidBlockHash, CancellationToken.None).ConfigureAwait(false);
-				}
+				await BlockDownloadService.RemoveBlocksAsync((uint)newBestHeight.Value).ConfigureAwait(false);
 			}
 		}
 		catch (Exception ex)
 		{
 			Logger.LogWarning(ex);
+		}
+	}
+
+	/// <summary>
+	/// Attempt to get the bitcoin block from a full node or use P2P as a fallback.
+	/// </summary>
+	private async Task<Block> KeepTryingToGetBlockAsync(uint256 blockHash, Priority priority, CancellationToken cancellationToken)
+	{
+		BlockDownloadService.IResult fullNodeResult = await BlockDownloadService.TryGetBlockAsync(FullNodeSourceRequest.Instance, blockHash, priority, cancellationToken).ConfigureAwait(false);
+
+		if (fullNodeResult is BlockDownloadService.SuccessResult successFullNodeResult)
+		{
+			return successFullNodeResult.Block;
+		}
+
+		while (true)
+		{
+			BlockDownloadService.IResult p2pNodeResult = await BlockDownloadService.TryGetBlockAsync(P2pSourceRequest.Automatic, blockHash, priority, cancellationToken).ConfigureAwait(false);
+
+			if (p2pNodeResult is BlockDownloadService.SuccessResult successP2pResult)
+			{
+				return successP2pResult.Block;
+			}
 		}
 	}
 
@@ -297,4 +370,5 @@ public class WalletFilterProcessor : BackgroundService
 	}
 
 	public record SyncRequest(SyncType SyncType, TaskCompletionSource Tcs);
+	private record FilterPreProcessing(FilterModel Filter, Task<Block>? Task);
 }

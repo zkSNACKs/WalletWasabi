@@ -24,6 +24,7 @@ using WalletWasabi.Stores;
 using WalletWasabi.Userfacing;
 using WalletWasabi.WabiSabi.Client;
 using WalletWasabi.WabiSabi.Client.Batching;
+using WalletWasabi.Wallets.FilterProcessor;
 
 namespace WalletWasabi.Wallets;
 
@@ -39,7 +40,7 @@ public class Wallet : BackgroundService, IWallet
 		WasabiSynchronizer syncer,
 		ServiceConfiguration serviceConfiguration,
 		HybridFeeProvider feeProvider,
-		IBlockProvider blockProvider)
+		BlockDownloadService blockDownloadService)
 	{
 		Guard.NotNullOrEmptyOrWhitespace(nameof(dataDir), dataDir);
 		Network = network;
@@ -48,7 +49,7 @@ public class Wallet : BackgroundService, IWallet
 		Synchronizer = syncer;
 		ServiceConfiguration = serviceConfiguration;
 		FeeProvider = feeProvider;
-		BlockProvider = blockProvider;
+		BlockDownloadService = blockDownloadService;
 
 		RuntimeParams.SetDataDir(dataDir);
 
@@ -61,7 +62,7 @@ public class Wallet : BackgroundService, IWallet
 
 		TransactionProcessor = new TransactionProcessor(BitcoinStore.TransactionStore, BitcoinStore.MempoolService, KeyManager, ServiceConfiguration.DustThreshold);
 		Coins = TransactionProcessor.Coins;
-		WalletFilterProcessor = new WalletFilterProcessor(KeyManager, BitcoinStore, TransactionProcessor, BlockProvider);
+		WalletFilterProcessor = new WalletFilterProcessor(KeyManager, BitcoinStore, TransactionProcessor, BlockDownloadService);
 		BatchedPayments = new PaymentBatch();
 		OutputProvider = new PaymentAwareOutputProvider(DestinationProvider, BatchedPayments);
 		WalletId = new WalletId(Guid.NewGuid());
@@ -108,7 +109,7 @@ public class Wallet : BackgroundService, IWallet
 
 	public WalletFilterProcessor WalletFilterProcessor { get; }
 	public FilterModel? LastProcessedFilter => WalletFilterProcessor.LastProcessedFilter;
-	public IBlockProvider BlockProvider { get; }
+	public BlockDownloadService BlockDownloadService { get; }
 
 	public bool IsLoggedIn { get; private set; }
 
@@ -552,9 +553,9 @@ public class Wallet : BackgroundService, IWallet
 		State = WalletState.WaitingForInit;
 	}
 
-	public static Wallet CreateAndRegisterServices(Network network, BitcoinStore bitcoinStore, KeyManager keyManager, WasabiSynchronizer synchronizer, string dataDir, ServiceConfiguration serviceConfiguration, HybridFeeProvider feeProvider, IBlockProvider blockProvider)
+	public static Wallet CreateAndRegisterServices(Network network, BitcoinStore bitcoinStore, KeyManager keyManager, WasabiSynchronizer synchronizer, string dataDir, ServiceConfiguration serviceConfiguration, HybridFeeProvider feeProvider, BlockDownloadService blockDownloadService)
 	{
-		var wallet = new Wallet(dataDir, network, keyManager, bitcoinStore, synchronizer, serviceConfiguration, feeProvider, blockProvider);
+		var wallet = new Wallet(dataDir, network, keyManager, bitcoinStore, synchronizer, serviceConfiguration, feeProvider, blockDownloadService);
 		wallet.Initialize();
 		return wallet;
 	}

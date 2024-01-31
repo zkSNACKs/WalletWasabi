@@ -19,6 +19,7 @@ using WalletWasabi.WebClients.Wasabi;
 using WalletWasabi.Tests.Helpers;
 using System.IO;
 using System.Linq;
+using WalletWasabi.Wallets.FilterProcessor;
 using System.Threading;
 
 namespace WalletWasabi.Tests.UnitTests.Wallet;
@@ -62,9 +63,12 @@ public class WalletBuilder : IAsyncDisposable
 		var serviceConfiguration = new ServiceConfiguration(new UriEndPoint(new Uri("http://www.nomatter.dontcare")), Money.Coins(WalletWasabi.Helpers.Constants.DefaultDustThreshold));
 
 		HybridFeeProvider feeProvider = new(Synchronizer, null);
-		SmartBlockProvider blockProvider = new(BitcoinStore.BlockRepository, rpcBlockProvider: null, null, null, Cache);
+		BlockDownloadService blockDownloadService = new (
+			BitcoinStore.BlockRepository,
+			new IBlockProvider[] { },
+			null);
 
-		return WalletWasabi.Wallets.Wallet.CreateAndRegisterServices(Network.RegTest, BitcoinStore, keyManager, Synchronizer, DataDir, serviceConfiguration, feeProvider, blockProvider);
+		return WalletWasabi.Wallets.Wallet.CreateAndRegisterServices(Network.RegTest, BitcoinStore, keyManager, Synchronizer, DataDir, serviceConfiguration, feeProvider, blockDownloadService);
 	}
 
 	public async ValueTask DisposeAsync()

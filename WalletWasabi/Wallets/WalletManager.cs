@@ -19,6 +19,7 @@ using WalletWasabi.Models;
 using WalletWasabi.Services;
 using WalletWasabi.Stores;
 using WalletWasabi.WabiSabi.Client;
+using WalletWasabi.Wallets.FilterProcessor;
 
 namespace WalletWasabi.Wallets;
 
@@ -34,7 +35,7 @@ public class WalletManager : IWalletProvider
 		BitcoinStore bitcoinStore,
 		WasabiSynchronizer synchronizer,
 		HybridFeeProvider feeProvider,
-		IBlockProvider blockProvider,
+		BlockDownloadService blockDownloadService,
 		ServiceConfiguration serviceConfiguration)
 	{
 		using IDisposable _ = BenchmarkLogger.Measure();
@@ -46,7 +47,7 @@ public class WalletManager : IWalletProvider
 		BitcoinStore = bitcoinStore;
 		Synchronizer = synchronizer;
 		FeeProvider = feeProvider;
-		BlockProvider = blockProvider;
+		BlockDownloadService = blockDownloadService;
 		ServiceConfiguration = serviceConfiguration;
 		CancelAllTasksToken = CancelAllTasks.Token;
 
@@ -89,7 +90,7 @@ public class WalletManager : IWalletProvider
 	private HybridFeeProvider FeeProvider { get; }
 	public Network Network { get; }
 	public WalletDirectories WalletDirectories { get; }
-	private IBlockProvider BlockProvider { get; }
+	private BlockDownloadService BlockDownloadService { get; }
 	private string WorkDir { get; }
 
 	private void RefreshWalletList()
@@ -333,7 +334,7 @@ public class WalletManager : IWalletProvider
 	}
 
 	private Wallet CreateWalletInstance(KeyManager keyManager)
-		=> new(WorkDir, Network, keyManager, BitcoinStore, Synchronizer, ServiceConfiguration, FeeProvider, BlockProvider);
+		=> new(WorkDir, Network, keyManager, BitcoinStore, Synchronizer, ServiceConfiguration, FeeProvider, BlockDownloadService);
 
 	public bool WalletExists(HDFingerprint? fingerprint) => GetWallets().Any(x => fingerprint is { } && x.KeyManager.MasterFingerprint == fingerprint);
 
