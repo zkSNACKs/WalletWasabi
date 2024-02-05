@@ -41,11 +41,11 @@ public abstract class WebSocketHandlerBase(WebSocketsConnectionTracker connectio
 			: Task.CompletedTask;
 	}
 
-	public Task SendMessageToAllAsync(byte[][] message, CancellationToken cancellationToken) =>
+	public Task SendMessageToAllAsync(byte[] message, CancellationToken cancellationToken) =>
 		Task.WhenAll(
 			connectionTracker
 				.GetWebSocketConnectionStates()
-				.Select(socketState => socketState.WebSocket.SendAsync(message, cancellationToken)));
+				.Select(socketState => socketState.WebSocket.SendAsync(message, WebSocketMessageType.Binary, true, cancellationToken)));
 
 	/// <summary>
 	/// Receives

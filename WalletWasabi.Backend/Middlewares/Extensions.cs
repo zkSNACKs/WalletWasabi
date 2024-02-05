@@ -28,15 +28,3 @@ public static class WebSocketManagerExtensions
 	public static IApplicationBuilder MapWebSocketManager(this IApplicationBuilder app, PathString path, WebSocketHandlerBase handlerBase) =>
 		app.Map(path, _app => _app.UseMiddleware<WebSocketHandlerMiddleware>(handlerBase));
 }
-
-public static class WebSocketExtensions
-{
-	public static async Task SendAsync(this WebSocket webSocket, byte[][] messageParts, CancellationToken cancellationToken)
-	{
-		foreach (var messagePart in messageParts.Take(messageParts.Length - 1))
-		{
-			await webSocket.SendAsync(messagePart, WebSocketMessageType.Binary, false, cancellationToken);
-		}
-		await webSocket.SendAsync(messageParts[^1], WebSocketMessageType.Binary, true, cancellationToken);
-	}
-}

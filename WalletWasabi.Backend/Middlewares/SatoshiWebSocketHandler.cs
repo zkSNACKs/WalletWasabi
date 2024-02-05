@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Threading;
@@ -5,7 +7,9 @@ using System.Threading.Tasks;
 using NBitcoin;
 using WalletWasabi.Backend.Models;
 using WalletWasabi.Blockchain.BlockFilters;
+using WalletWasabi.Extensions;
 using WalletWasabi.Logging;
+using WalletWasabi.Synchronizarion;
 
 namespace WalletWasabi.Backend.Middlewares;
 
@@ -23,19 +27,9 @@ namespace WalletWasabi.Backend.Middlewares;
 /// </remarks>
 public class SatoshiWebSocketHandler : WebSocketHandlerBase, IObserver<FilterModel>
 {
-	private enum RequestMessage
-	{
-		BestKnowBlockHash
-	}
-
-	private enum ResponseMessage
-	{
-		Filter
-	}
-
 	private readonly IndexBuilderService _indexBuilderService;
 
-	public SatoshiWebSocketHandler( WebSocketsConnectionTracker connectionTracker, IndexBuilderService indexBuilderService)
+	public SatoshiWebSocketHandler(WebSocketsConnectionTracker connectionTracker, IndexBuilderService indexBuilderService)
 		: base(connectionTracker)
 	{
 		_indexBuilderService = indexBuilderService;
@@ -50,20 +44,34 @@ public class SatoshiWebSocketHandler : WebSocketHandlerBase, IObserver<FilterMod
 	/// <param name="result">The reading result.</param>
 	/// <param name="buffer">The buffer containing the message received from the client.</param>
 	/// <param name="cancellationToken">The cancellation token.</param>
-	/// <returns></returns>
-	public override Task ReceiveAsync(WebSocketConnectionState socketState, WebSocketReceiveResult result, byte[] buffer, CancellationToken cancellationToken)
+	public override async Task ReceiveAsync(WebSocketConnectionState socketState, WebSocketReceiveResult result, byte[] buffer, CancellationToken cancellationToken)
 	{
 		if (!socketState.Handshaked && result.MessageType == WebSocketMessageType.Binary)
 		{
-			if (buffer is [(byte)RequestMessage.BestKnowBlockHash, 32, 0, .. var blockHashBytes])
+			switch ((RequestMessage)buffer[0])
 			{
-				var bestKnownBlockHash = new uint256(blockHashBytes[..32], false);
-				socketState.Handshaked = true;
-				StartSendingUpdatesAsync(socketState.WebSocket, bestKnownBlockHash, cancellationToken);
+				case RequestMessage.BestKnowBlockHash:
+					try
+					{
+						using var reader = new BinaryReader(new MemoryStream(buffer[1..]));
+						var bestKnownBlockHash = reader.ReadUInt256();
+						socketState.Handshaked = true;
+						await StartSendingUpdatesAsync(socketState.WebSocket, bestKnownBlockHash, cancellationToken);
+					}
+					catch (Exception e) when (e is FormatException or InvalidOperationException)
+					{
+						await SendHandshakeError(socketState.WebSocket, cancellationToken);
+					}
+					break;
+				default:
+					await SendHandshakeError(socketState.WebSocket, cancellationToken);
+					break;
 			}
 		}
-		return Task.CompletedTask;
 	}
+
+	private static Task SendHandshakeError(WebSocket webSocket, CancellationToken cancellationToken) =>
+		 webSocket.SendAsync(new[] { (byte)ResponseMessage.HandshakeError }, WebSocketMessageType.Binary, true, cancellationToken);
 
 	private async Task StartSendingUpdatesAsync(WebSocket webSocket, uint256 bestKnownBlockHash, CancellationToken cancellationToken)
 	{
@@ -78,6 +86,8 @@ public class SatoshiWebSocketHandler : WebSocketHandlerBase, IObserver<FilterMod
 
 		// Subscribe to changes in the mining fee rates and send them immediately.
 
+		// Subscribe to changes in the exchange rate rates and send them immediately.
+
 		// Am I missing something?
 	}
 
@@ -90,20 +100,30 @@ public class SatoshiWebSocketHandler : WebSocketHandlerBase, IObserver<FilterMod
 	private async Task SendMissingFiltersAsync(WebSocket webSocket, uint256 bestKnownBlockHash, CancellationToken cancellationToken)
 	{
 		var lastTransmittedFilter = bestKnownBlockHash;
-		var getFiltersChunkResult =
-			_indexBuilderService.GetFilterLinesExcluding(lastTransmittedFilter, 1_000, out var found); // TODO: do something if found is false
+		var getFiltersChunk = GetFiltersBucketStartingFrom(lastTransmittedFilter);
 
-		while (getFiltersChunkResult.filters.Any())
+		while (getFiltersChunk.Any())
 		{
-			foreach (var filter in getFiltersChunkResult.filters)
+			foreach (var filter in getFiltersChunk)
 			{
-				await webSocket.SendAsync(FilterToBinary(filter), cancellationToken);
+				var message = new FilterMessage(filter);
+				await webSocket.SendAsync(message.ToByteArray(), WebSocketMessageType.Binary, true, cancellationToken);
 
 				lastTransmittedFilter = filter.Header.BlockHash;
 			}
 
-			getFiltersChunkResult = _indexBuilderService.GetFilterLinesExcluding(lastTransmittedFilter, 1_000, out found);
+			getFiltersChunk = GetFiltersBucketStartingFrom(lastTransmittedFilter);
 		}
+	}
+
+	private IEnumerable<FilterModel> GetFiltersBucketStartingFrom(uint256 startingBlockHash)
+	{
+		var (_, filters) = _indexBuilderService.GetFilterLinesExcluding(startingBlockHash, 1_000, out var found);
+		if (!found)
+		{
+			throw new InvalidOperationException($"Filter {startingBlockHash} not found");
+		}
+		return filters;
 	}
 
 	public void OnCompleted()
@@ -117,17 +137,7 @@ public class SatoshiWebSocketHandler : WebSocketHandlerBase, IObserver<FilterMod
 
 	void IObserver<FilterModel>.OnNext(FilterModel filter)
 	{
-		SendMessageToAllAsync(FilterToBinary(filter), CancellationToken.None);
+		var message = new FilterMessage(filter);
+		SendMessageToAllAsync(message.ToByteArray(), CancellationToken.None);
 	}
-
-	private byte[][] FilterToBinary(FilterModel filter) =>
-		[
-			[(byte) ResponseMessage.Filter],
-			filter.Header.BlockHash.ToBytes(),
-			filter.Header.PrevHash.ToBytes(),
-			BitConverter.GetBytes(filter.Header.Height),
-			BitConverter.GetBytes(filter.Header.EpochBlockTime),
-			BitConverter.GetBytes(filter.FilterData.Length),
-			filter.FilterData
-		];
 }
