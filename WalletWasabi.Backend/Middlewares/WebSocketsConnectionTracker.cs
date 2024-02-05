@@ -10,16 +10,18 @@ namespace WalletWasabi.Backend.Middlewares;
 public class WebSocketsConnectionTracker
 {
 	private readonly object _sync = new();
-	private readonly List<WebSocket> _sockets = [];
+	private readonly List<WebSocketConnectionState> _sockets = [];
 
 	/// <summary>
 	/// Returns a list of opened WebSocket objects.
 	/// </summary>
-	public IEnumerable<WebSocket> GetWebSockets()
+	public IEnumerable<WebSocketConnectionState> GetWebSocketConnectionStates()
 	{
 		lock (_sync)
 		{
-			return _sockets.Where(x => x.State == WebSocketState.Open).ToList();
+			return _sockets
+				.Where(x => x.WebSocket.State == WebSocketState.Open)
+				.ToList();
 		}
 	}
 
@@ -27,7 +29,7 @@ public class WebSocketsConnectionTracker
 	{
 		lock (_sync)
 		{
-			_sockets.Add(socket);
+			_sockets.Add(new WebSocketConnectionState(socket, DateTime.UtcNow));
 		}
 	}
 
@@ -35,7 +37,15 @@ public class WebSocketsConnectionTracker
 	{
 		lock (_sync)
 		{
-			_sockets.Remove(socket);
+			_sockets.RemoveAll(x => x.WebSocket == socket);
+		}
+	}
+
+	public WebSocketConnectionState GetWebSocketConnectionState(WebSocket socket)
+	{
+		lock (_sync)
+		{
+			return _sockets.First(x => x.WebSocket == socket);
 		}
 	}
 }

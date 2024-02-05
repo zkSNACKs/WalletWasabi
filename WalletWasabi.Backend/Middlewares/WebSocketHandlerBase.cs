@@ -41,11 +41,11 @@ public abstract class WebSocketHandlerBase(WebSocketsConnectionTracker connectio
 			: Task.CompletedTask;
 	}
 
-	public Task SendMessageToAllAsync(byte[] message, CancellationToken cancellationToken) =>
+	public Task SendMessageToAllAsync(byte[][] message, CancellationToken cancellationToken) =>
 		Task.WhenAll(
 			connectionTracker
-				.GetWebSockets()
-				.Select(socket => socket.SendAsync(message, WebSocketMessageType.Binary, true, cancellationToken)));
+				.GetWebSocketConnectionStates()
+				.Select(socketState => socketState.WebSocket.SendAsync(message, cancellationToken)));
 
 	/// <summary>
 	/// Receives
@@ -54,5 +54,8 @@ public abstract class WebSocketHandlerBase(WebSocketsConnectionTracker connectio
 	/// <param name="result">The websocket reading result.</param>
 	/// <param name="buffer">The buffer containing the read message</param>
 	/// <param name="cancellationToken">The cancellationToken.</param>
-	public abstract Task ReceiveAsync(WebSocket socket, WebSocketReceiveResult result, byte[] buffer, CancellationToken cancellationToken);
+	public virtual Task ReceiveAsync(WebSocket socket, WebSocketReceiveResult result, byte[] buffer, CancellationToken cancellationToken) =>
+		ReceiveAsync(connectionTracker.GetWebSocketConnectionState(socket), result, buffer, cancellationToken);
+
+	public abstract Task ReceiveAsync(WebSocketConnectionState socketState, WebSocketReceiveResult result, byte[] buffer, CancellationToken cancellationToken);
 }
