@@ -15,12 +15,14 @@ using WalletWasabi.Models;
 
 namespace WalletWasabi.Blockchain.BlockFilters;
 
-public class IndexBuilderService
+public class IndexBuilderService : IObservable<FilterModel>
 {
 	private const long NotStarted = 0;
 	private const long Running = 1;
 	private const long Stopping = 2;
 	private const long Stopped = 3;
+
+	private readonly List<IObserver<FilterModel>> _observers = new ();
 
 	/// <summary>
 	/// 0: Not started, 1: Running, 2: Stopping, 3: Stopped
@@ -204,6 +206,7 @@ public class IndexBuilderService
 
 							var smartHeader = new SmartHeader(block.Hash, block.PrevBlockHash, nextHeight, block.BlockTime);
 							var filterModel = new FilterModel(smartHeader, filter);
+							NotifyAll(filterModel);
 
 							await File.AppendAllLinesAsync(IndexFilePath, new[] { filterModel.ToLine() }).ConfigureAwait(false);
 
@@ -394,4 +397,39 @@ public class IndexBuilderService
 			await Task.Delay(50).ConfigureAwait(false);
 		}
 	}
+
+	private void NotifyAll(FilterModel filterModel)
+	{
+		foreach (var observer in _observers)
+		{
+			observer.OnNext(filterModel);
+		}
+	}
+
+	public IDisposable Subscribe(IObserver<FilterModel> observer)
+	{
+	   if (! _observers.Contains(observer))
+	   {
+		   _observers.Add(observer);
+	   }
+
+	   return new Unsubscriber(_observers, observer);
+	}
+
+	private class Unsubscriber : IDisposable
+    {
+       private List<IObserver<FilterModel>> _observers;
+       private IObserver<FilterModel> _observer;
+
+       public Unsubscriber(List<IObserver<FilterModel>> observers, IObserver<FilterModel> observer)
+       {
+          _observers = observers;
+          _observer = observer;
+       }
+
+       public void Dispose()
+       {
+          _observers.Remove(_observer);
+       }
+    }
 }
