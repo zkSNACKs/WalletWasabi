@@ -1,14 +1,35 @@
+using System.IO;
 using NBitcoin;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using WalletWasabi.Blockchain.Keys;
+using WalletWasabi.Fluent.Helpers;
 using WalletWasabi.Hwi;
 using WalletWasabi.Hwi.Exceptions;
 using WalletWasabi.Hwi.Models;
 using WalletWasabi.Hwi.Parsers;
 using WalletWasabi.Tests.Helpers;
+using WalletWasabi.Tests.UnitTests.Helpers;
 using Xunit;
+using Microsoft.Extensions.Options;
+using WalletWasabi.Fluent.Models;
+using Moq;
+using NBitcoin.Protocol;
+using WalletWasabi.BitcoinCore.Rpc;
+using WalletWasabi.Blockchain.Analysis.FeesEstimation;
+using WalletWasabi.Fluent.Models.Wallets;
+using WalletWasabi.Helpers;
+using WalletWasabi.Models;
+using WalletWasabi.Services;
+using WalletWasabi.Stores;
+using WalletWasabi.Tests.RegressionTests;
+using WalletWasabi.Tests.XunitConfiguration;
+using WalletWasabi.Wallets;
+using WalletWasabi.WebClients.Wasabi;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace WalletWasabi.Tests.AcceptanceTests;
 
@@ -538,5 +559,155 @@ public class HwiKatas
 
 		var checkResult = signedTx.Check();
 		Assert.Equal(TransactionCheckResult.Success, checkResult);
+	}
+
+	[Fact]
+	public async Task ColdCardPsbtKataAsync()
+	{
+		// --- USER INTERACTIONS ---
+		//
+		// Connect and initialize your ColdCard with the following seed phrase:
+		// more maid moon upgrade layer alter marine screen benefit way cover alcohol
+		// Before you start the test:
+		// 1. Make sure SD card is not connected to the computer.
+		// Run this test.
+		//
+		// 1. Beep sound.
+		// 2. Plug the SD card into the computer.
+		// 3. Beep sound.
+		// 2. Unplug the SD card from the computer.
+		// 3. Plug the SD card into the ColdCard.
+		// 4. Try to sign the transaction (Ready to sign).
+		// 5. If the transaction is signed without error, then plug the SD card into the computer else wait for the beep sound.
+		// 6. Beep sound.
+		//
+		// --- USER INTERACTIONS ---
+		var network = Network.Main;
+		Console.Beep();
+
+		var newDrive = await UsbAttachHelper.DetectNewDriveAsync();
+		// Insert the SD card into the computer.
+		Assert.NotNull(newDrive);
+
+		// Consolidating tx with 10 inputs and 1 output.
+		PSBT coldCardPsbt = PSBT.Parse(
+			"cHNidP8BAHEBAAAAAbUwDqJlIViUTsXtSM/1IErUC9Xh4SF/6NKBm7zVb1W9AAAAAAD9////AhM8AAAAAAAAFgAUBRkjCvL5zaksawVCiozhXY+jZ8vACAAAAAAAABYAFCZua7ILm6F4bNWykw9wgeVD5s0VAAAAAAABAR9zVgAAAAAAABYAFNAycvKl+jDeu23kRyGQ2ZJ1MgYkAQB9AQAAAAFKFZo0tmZ8bL5tIw6RDPrVB++6ZEzEkWeO3p7eQtpBZAAAAAAA/f///wJzVgAAAAAAABYAFNAycvKl+jDeu23kRyGQ2ZJ1MgYka71hAAAAAAAiUSCdmcl1eIg8Xewvv+HYh34kHENr175Nx0hvleXmc5cIMAAAAAAiBgMDjnKMrVTFG6rS2lkJ5Abs2eQLEpMwb12jIRU83l/5LRjl28nLVAAAgAAAAIAAAACAAAAAAAsAAAAAACICAsd5ZUg1yxznPEp3vwCtmzBBEC3lHkIpIltXojE9SDZLGOXbyctUAACAAAAAgAAAAIABAAAABgAAAAA=", network);
+
+		string initialFileName = coldCardPsbt.GetOriginalTransaction().GetHash().ToString();
+		string fileName = Path.Combine(newDrive, initialFileName + ".psbt");
+
+		if (File.Exists(fileName))
+		{
+			File.Delete(fileName);
+		}
+
+		await File.WriteAllBytesAsync(fileName, coldCardPsbt.ToBytes());
+
+		Console.Beep();
+
+		newDrive = await UsbAttachHelper.DetectNewDriveAsync();
+
+		Assert.NotNull(newDrive);
+
+		fileName = Path.Combine(newDrive, initialFileName + ".psbt");
+		Assert.True(File.Exists(fileName));
+
+		var importedTransaction = Mock.Of<ITransactionBroadcasterModel>().LoadFromFileAsync(fileName);
+
+		Assert.NotNull(importedTransaction);
+		Console.Beep();
+		// Unplug the SD card from the computer.
+	}
+
+	[Fact]
+	public async Task ColdCardImportWalletKataAsync()
+	{
+		// --- USER INTERACTIONS ---
+		//
+		// Connect and initialize your ColdCard with the following seed phrase:
+		// more maid moon upgrade layer alter marine screen benefit way cover alcohol
+		// Before you start the test:
+		// 1. Make sure that the SD card is inserted into the ColdCard.
+		// 2. Make sure that the exported wallet wasabi file is on the sd card (Advanced > MicroSD Card > Export Wallet > WalletWasabi).
+		// 3. Make sure SD card is not connected to the computer.
+		// 4. Make sure that WasabiWallet file name is "new-wasabi.json".
+		// Run this test.
+		//
+		// 1. Beep sound.
+		// 2. Plug the SD card into the computer,from the ColdCard.
+		// 3. Beep sound.
+		// 2. Unplug the SD card from the computer.
+		// 3. Plug the SD card into the ColdCard.
+		// 4. Try to sign the transaction (Ready to sign).
+		// 5. If the transaction is signed without error, then plug the SD card into the computer else wait for the beep sound.
+		// 6. Beep sound.
+		//
+		// --- USER INTERACTIONS ---
+
+		#region SetupRegTestNetwork
+
+		await using RegTestSetup setup = await RegTestSetup.InitializeTestEnvironmentAsync(new RegTestFixture(), numberOfBlocksToGenerate: 1);
+		IRPCClient rpc = setup.RpcClient;
+		Network network = setup.Network;
+		BitcoinStore bitcoinStore = setup.BitcoinStore;
+		using Backend.Global global = setup.Global;
+		ServiceConfiguration serviceConfiguration = setup.ServiceConfiguration;
+		string password = setup.Password;
+
+		bitcoinStore.IndexStore.NewFilters += setup.Wallet_NewFiltersProcessed;
+
+		// Create the services.
+		// 1. Create connection service.
+		NodesGroup nodes = new(global.Config.Network, requirements: Constants.NodeRequirements);
+		nodes.ConnectedNodes.Add(await new RegTestFixture().BackendRegTestNode.CreateNewP2pNodeAsync());
+
+		// 2. Create mempool service.
+
+		Node node = await new RegTestFixture().BackendRegTestNode.CreateNewP2pNodeAsync();
+		node.Behaviors.Add(bitcoinStore.CreateUntrustedP2pBehavior());
+
+		// 3. Create wasabi synchronizer service.
+		await using WasabiHttpClientFactory httpClientFactory = new(torEndPoint: null, backendUriGetter: () => new Uri(new RegTestFixture().BackendEndPoint));
+		WasabiSynchronizer synchronizer = new(requestInterval: TimeSpan.FromSeconds(3), 10000, bitcoinStore, httpClientFactory);
+		HybridFeeProvider feeProvider = new(synchronizer, null);
+
+		// 4. Create key manager service.
+		var keyManager = KeyManager.CreateNew(out _, password, network);
+
+		// 5. Create wallet service.
+		var workDir = Common.GetWorkDir();
+
+		using MemoryCache cache = BitcoinFactory.CreateMemoryCache();
+		await using SpecificNodeBlockProvider specificNodeBlockProvider = new(network, serviceConfiguration, httpClientFactory.TorEndpoint);
+
+		var blockProvider = new SmartBlockProvider(
+			bitcoinStore.BlockRepository,
+			rpcBlockProvider: null,
+			specificNodeBlockProvider,
+			new P2PBlockProvider(network, nodes, httpClientFactory.IsTorEnabled),
+			cache);
+
+		WalletManager walletManager = new(network, workDir, new WalletDirectories(network, workDir), bitcoinStore, synchronizer, feeProvider, blockProvider, serviceConfiguration);
+		walletManager.Initialize();
+
+		#endregion SetupRegTestNetwork
+
+		Console.Beep();
+
+		var newDrive = await UsbAttachHelper.DetectNewDriveAsync();
+		// Insert the SD card into the computer.
+		Assert.NotNull(newDrive);
+
+		var walletPath = Path.Combine(newDrive, "new-wasabi.json");
+		Assert.True(File.Exists(walletPath));
+
+		var readColdCardWasabiWalletText = await File.ReadAllTextAsync(walletPath);
+		string pattern = "\\{\"ExtPubKey\":\\s*\"(xpub[1-9A-HJ-NP-Za-km-z]+)\",\\s*\"MasterFingerprint\":\\s*\"([0-9A-Fa-f]+)\",\\s*\"ColdCardFirmwareVersion\":\\s*\"(\\d+\\.\\d+\\.\\d+)\"\\}";
+
+		//string pattern = @"\""ExtPubKey\"":\s*\""xpub[^\""]+"",\s *\""MasterFingerprint\"":\s *\""([0 - 9A - F]{ 8})"",\s *\""ColdCardFirmwareVersion\"":\s *\""(\d +\.\d +\.\d +)""";
+
+		Assert.Matches(pattern, readColdCardWasabiWalletText);
+
+		var wallet = await ImportWalletHelper.ImportWalletAsync(walletManager, "coldCardTest", walletPath);
 	}
 }
