@@ -165,7 +165,7 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 				UsdExchangeRate = exchangeRate.Rate;
 			}
 
-			await FilterProcessor.ProcessAsync((uint)response.BestHeight, response.FiltersResponseState, response.Filters).ConfigureAwait(false);
+			//await FilterProcessor.ProcessAsync((uint)response.BestHeight, response.FiltersResponseState, response.Filters).ConfigureAwait(false);
 
 			LastResponse = response;
 			ResponseArrived?.Invoke(this, response);
