@@ -12,10 +12,11 @@ using WalletWasabi.Blockchain.Blocks;
 using WalletWasabi.Helpers;
 using WalletWasabi.Logging;
 using WalletWasabi.Models;
+using WalletWasabi.Services;
 
 namespace WalletWasabi.Blockchain.BlockFilters;
 
-public class IndexBuilderService : IObservable<FilterModel>
+public class IndexBuilderService
 {
 	private const long NotStarted = 0;
 	private const long Running = 1;
@@ -31,8 +32,11 @@ public class IndexBuilderService : IObservable<FilterModel>
 
 	private long _workerCount;
 
-	public IndexBuilderService(IndexType indexType, IRPCClient rpc, BlockNotifier blockNotifier, string indexFilePath)
+	private readonly EventBus _eventBus;
+
+	public IndexBuilderService(IndexType indexType, IRPCClient rpc, BlockNotifier blockNotifier, string indexFilePath, EventBus eventBus)
 	{
+		_eventBus = eventBus;
 		IndexType = indexType;
 		RpcClient = Guard.NotNull(nameof(rpc), rpc);
 		BlockNotifier = Guard.NotNull(nameof(blockNotifier), blockNotifier);
@@ -400,36 +404,6 @@ public class IndexBuilderService : IObservable<FilterModel>
 
 	private void NotifyAll(FilterModel filterModel)
 	{
-		foreach (var observer in _observers)
-		{
-			observer.OnNext(filterModel);
-		}
+		_eventBus.Publish(filterModel);
 	}
-
-	public IDisposable Subscribe(IObserver<FilterModel> observer)
-	{
-	   if (! _observers.Contains(observer))
-	   {
-		   _observers.Add(observer);
-	   }
-
-	   return new Unsubscriber(_observers, observer);
-	}
-
-	private class Unsubscriber : IDisposable
-    {
-       private List<IObserver<FilterModel>> _observers;
-       private IObserver<FilterModel> _observer;
-
-       public Unsubscriber(List<IObserver<FilterModel>> observers, IObserver<FilterModel> observer)
-       {
-          _observers = observers;
-          _observer = observer;
-       }
-
-       public void Dispose()
-       {
-          _observers.Remove(_observer);
-       }
-    }
 }

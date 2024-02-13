@@ -41,10 +41,12 @@ public class Global : IDisposable
 		P2pNode = new(config.Network, config.GetBitcoinP2pEndPoint(), new(), $"/WasabiCoordinator:{Constants.BackendMajorVersion}/");
 		HostedServices.Register<BlockNotifier>(() => new BlockNotifier(TimeSpan.FromSeconds(7), rpcClient, P2pNode), "Block Notifier");
 
+		EventBus = new EventBus();
+
 		// Initialize index building
 		var indexBuilderServiceDir = Path.Combine(DataDir, "IndexBuilderService");
 		var indexFilePath = Path.Combine(indexBuilderServiceDir, $"Index{RpcClient.Network}.dat");
-		IndexBuilderService = new(IndexType.SegwitTaproot, RpcClient, HostedServices.Get<BlockNotifier>(), indexFilePath);
+		IndexBuilderService = new(IndexType.SegwitTaproot, RpcClient, HostedServices.Get<BlockNotifier>(), indexFilePath, EventBus);
 
 		MempoolMirror = new MempoolMirror(TimeSpan.FromSeconds(21), RpcClient, P2pNode);
 		CoinJoinMempoolManager = new CoinJoinMempoolManager(CoinJoinIdStore, MempoolMirror);
@@ -75,6 +77,7 @@ public class Global : IDisposable
 	private Whitelist? WhiteList { get; set; }
 	private MempoolMirror MempoolMirror { get; }
 	public CoinJoinMempoolManager CoinJoinMempoolManager { get; private set; }
+	public EventBus EventBus { get; private set; }
 
 	public async Task InitializeAsync(CancellationToken cancel)
 	{

@@ -30,6 +30,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using System.Net;
+using WalletWasabi.Services;
 
 [assembly: ApiController]
 
@@ -143,11 +144,18 @@ public class Startup
 			var global = serviceProvider.GetRequiredService<Global>();
 			return global.IndexBuilderService;
 		});
+		services.AddSingleton(serviceProvider =>
+		{
+			var global = serviceProvider.GetRequiredService<Global>();
+			return global.EventBus;
+		});
 		services.AddStartupTask<InitConfigStartupTask>();
 
 		services.AddResponseCompression();
 
 		services.AddWebSocketHandlers();
+
+		services.AddHostedService<ExchangeRateFetcher>();
 	}
 
 	[SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "This method gets called by the runtime. Use this method to configure the HTTP request pipeline")]

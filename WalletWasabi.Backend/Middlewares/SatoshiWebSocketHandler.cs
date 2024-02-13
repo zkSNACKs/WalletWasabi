@@ -9,6 +9,7 @@ using WalletWasabi.Backend.Models;
 using WalletWasabi.Blockchain.BlockFilters;
 using WalletWasabi.Extensions;
 using WalletWasabi.Logging;
+using WalletWasabi.Services;
 using WalletWasabi.Synchronizarion;
 
 namespace WalletWasabi.Backend.Middlewares;
@@ -25,13 +26,15 @@ namespace WalletWasabi.Backend.Middlewares;
 /// is the initial handshake that is started by the client sending the best known block hash. After that, all
 /// messages from the client are simply ignored.
 /// </remarks>
-public class SatoshiWebSocketHandler : WebSocketHandlerBase, IObserver<FilterModel>
+public class SatoshiWebSocketHandler : WebSocketHandlerBase
 {
+	private readonly EventBus _eventBus;
 	private readonly IndexBuilderService _indexBuilderService;
 
-	public SatoshiWebSocketHandler(WebSocketsConnectionTracker connectionTracker, IndexBuilderService indexBuilderService)
+	public SatoshiWebSocketHandler(WebSocketsConnectionTracker connectionTracker, EventBus eventBus, IndexBuilderService indexBuilderService)
 		: base(connectionTracker)
 	{
+		_eventBus = eventBus;
 		_indexBuilderService = indexBuilderService;
 	}
 
@@ -60,35 +63,44 @@ public class SatoshiWebSocketHandler : WebSocketHandlerBase, IObserver<FilterMod
 					}
 					catch (Exception e) when (e is FormatException or InvalidOperationException)
 					{
-						await SendHandshakeError(socketState.WebSocket, cancellationToken);
+						await SendHandshakeErrorAsync(socketState.WebSocket, cancellationToken);
 					}
 					break;
 				default:
-					await SendHandshakeError(socketState.WebSocket, cancellationToken);
+					await SendHandshakeErrorAsync(socketState.WebSocket, cancellationToken);
 					break;
 			}
 		}
 	}
 
-	private static Task SendHandshakeError(WebSocket webSocket, CancellationToken cancellationToken) =>
+	private static Task SendHandshakeErrorAsync(WebSocket webSocket, CancellationToken cancellationToken) =>
 		 webSocket.SendAsync(new[] { (byte)ResponseMessage.HandshakeError }, WebSocketMessageType.Binary, true, cancellationToken);
 
 	private async Task StartSendingUpdatesAsync(WebSocket webSocket, uint256 bestKnownBlockHash, CancellationToken cancellationToken)
 	{
+		// Send the best block height
+		await SendBlockHeightAsync(webSocket, cancellationToken);
+
 		// First we send all the filters from the bestknownblockhash until the tip
 		await SendMissingFiltersAsync(webSocket, bestKnownBlockHash, cancellationToken);
 
-		_indexBuilderService.Subscribe(this);
-
 		// Subscribe to the filters creation and send filters immediately after they are create.
+		_eventBus.Subscribe<FilterModel>(SendFilter);
+
+		// Subscribe to changes in the exchange rate rates and send them immediately.
+		_eventBus.Subscribe<ExchangeRate>(NotifyExchangeRate);
 
 		// Subscribe to changes in the rounds and send them immediately.
 
 		// Subscribe to changes in the mining fee rates and send them immediately.
+	}
 
-		// Subscribe to changes in the exchange rate rates and send them immediately.
-
-		// Am I missing something?
+	private Task SendBlockHeightAsync(WebSocket webSocket, CancellationToken cancellationToken)
+	{
+		var lastFilter = _indexBuilderService.GetLastFilter();
+		var bestBlockHight = lastFilter.Header.Height;
+		var message = new BlockHeightMessage(bestBlockHight);
+		return webSocket.SendAsync(message.ToByteArray(), WebSocketMessageType.Binary, true, cancellationToken);
 	}
 
 	/// <summary>
@@ -126,16 +138,14 @@ public class SatoshiWebSocketHandler : WebSocketHandlerBase, IObserver<FilterMod
 		return filters;
 	}
 
-	public void OnCompleted()
+
+	void NotifyExchangeRate(ExchangeRate exchangeRate)
 	{
+		var message = new ExchangeRateMessage(exchangeRate);
+		SendMessageToAllAsync(message.ToByteArray(), CancellationToken.None);
 	}
 
-	public void OnError(Exception error)
-	{
-		Logger.LogError(error);
-	}
-
-	void IObserver<FilterModel>.OnNext(FilterModel filter)
+	void SendFilter(FilterModel filter)
 	{
 		var message = new FilterMessage(filter);
 		SendMessageToAllAsync(message.ToByteArray(), CancellationToken.None);
