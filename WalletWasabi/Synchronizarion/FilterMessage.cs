@@ -12,9 +12,9 @@ public enum RequestMessage
 public enum ResponseMessage
 {
 	Filter,
-	HandshakeError
 	HandshakeError,
 	BlockHeight,
+	ExchangeRate
 }
 
 public record FilterMessage(FilterModel filterModel)
