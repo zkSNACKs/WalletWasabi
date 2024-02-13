@@ -13,6 +13,8 @@ public enum ResponseMessage
 {
 	Filter,
 	HandshakeError
+	HandshakeError,
+	BlockHeight,
 }
 
 public record FilterMessage(FilterModel filterModel)

@@ -61,6 +61,11 @@ public class SatoshiSynchronizer : BackgroundService
 			using var reader = new BinaryReader(new MemoryStream(buffer[1..]));
 			switch (messageType)
 			{
+				case ResponseMessage.BlockHeight:
+					var height = reader.ReadUInt32();
+					localChain.SetServerTipHeight(height);
+					break;
+
 				case ResponseMessage.Filter:
 					var filter = reader.ReadFilterModel();
 					if (localChain.TipHeight + 1 == filter.Header.Height)
