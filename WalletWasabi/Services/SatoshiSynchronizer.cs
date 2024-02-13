@@ -83,7 +83,10 @@ public class SatoshiSynchronizer : BackgroundService
 					await RewindAsync(144).ConfigureAwait(false);
 					break;
 
+				case ResponseMessage.ExchangeRate:
+					var exchangeRates = reader.ReadDecimal();
 					break;
+
 				default:
 					throw new ArgumentOutOfRangeException();
 			}
