@@ -23,8 +23,6 @@ public class IndexBuilderService
 	private const long Stopping = 2;
 	private const long Stopped = 3;
 
-	private readonly List<IObserver<FilterModel>> _observers = new ();
-
 	/// <summary>
 	/// 0: Not started, 1: Running, 2: Stopping, 3: Stopped
 	/// </summary>
