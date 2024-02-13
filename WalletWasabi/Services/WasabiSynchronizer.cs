@@ -10,9 +10,7 @@ using WalletWasabi.Backend.Models;
 using WalletWasabi.Backend.Models.Responses;
 using WalletWasabi.Bases;
 using WalletWasabi.Blockchain.Analysis.FeesEstimation;
-using WalletWasabi.Blockchain.BlockFilters;
 using WalletWasabi.Blockchain.Blocks;
-using WalletWasabi.Logging;
 using WalletWasabi.Models;
 using WalletWasabi.Stores;
 using WalletWasabi.Tor.Socks5.Exceptions;
@@ -36,7 +34,6 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 
 		LastResponse = null;
 		SmartHeaderChain = bitcoinStore.SmartHeaderChain;
-		FilterProcessor = new FilterProcessor(bitcoinStore);
 		HttpClientFactory = httpClientFactory;
 		WasabiClient = httpClientFactory.SharedWasabiClient;
 	}
@@ -87,7 +84,6 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 	public TimeSpan BackendStatusChangedSince => DateTimeOffset.UtcNow - BackendStatusChangedAt;
 	private int MaxFiltersToSync { get; }
 	private SmartHeaderChain SmartHeaderChain { get; }
-	private FilterProcessor FilterProcessor { get; }
 
 	public AllFeeEstimate? LastAllFeeEstimate => LastResponse?.AllFeeEstimate;
 
@@ -164,8 +160,6 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 			{
 				UsdExchangeRate = exchangeRate.Rate;
 			}
-
-			//await FilterProcessor.ProcessAsync((uint)response.BestHeight, response.FiltersResponseState, response.Filters).ConfigureAwait(false);
 
 			LastResponse = response;
 			ResponseArrived?.Invoke(this, response);

@@ -1,12 +1,14 @@
 using System.IO;
 using System.Net;
 using System.Net.WebSockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using NBitcoin;
 using WalletWasabi.Backend.Models;
-using WalletWasabi.Blockchain.BlockFilters;
 using WalletWasabi.Extensions;
+using WalletWasabi.Logging;
 using WalletWasabi.Stores;
 using WalletWasabi.Synchronizarion;
 
@@ -17,13 +19,11 @@ public class SatoshiSynchronizer : BackgroundService
 	private readonly BitcoinStore _bitcoinStore;
 	private readonly Uri _satoshiEndpointUri;
 	private readonly Uri? _socksProxyUri;
-	private readonly FilterProcessor _filterProcessor;
 
 	public SatoshiSynchronizer(BitcoinStore bitcoinStore, Uri satoshiEndpointUri, EndPoint? socksEndPoint)
 	{
 		_bitcoinStore = bitcoinStore;
 		_satoshiEndpointUri = satoshiEndpointUri;
-		_filterProcessor = new FilterProcessor(bitcoinStore);
 		_socksProxyUri = socksEndPoint switch
 		{
 			DnsEndPoint dns => new UriBuilder("socks5", dns.Host, dns.Port).Uri,
@@ -39,13 +39,13 @@ public class SatoshiSynchronizer : BackgroundService
 		ws.Options.Proxy = _socksProxyUri is not null ? new WebProxy(_socksProxyUri) : ws.Options.Proxy;
 		await ws.ConnectAsync(_satoshiEndpointUri, stoppingToken).ConfigureAwait(false);
 
-		while (_bitcoinStore.SmartHeaderChain.TipHash is null)
+		var localChain = _bitcoinStore.SmartHeaderChain;
+		while (localChain.TipHash is null)
 		{
 			await Task.Delay(100, stoppingToken).ConfigureAwait(false);
 		}
 
-		var handshake = new HandshakeMessage(_bitcoinStore.SmartHeaderChain.TipHash);
-		await ws.SendAsync(handshake.ToByteArray(), WebSocketMessageType.Binary, true, stoppingToken).ConfigureAwait(false);
+		await HandshakeAsync(localChain.TipHash).ConfigureAwait(false);
 
 		while (!stoppingToken.IsCancellationRequested)
 		{
@@ -63,17 +63,51 @@ public class SatoshiSynchronizer : BackgroundService
 			{
 				case ResponseMessage.Filter:
 					var filter = reader.ReadFilterModel();
-
-					await _filterProcessor.ProcessAsync(filter.Header.Height, FiltersResponseState.NewFilters, [filter])
-						.ConfigureAwait(false);
+					if (localChain.TipHeight + 1 == filter.Header.Height)
+					{
+						await _bitcoinStore.IndexStore.AddNewFiltersAsync([filter]).ConfigureAwait(false);
+					}
+					else
+					{
+						Logger.LogError(ChainHeightMismatchError(filter));
+						await RewindAsync(1).ConfigureAwait(false);
+					}
 					break;
+
 				case ResponseMessage.HandshakeError:
-					await _filterProcessor.ProcessAsync(_bitcoinStore.SmartHeaderChain.ServerTipHeight, FiltersResponseState.BestKnownHashNotFound, [])
-						.ConfigureAwait(false);
+					await RewindAsync(144).ConfigureAwait(false);
+					break;
+
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();
 			}
+		}
+
+		return;
+
+		async Task HandshakeAsync(uint256 tipHash)
+		{
+			var handshake = new HandshakeMessage(tipHash);
+			await ws.SendAsync(handshake.ToByteArray(), WebSocketMessageType.Binary, true, stoppingToken).ConfigureAwait(false);
+		}
+
+		async Task RewindAsync(int count)
+		{
+			var rewindCount = Math.Min(count, localChain.HashCount);
+			var rewindTipHeight = localChain.TipHeight - rewindCount;
+			await _bitcoinStore.IndexStore.RemoveAllNewerThanAsync((uint) rewindTipHeight).ConfigureAwait(false);
+			await HandshakeAsync(localChain.TipHash).ConfigureAwait(false);
+		}
+
+		string ChainHeightMismatchError(FilterModel filter)
+		{
+			var sb = new StringBuilder();
+			sb.AppendLine("Inconsistent index state detected.");
+			sb.Append($"Local chain: {localChain.TipHeight}/{localChain.ServerTipHeight} ({localChain.HashesLeft} left");
+			sb.AppendLine($"- best known block hash: {localChain.TipHash}");
+			sb.AppendLine($"Received filter: {filter.Header.BlockHash} height: {filter.Header.Height}");
+			return sb.ToString();
 		}
 	}
 }
