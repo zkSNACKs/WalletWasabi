@@ -87,6 +87,10 @@ public class SatoshiSynchronizer : BackgroundService
 					var exchangeRates = reader.ReadDecimal();
 					break;
 
+				case ResponseMessage.MiningFeeRates:
+					var allFeeEstimate = reader.ReadMiningFeeRates();
+					break;
+
 				default:
 					throw new ArgumentOutOfRangeException();
 			}

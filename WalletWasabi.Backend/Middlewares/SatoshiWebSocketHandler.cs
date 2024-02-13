@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NBitcoin;
 using WalletWasabi.Backend.Models;
+using WalletWasabi.Blockchain.Analysis.FeesEstimation;
 using WalletWasabi.Blockchain.BlockFilters;
 using WalletWasabi.Extensions;
 using WalletWasabi.Logging;
@@ -90,9 +91,10 @@ public class SatoshiWebSocketHandler : WebSocketHandlerBase
 		// Subscribe to changes in the exchange rate rates and send them immediately.
 		_eventBus.Subscribe<ExchangeRate>(NotifyExchangeRate);
 
-		// Subscribe to changes in the rounds and send them immediately.
-
 		// Subscribe to changes in the mining fee rates and send them immediately.
+		_eventBus.Subscribe<AllFeeEstimate>(NotifyFeeEstimations);
+
+		// Subscribe to changes in the rounds and send them immediately.
 	}
 
 	private Task SendBlockHeightAsync(WebSocket webSocket, CancellationToken cancellationToken)
@@ -138,6 +140,11 @@ public class SatoshiWebSocketHandler : WebSocketHandlerBase
 		return filters;
 	}
 
+	void NotifyFeeEstimations(AllFeeEstimate allFeeEstimate)
+	{
+		var message = new MiningFeeRatesMessage(allFeeEstimate);
+		SendMessageToAllAsync(message.ToByteArray(), CancellationToken.None);
+	}
 
 	void NotifyExchangeRate(ExchangeRate exchangeRate)
 	{

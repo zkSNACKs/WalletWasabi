@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using System.IO;
 using NBitcoin;
+using NBitcoin.RPC;
 using WalletWasabi.Backend.Models;
+using WalletWasabi.Blockchain.Analysis.FeesEstimation;
 using WalletWasabi.Blockchain.Blocks;
 
 namespace WalletWasabi.Extensions;
@@ -57,5 +60,27 @@ public static class StreamReaderWriterExtensions
 	public static FilterModel ReadFilterModel(this BinaryReader reader)
 	{
 		return new FilterModel( reader.ReadSmartHeader(), reader.ReadGRFilter());
+	}
+
+	public static void Write(this BinaryWriter writer, AllFeeEstimate allFeeEstimate)
+	{
+		writer.Write(allFeeEstimate.Estimations.Count);
+		foreach (var estimation in allFeeEstimate.Estimations)
+		{
+			writer.Write(estimation.Key);
+			writer.Write(estimation.Value);
+		}
+	}
+
+	public static AllFeeEstimate ReadMiningFeeRates(this BinaryReader reader)
+	{
+		var estimations = new Dictionary<int, int>();
+		var count = reader.ReadInt32();
+		for (var i = 0; i < count; i++)
+		{
+			estimations.Add(reader.ReadInt32(), reader.ReadInt32());
+		}
+
+		return new AllFeeEstimate(estimations);
 	}
 }
