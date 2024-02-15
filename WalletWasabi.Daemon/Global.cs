@@ -78,7 +78,8 @@ public class Global
 		WasabiSynchronizer wasabiSynchronizer = HostedServices.Get<WasabiSynchronizer>();
 
 		var coordinatorUri = config.GetCoordinatorUri();
-		var satoshiEndpointUri = new UriBuilder("ws", coordinatorUri.Host, coordinatorUri.Port, "satoshi").Uri;
+		var satoshiUriScheme = coordinatorUri.Scheme == "https" ? "wss" : "ws";
+		var satoshiEndpointUri = new UriBuilder(satoshiUriScheme, coordinatorUri.Host, coordinatorUri.Port, "satoshi").Uri;
 		HostedServices.Register<SatoshiSynchronizer>(() => new SatoshiSynchronizer(BitcoinStore, satoshiEndpointUri, Config.UseTor ? TorSettings.SocksEndpoint : null), "Satoshi Synchronizer");
 
 		HostedServices.Register<UpdateChecker>(() => new UpdateChecker(TimeSpan.FromSeconds(5), wasabiSynchronizer), "Software Update Checker");
