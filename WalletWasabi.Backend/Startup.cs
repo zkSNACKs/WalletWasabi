@@ -147,6 +147,11 @@ public class Startup
 		services.AddSingleton(serviceProvider =>
 		{
 			var global = serviceProvider.GetRequiredService<Global>();
+			return global.RpcClient;
+		});
+		services.AddSingleton(serviceProvider =>
+		{
+			var global = serviceProvider.GetRequiredService<Global>();
 			return global.EventBus;
 		});
 		services.AddStartupTask<InitConfigStartupTask>();
