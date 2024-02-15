@@ -2,20 +2,19 @@ using System.Linq;
 using System.Collections.Generic;
 
 namespace WalletWasabi.Services;
+using SubscriptionRegistry = Dictionary<Type, List<EventBus.Subscription>>;
 
 public class EventBus
 {
-	private readonly Dictionary<Type, List<Action<object>>> _subscriptions;
-	private readonly Dictionary<object, Type> _typeMap;
+	private readonly SubscriptionRegistry _subscriptions;
 	private readonly object _syncObj = new();
 
 	public EventBus()
 	{
-		_subscriptions = new Dictionary<Type, List<Action<object>>>();
-		_typeMap = new Dictionary<object, Type>();
+		_subscriptions = new SubscriptionRegistry();
 	}
 
-	public void Subscribe<TEvent>(Action<TEvent> action) where TEvent : notnull
+	public IDisposable Subscribe<TEvent>(Action<TEvent> action) where TEvent : notnull
 	{
 		lock (_syncObj)
 		{
@@ -24,19 +23,20 @@ public class EventBus
 				_subscriptions.Add(typeof(TEvent), []);
 			}
 
-			_typeMap.Add(action, typeof(TEvent));
-			_subscriptions[typeof(TEvent)].Add(o => action((TEvent)o));
+			var subscription = Subscription.Create(action, this);
+			_subscriptions[typeof(TEvent)].Add(subscription);
+			return subscription;
 		}
 	}
 
-	public void Unsubscribe<TEvent>(Action<TEvent> action) where TEvent : notnull
+	private void Unsubscribe(Subscription subscription)
 	{
 		lock (_syncObj)
 		{
-			Type type = _typeMap[action];
+			Type type = subscription.Type;
 			if (_subscriptions.TryGetValue(type, out var allSubscriptions))
 			{
-				var subscriptionToRemove = allSubscriptions.FirstOrDefault(x => true /*x == action*/);
+				var subscriptionToRemove = allSubscriptions.FirstOrDefault(x => x == subscription);
 				if (subscriptionToRemove != null)
 				{
 					allSubscriptions.Remove(subscriptionToRemove);
@@ -47,7 +47,7 @@ public class EventBus
 
 	public void Publish<TEvent>(TEvent eventItem) where TEvent : notnull
 	{
-		List<Action<object>>? allSubscriptions;
+		List<Subscription>? allSubscriptions;
 		lock (_syncObj)
 		{
 			if (!_subscriptions.TryGetValue(typeof(TEvent), out allSubscriptions))
@@ -59,6 +59,33 @@ public class EventBus
 		foreach (var subscription in allSubscriptions)
 		{
 			subscription.Invoke(eventItem);
+		}
+	}
+
+	internal class Subscription : IDisposable
+	{
+		public Type Type { get; }
+		private readonly Action<object> _action;
+		private readonly EventBus _eventBus;
+
+		public static Subscription Create<TEvent>(Action<TEvent> action, EventBus eventBus) =>
+			new(o => action((TEvent)o), typeof(TEvent), eventBus);
+
+		private Subscription(Action<object> action, Type type, EventBus eventBus)
+		{
+			Type = type;
+			_action = action;
+			_eventBus = eventBus;
+		}
+
+		public void Invoke<TEvent>(TEvent param) where TEvent : notnull
+		{
+			_action(param);
+		}
+
+		public void Dispose()
+		{
+			_eventBus.Unsubscribe(this);
 		}
 	}
 }
