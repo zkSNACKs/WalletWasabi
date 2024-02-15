@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,12 +39,6 @@ public abstract class WebSocketHandlerBase(WebSocketsConnectionTracker connectio
 				cancellationToken)
 			: Task.CompletedTask;
 	}
-
-	public Task SendMessageToAllAsync(byte[] message, CancellationToken cancellationToken) =>
-		Task.WhenAll(
-			connectionTracker
-				.GetWebSocketConnectionStates()
-				.Select(socketState => socketState.WebSocket.SendAsync(message, WebSocketMessageType.Binary, true, cancellationToken)));
 
 	/// <summary>
 	/// Receives
