@@ -1,5 +1,6 @@
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -33,75 +34,113 @@ public class SatoshiSynchronizer : BackgroundService
 		};
 	}
 
-	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+	protected override async Task ExecuteAsync(CancellationToken cancellationToken)
 	{
-		using var ws = new ClientWebSocket();
-		ws.Options.Proxy = _socksProxyUri is not null ? new WebProxy(_socksProxyUri) : ws.Options.Proxy;
-		await ws.ConnectAsync(_satoshiEndpointUri, stoppingToken).ConfigureAwait(false);
-
 		var localChain = _bitcoinStore.SmartHeaderChain;
-		while (localChain.TipHash is null)
+		while (!cancellationToken.IsCancellationRequested)
 		{
-			await Task.Delay(100, stoppingToken).ConfigureAwait(false);
-		}
-
-		await HandshakeAsync(localChain.TipHash).ConfigureAwait(false);
-
-		while (!stoppingToken.IsCancellationRequested)
-		{
-			var buffer = new byte[80 * 1024];
-			var result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), stoppingToken).ConfigureAwait(false);
-
-			if (result.MessageType == WebSocketMessageType.Close)
+			using var ws = new ClientWebSocket();
+			try
 			{
-				break;
+				await ConnectToSatoshiEndpointAsync(ws).ConfigureAwait(false);
+				await StartReceivingMessagesAsync(ws).ConfigureAwait(false);
 			}
-
-			var messageType = (ResponseMessage)buffer[0];
-			using var reader = new BinaryReader(new MemoryStream(buffer[1..]));
-			switch (messageType)
+			catch (WebSocketException wse) when (wse.InnerException is HttpRequestException re &&
+			                                     re.HttpRequestError == HttpRequestError.ConnectionError)
 			{
-				case ResponseMessage.BlockHeight:
-					var height = reader.ReadUInt32();
-					localChain.SetServerTipHeight(height);
-					break;
-
-				case ResponseMessage.Filter:
-					var filter = reader.ReadFilterModel();
-					if (localChain.TipHeight + 1 == filter.Header.Height)
-					{
-						await _bitcoinStore.IndexStore.AddNewFiltersAsync([filter]).ConfigureAwait(false);
-					}
-					else
-					{
-						Logger.LogError(ChainHeightMismatchError(filter));
-						await RewindAsync(1).ConfigureAwait(false);
-					}
-					break;
-
-				case ResponseMessage.HandshakeError:
-					await RewindAsync(144).ConfigureAwait(false);
-					break;
-
-				case ResponseMessage.ExchangeRate:
-					var exchangeRates = reader.ReadDecimal();
-					break;
-
-				case ResponseMessage.MiningFeeRates:
-					var allFeeEstimate = reader.ReadMiningFeeRates();
-					break;
-
-				default:
-					throw new ArgumentOutOfRangeException();
+				await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
+			}
+			catch (Exception e)
+			{
+				Logger.LogError(e);
+			}
+			finally
+			{
+				await DisconnectFromSatoshiEndpointAsync(ws).ConfigureAwait(false);
 			}
 		}
 
 		return;
 
-		async Task HandshakeAsync(uint256 tipHash)
+		async Task ConnectToSatoshiEndpointAsync(ClientWebSocket ws)
 		{
-			var handshake = new HandshakeMessage(tipHash);
-			await ws.SendAsync(handshake.ToByteArray(), WebSocketMessageType.Binary, true, stoppingToken).ConfigureAwait(false);
+			ws.Options.Proxy = _socksProxyUri is not null ? new WebProxy(_socksProxyUri) : ws.Options.Proxy;
+			await ws.ConnectAsync(_satoshiEndpointUri, cancellationToken).ConfigureAwait(false);
+			await WaitForTipHashAsync().ConfigureAwait(false);
+			await HandshakeAsync(localChain.TipHash).ConfigureAwait(false);
+
+			async Task WaitForTipHashAsync()
+			{
+				while (localChain.TipHash is null) // Just another hidden communication/synchronization channel
+				{
+					await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+				}
+			}
+
+			async Task HandshakeAsync(uint256 tipHash)
+			{
+				var handshake = new HandshakeMessage(tipHash);
+				await ws.SendAsync(handshake.ToByteArray(), WebSocketMessageType.Binary, true, cancellationToken).ConfigureAwait(false);
+			}
+		}
+
+		async Task DisconnectFromSatoshiEndpointAsync(WebSocket ws)
+		{
+			if (ws.State == WebSocketState.Open)
+			{
+				await ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by client", cancellationToken).ConfigureAwait(false);
+			}
+		}
+
+		async Task StartReceivingMessagesAsync(WebSocket ws)
+		{
+			while (!cancellationToken.IsCancellationRequested)
+			{
+				var buffer = new byte[80 * 1024];
+				var result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken).ConfigureAwait(false);
+
+				if (result.MessageType == WebSocketMessageType.Close)
+				{
+					return;
+				}
+
+				var messageType = (ResponseMessage)buffer[0];
+				using var reader = new BinaryReader(new MemoryStream(buffer[1..]));
+				switch (messageType)
+				{
+					case ResponseMessage.BlockHeight:
+						var height = reader.ReadUInt32();
+						localChain.SetServerTipHeight(height);
+						break;
+
+					case ResponseMessage.Filter:
+						var filter = reader.ReadFilterModel();
+						if (localChain.TipHeight + 1 != filter.Header.Height)
+						{
+							Logger.LogError(ChainHeightMismatchError(filter));
+							await RewindAsync(1).ConfigureAwait(false);
+							return;
+						}
+
+						await _bitcoinStore.IndexStore.AddNewFiltersAsync([filter]).ConfigureAwait(false);
+						break;
+
+					case ResponseMessage.HandshakeError:
+						await RewindAsync(144).ConfigureAwait(false);
+						return;
+
+					case ResponseMessage.ExchangeRate:
+						var exchangeRates = reader.ReadDecimal();
+						break;
+
+					case ResponseMessage.MiningFeeRates:
+						var allFeeEstimate = reader.ReadMiningFeeRates();
+						break;
+
+					default:
+						throw new ArgumentOutOfRangeException();
+				}
+			}
 		}
 
 		async Task RewindAsync(int count)
@@ -109,7 +148,6 @@ public class SatoshiSynchronizer : BackgroundService
 			var rewindCount = Math.Min(count, localChain.HashCount);
 			var rewindTipHeight = localChain.TipHeight - rewindCount;
 			await _bitcoinStore.IndexStore.RemoveAllNewerThanAsync((uint) rewindTipHeight).ConfigureAwait(false);
-			await HandshakeAsync(localChain.TipHash).ConfigureAwait(false);
 		}
 
 		string ChainHeightMismatchError(FilterModel filter)
