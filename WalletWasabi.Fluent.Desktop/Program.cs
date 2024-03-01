@@ -190,6 +190,12 @@ public static class WasabiAppExtensions
 					appBuilder.StartWithClassicDesktopLifetime(app.AppConfig.Arguments);
 				}
 
+				// Invoke the crash reporter if we terminated with an exception.
+				if (app.TerminateService.TerminationException is not null)
+				{
+					throw app.TerminateService.TerminationException;
+				}
+
 				return Task.CompletedTask;
 			});
 	}

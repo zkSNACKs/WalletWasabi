@@ -17,6 +17,7 @@ using WalletWasabi.Helpers;
 using WalletWasabi.Logging;
 using WalletWasabi.Models;
 using WalletWasabi.Services;
+using WalletWasabi.Services.Terminate;
 using WalletWasabi.Stores;
 using WalletWasabi.WabiSabi.Client;
 
@@ -240,7 +241,7 @@ public class WalletManager : IWalletProvider
 			try
 			{
 				Logger.LogInfo($"Starting wallet '{wallet.WalletName}'...");
-				await wallet.StartAsync(CancelAllTasksToken).ConfigureAwait(false);
+				await wallet.StartAndSetUpUnhandledExceptionCallbackAsync(TerminateService.Instance, CancelAllTasksToken).ConfigureAwait(false);
 				Logger.LogInfo($"Wallet '{wallet.WalletName}' started.");
 				CancelAllTasksToken.ThrowIfCancellationRequested();
 				return wallet;
@@ -328,7 +329,7 @@ public class WalletManager : IWalletProvider
 	}
 
 	private Wallet CreateWalletInstance(KeyManager keyManager)
-		=> new (WorkDir, Network, keyManager, BitcoinStore, Synchronizer, ServiceConfiguration, FeeProvider, BlockProvider);
+		=> new(WorkDir, Network, keyManager, BitcoinStore, Synchronizer, ServiceConfiguration, FeeProvider, BlockProvider);
 
 	public bool WalletExists(HDFingerprint? fingerprint) => GetWallets().Any(x => fingerprint is { } && x.KeyManager.MasterFingerprint == fingerprint);
 

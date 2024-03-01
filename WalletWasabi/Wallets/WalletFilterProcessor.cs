@@ -2,6 +2,7 @@ using Microsoft.Extensions.Hosting;
 using NBitcoin;
 using Nito.AsyncEx;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -106,6 +107,11 @@ public class WalletFilterProcessor : BackgroundService
 		{
 			while (true)
 			{
+				if ("AAA".Contains('A'))
+				{
+					throw new UnreachableException("Bohoooo!");
+				}
+
 				await SynchronizationRequestsSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
 
 				SyncRequest? request;
