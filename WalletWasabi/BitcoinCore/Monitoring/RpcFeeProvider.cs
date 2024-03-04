@@ -6,23 +6,24 @@ using WalletWasabi.Bases;
 using WalletWasabi.BitcoinCore.Rpc;
 using WalletWasabi.Blockchain.Analysis.FeesEstimation;
 using WalletWasabi.Extensions;
+using WalletWasabi.Services;
+using WalletWasabi.Services.Events;
 
 namespace WalletWasabi.BitcoinCore.Monitoring;
 
 public class RpcFeeProvider : PeriodicRunner
 {
-	public RpcFeeProvider(TimeSpan period, IRPCClient rpcClient, RpcMonitor rpcMonitor) : base(period)
+	public RpcFeeProvider(TimeSpan period, IRPCClient rpcClient, RpcMonitor rpcMonitor, EventBus eventBus) : base(period)
 	{
 		RpcClient = rpcClient;
 		RpcMonitor = rpcMonitor;
+		EventBus = eventBus;
 	}
 
-	public event EventHandler<AllFeeEstimate>? AllFeeEstimateArrived;
-
+	private EventBus EventBus { get; }
 	public IRPCClient RpcClient { get; set; }
 	public RpcMonitor RpcMonitor { get; }
 	public AllFeeEstimate? LastAllFeeEstimate { get; private set; }
-	public bool InError { get; private set; } = false;
 
 	protected override async Task ActionAsync(CancellationToken cancel)
 	{
@@ -33,19 +34,12 @@ public class RpcFeeProvider : PeriodicRunner
 			LastAllFeeEstimate = allFeeEstimate;
 			if (allFeeEstimate.Estimations.Any())
 			{
-				AllFeeEstimateArrived?.Invoke(this, allFeeEstimate);
+				EventBus.Publish(new MiningFeeRatesChanged(FeeRateSource.LocalNodeRpc, allFeeEstimate));
 			}
-			InError = false;
 		}
 		catch (NoEstimationException)
 		{
 			Logging.Logger.LogInfo("Couldn't get fee estimation from the Bitcoin node, probably because it was not yet initialized.");
-			InError = true;
-		}
-		catch
-		{
-			InError = true;
-			throw;
 		}
 	}
 }
