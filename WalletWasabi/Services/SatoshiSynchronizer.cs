@@ -1,6 +1,5 @@
 using System.IO;
 using System.Net;
-using System.Net.Http;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -10,6 +9,7 @@ using NBitcoin;
 using WalletWasabi.Backend.Models;
 using WalletWasabi.Extensions;
 using WalletWasabi.Logging;
+using WalletWasabi.Services.Events;
 using WalletWasabi.Stores;
 using WalletWasabi.Synchronizarion;
 
@@ -20,11 +20,13 @@ public class SatoshiSynchronizer : BackgroundService
 	private readonly BitcoinStore _bitcoinStore;
 	private readonly Uri _satoshiEndpointUri;
 	private readonly Uri? _socksProxyUri;
+	private readonly EventBus _eventBus;
 
-	public SatoshiSynchronizer(BitcoinStore bitcoinStore, Uri satoshiEndpointUri, EndPoint? socksEndPoint)
+	public SatoshiSynchronizer(BitcoinStore bitcoinStore, Uri satoshiEndpointUri, EndPoint? socksEndPoint, EventBus eventBus)
 	{
 		_bitcoinStore = bitcoinStore;
 		_satoshiEndpointUri = satoshiEndpointUri;
+		_eventBus = eventBus;
 		_socksProxyUri = socksEndPoint switch
 		{
 			DnsEndPoint dns => new UriBuilder("socks5", dns.Host, dns.Port).Uri,
@@ -45,9 +47,9 @@ public class SatoshiSynchronizer : BackgroundService
 				await ConnectToSatoshiEndpointAsync(ws).ConfigureAwait(false);
 				await StartReceivingMessagesAsync(ws).ConfigureAwait(false);
 			}
-			catch (WebSocketException wse) when (wse.InnerException is HttpRequestException re &&
-			                                     re.HttpRequestError == HttpRequestError.ConnectionError)
+			catch (WebSocketException)
 			{
+				_eventBus.Publish(new ConnectionStateChanged(false));
 				await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
 			}
 			catch (Exception e)
@@ -56,6 +58,7 @@ public class SatoshiSynchronizer : BackgroundService
 			}
 			finally
 			{
+				_eventBus.Publish(new ConnectionStateChanged(false));
 				await DisconnectFromSatoshiEndpointAsync(ws).ConfigureAwait(false);
 			}
 		}
@@ -66,8 +69,12 @@ public class SatoshiSynchronizer : BackgroundService
 		{
 			ws.Options.Proxy = _socksProxyUri is not null ? new WebProxy(_socksProxyUri) : ws.Options.Proxy;
 			await ws.ConnectAsync(_satoshiEndpointUri, cancellationToken).ConfigureAwait(false);
+
+			_eventBus.Publish(new ConnectionStateChanged(true));
+
 			await WaitForTipHashAsync().ConfigureAwait(false);
 			await HandshakeAsync(localChain.TipHash).ConfigureAwait(false);
+			return;
 
 			async Task WaitForTipHashAsync()
 			{
@@ -111,6 +118,7 @@ public class SatoshiSynchronizer : BackgroundService
 					case ResponseMessage.BlockHeight:
 						var height = reader.ReadUInt32();
 						localChain.SetServerTipHeight(height);
+						_eventBus.Publish(new ServerTipHeightChanged(height));
 						break;
 
 					case ResponseMessage.Filter:
@@ -130,11 +138,13 @@ public class SatoshiSynchronizer : BackgroundService
 						return;
 
 					case ResponseMessage.ExchangeRate:
-						var exchangeRates = reader.ReadDecimal();
+						var exchangeRate = reader.ReadDecimal();
+						_eventBus.Publish(new ExchangeRateChanged(exchangeRate));
 						break;
 
 					case ResponseMessage.MiningFeeRates:
 						var allFeeEstimate = reader.ReadMiningFeeRates();
+						_eventBus.Publish(new MiningFeeRatesChanged(FeeRateSource.Backend, allFeeEstimate));
 						break;
 
 					default:
