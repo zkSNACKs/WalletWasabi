@@ -11,7 +11,6 @@ public class MiningFeeRateFetcher : BackgroundService
 {
 	private readonly IRPCClient _rpcClient;
 	private readonly EventBus _eventBus;
-	private AllFeeEstimate? _lastFeeEstimate;
 
 	public MiningFeeRateFetcher(IRPCClient rpcClient, EventBus eventBus)
 	{
@@ -26,11 +25,14 @@ public class MiningFeeRateFetcher : BackgroundService
 			!stoppingToken.IsCancellationRequested &&
 			await timer.WaitForNextTickAsync(stoppingToken).ConfigureAwait(false))
 		{
-			var allFeeEstimate = await _rpcClient.EstimateAllFeeAsync(stoppingToken).ConfigureAwait(false);
-			if (_lastFeeEstimate != allFeeEstimate)
+			try
 			{
-				_lastFeeEstimate = allFeeEstimate;
+				var allFeeEstimate = await _rpcClient.EstimateAllFeeAsync(stoppingToken).ConfigureAwait(false);
 				_eventBus.Publish(allFeeEstimate);
+			}
+			catch
+			{
+				// ignored
 			}
 		}
 	}

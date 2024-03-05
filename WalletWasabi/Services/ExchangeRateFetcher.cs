@@ -11,7 +11,6 @@ public class ExchangeRateFetcher : BackgroundService
 {
 	private readonly IExchangeRateProvider _exchangeRateProvider;
 	private readonly EventBus _eventBus;
-	private ExchangeRate? _lastBtcUsdRate;
 
 	public ExchangeRateFetcher(IExchangeRateProvider exchangeRateProvider, EventBus eventBus)
 	{
@@ -26,11 +25,17 @@ public class ExchangeRateFetcher : BackgroundService
 			!stoppingToken.IsCancellationRequested &&
 			await timer.WaitForNextTickAsync(stoppingToken).ConfigureAwait(false))
 		{
-			var rates = await _exchangeRateProvider.GetExchangeRateAsync(stoppingToken).ConfigureAwait(false);
-			if (rates.FirstOrDefault() is { } btcusd && btcusd != _lastBtcUsdRate)
+			try
 			{
-				_lastBtcUsdRate = btcusd;
-				_eventBus.Publish(btcusd);
+				var rates = await _exchangeRateProvider.GetExchangeRateAsync(stoppingToken).ConfigureAwait(false);
+				if (rates.FirstOrDefault() is { } btcusd)
+				{
+					_eventBus.Publish(btcusd);
+				}
+			}
+			catch
+			{
+				// ignored
 			}
 		}
 	}
