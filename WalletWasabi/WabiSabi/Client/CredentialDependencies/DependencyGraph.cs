@@ -51,11 +51,8 @@ public record DependencyGraph
 	/// and may contain additional nodes if reissuance requests are
 	/// required.</remarks>
 	///
-	public static DependencyGraph ResolveCredentialDependencies(IEnumerable<(Money EffectiveValue, int InputSize)> effectiveValuesAndSizes, IEnumerable<TxOut> outputs, FeeRate feeRate, long vsizeAllocationPerInput)
+	public static DependencyGraph ResolveCredentialDependencies(IEnumerable<Money> effectiveValues, IEnumerable<TxOut> outputs, FeeRate feeRate, long availableVSize)
 	{
-		var effectiveValues = effectiveValuesAndSizes.Select(x => x.EffectiveValue);
-		var inputSizes = effectiveValuesAndSizes.Select(x => x.InputSize);
-
 		if (effectiveValues.Any(x => x <= Money.Zero))
 		{
 			throw new InvalidOperationException($"Not enough funds to pay for the fees.");
@@ -65,7 +62,7 @@ public record DependencyGraph
 		var effectiveCosts = Enumerable.Zip(outputs, outputSizes, (txout, size) => txout.EffectiveCost(feeRate));
 
 		return ResolveCredentialDependencies(
-			Enumerable.Zip(effectiveValues.Select(a => a.Satoshi), inputSizes.Select(i => (vsizeAllocationPerInput - i)), ImmutableArray.Create).Cast<IEnumerable<long>>(),
+			Enumerable.Zip(effectiveValues.Select(a => a.Satoshi), [availableVSize], ImmutableArray.Create).Cast<IEnumerable<long>>(),
 			Enumerable.Zip(effectiveCosts.Select(a => a.Satoshi), outputSizes.Select(i => (long)i), ImmutableArray.Create).Cast<IEnumerable<long>>()
 		);
 	}
