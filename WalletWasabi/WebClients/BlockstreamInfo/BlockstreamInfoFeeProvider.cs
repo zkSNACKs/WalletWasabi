@@ -17,7 +17,6 @@ public class BlockstreamInfoFeeProvider : PeriodicRunner, IThirdPartyFeeProvider
 
 	public BlockstreamInfoClient BlockstreamInfoClient { get; set; }
 	public AllFeeEstimate? LastAllFeeEstimate { get; private set; }
-	public bool InError { get; private set; } = false;
 	public bool IsPaused { get; set; } = false;
 
 	protected override async Task ActionAsync(CancellationToken cancel)
@@ -26,22 +25,12 @@ public class BlockstreamInfoFeeProvider : PeriodicRunner, IThirdPartyFeeProvider
 		{
 			return;
 		}
-		try
-		{
-			var allFeeEstimate = await BlockstreamInfoClient.GetFeeEstimatesAsync(cancel).ConfigureAwait(false);
-			LastAllFeeEstimate = allFeeEstimate;
+		var allFeeEstimate = await BlockstreamInfoClient.GetFeeEstimatesAsync(cancel).ConfigureAwait(false);
+		LastAllFeeEstimate = allFeeEstimate;
 
-			if (allFeeEstimate.Estimations.Count != 0)
-			{
-				AllFeeEstimateArrived?.Invoke(this, allFeeEstimate);
-			}
-
-			InError = false;
-		}
-		catch
+		if (allFeeEstimate.Estimations.Count != 0)
 		{
-			InError = true;
-			throw;
+			AllFeeEstimateArrived?.Invoke(this, allFeeEstimate);
 		}
 	}
 }

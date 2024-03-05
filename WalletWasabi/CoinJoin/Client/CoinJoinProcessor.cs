@@ -49,7 +49,7 @@ public class CoinJoinProcessor : IDisposable
 
 				var txsNotKnownByAWallet = WalletManager.FilterUnknownCoinjoins(unconfirmedCoinJoinHashes);
 
-				var client = Synchronizer.HttpClientFactory.SharedWasabiClient;
+				var client = Synchronizer.WasabiClient;
 				var unconfirmedCoinJoins = await client.GetTransactionsAsync(Network, txsNotKnownByAWallet, CancellationToken.None).ConfigureAwait(false);
 
 				foreach (var tx in unconfirmedCoinJoins.Select(x => new SmartTransaction(x, Height.Mempool)))

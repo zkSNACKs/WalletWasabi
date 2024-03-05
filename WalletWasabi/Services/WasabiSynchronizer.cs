@@ -26,20 +26,25 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 
 	private BackendStatus _backendStatus;
 
-	public WasabiSynchronizer(TimeSpan period, BitcoinStore bitcoinStore, WasabiHttpClientFactory httpClientFactory, EventBus eventBus) : base(period)
+	public WasabiSynchronizer(TimeSpan period, SmartHeaderChain smartHeaderChain, WasabiClient wasabiClient, EventBus eventBus) : base(period)
 	{
 		LastResponse = null;
-		SmartHeaderChain = bitcoinStore.SmartHeaderChain;
-		HttpClientFactory = httpClientFactory;
-		WasabiClient = httpClientFactory.SharedWasabiClient;
+		SmartHeaderChain = smartHeaderChain;
+		WasabiClient = wasabiClient;
 
 		EventBus = eventBus;
 		ExchangeRateChangedSubscription = EventBus.Subscribe((ExchangeRateChanged e) => UsdExchangeRate = e.UsdBtcRate);
-		FeeEstimationChangedSubscription =
-			EventBus.Subscribe((MiningFeeRatesChanged e) =>
+		FeeEstimationChangedSubscription = EventBus.Subscribe(
+			(MiningFeeRatesChanged e) =>
 			{
 				LastAllFeeEstimate = e.AllFeeEstimate;
 				AllFeeEstimateArrived?.Invoke(this, e.AllFeeEstimate);
+			});
+		BackendConnectionChangedSubscription = EventBus.Subscribe(
+			(ConnectionStateChanged e) =>
+			{
+				BackendStatus = e.Connected ? BackendStatus.Connected : BackendStatus.NotConnected;
+				SynchronizeRequestFinished?.Invoke(this, e.Connected);
 			});
 	}
 
@@ -57,11 +62,11 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 	public TaskCompletionSource<bool> InitialRequestTcs { get; } = new();
 
 	public SynchronizeResponse? LastResponse { get; private set; }
-	public WasabiHttpClientFactory HttpClientFactory { get; }
-	private WasabiClient WasabiClient { get; }
+	public WasabiClient WasabiClient { get; }
 	private EventBus EventBus { get; }
 	private IDisposable ExchangeRateChangedSubscription { get; }
 	private IDisposable FeeEstimationChangedSubscription { get; }
+	private IDisposable BackendConnectionChangedSubscription { get; }
 
 	/// <summary>Gets the Bitcoin price in USD.</summary>
 	public decimal UsdExchangeRate
@@ -91,10 +96,7 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 	private DateTimeOffset BackendStatusChangedAt { get; set; } = DateTimeOffset.UtcNow;
 	public TimeSpan BackendStatusChangedSince => DateTimeOffset.UtcNow - BackendStatusChangedAt;
 	private SmartHeaderChain SmartHeaderChain { get; }
-
 	public AllFeeEstimate? LastAllFeeEstimate { get; private set; }
-
-	public bool InError => BackendStatus != BackendStatus.Connected;
 
 	#endregion EventsPropertiesMembers
 
@@ -170,8 +172,6 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 
 		// One time trigger for the UI about the first request.
 		InitialRequestTcs.TrySetResult(isBackendConnected);
-
-		SynchronizeRequestFinished?.Invoke(this, isBackendConnected);
 	}
 
 	protected bool RaiseAndSetIfChanged<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
@@ -190,6 +190,7 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 	{
 		ExchangeRateChangedSubscription.Dispose();
 		FeeEstimationChangedSubscription.Dispose();
+		BackendConnectionChangedSubscription.Dispose();
 		base.Dispose();
 	}
 }

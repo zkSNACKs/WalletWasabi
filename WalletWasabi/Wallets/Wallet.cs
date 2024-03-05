@@ -439,7 +439,7 @@ public class Wallet : BackgroundService, IWallet
 				return;
 			}
 
-			await BitcoinStore.MempoolService.TryPerformMempoolCleanupAsync(Synchronizer.HttpClientFactory).ConfigureAwait(false);
+			await BitcoinStore.MempoolService.TryPerformMempoolCleanupAsync(Synchronizer.WasabiClient).ConfigureAwait(false);
 		}
 		catch (OperationCanceledException)
 		{
@@ -500,7 +500,7 @@ public class Wallet : BackgroundService, IWallet
 		{
 			try
 			{
-				var client = Synchronizer.HttpClientFactory.SharedWasabiClient;
+				var client = Synchronizer.WasabiClient;
 				var compactness = 10;
 
 				var mempoolHashes = await client.GetMempoolHashesAsync(compactness).ConfigureAwait(false);

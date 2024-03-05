@@ -54,7 +54,7 @@ public class WalletTests : IClassFixture<RegTestFixture>
 
 		// 2. Create wasabi synchronizer service.
 		await using WasabiHttpClientFactory httpClientFactory = new(torEndPoint: null, backendUriGetter: () => new Uri(RegTestFixture.BackendEndPoint));
-		using WasabiSynchronizer synchronizer = new(period: TimeSpan.FromSeconds(3), bitcoinStore, httpClientFactory, global.EventBus);
+		using WasabiSynchronizer synchronizer = new(period: TimeSpan.FromSeconds(3), bitcoinStore.SmartHeaderChain, httpClientFactory.SharedWasabiClient, global.EventBus);
 		HybridFeeProvider feeProvider = new(global.EventBus);
 
 		// 3. Create key manager service.

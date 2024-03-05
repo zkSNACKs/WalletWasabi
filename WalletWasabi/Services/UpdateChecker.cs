@@ -13,7 +13,7 @@ public class UpdateChecker : PeriodicRunner
 	{
 		Synchronizer = synchronizer;
 		UpdateStatus = new UpdateStatus(backendCompatible: true, clientUpToDate: true, new Version(), currentBackendMajorVersion: 0, new Version());
-		WasabiClient = Synchronizer.HttpClientFactory.SharedWasabiClient;
+		WasabiClient = Synchronizer.WasabiClient;
 		Synchronizer.PropertyChanged += Synchronizer_PropertyChanged;
 	}
 

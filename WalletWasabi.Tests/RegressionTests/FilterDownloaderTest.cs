@@ -43,7 +43,7 @@ public class FilterDownloaderTest : IClassFixture<RegTestFixture>
 		BitcoinStore bitcoinStore = setup.BitcoinStore;
 
 		await using WasabiHttpClientFactory httpClientFactory = new(torEndPoint: null, backendUriGetter: () => new Uri(RegTestFixture.BackendEndPoint));
-		using WasabiSynchronizer synchronizer = new(period: TimeSpan.FromSeconds(1), bitcoinStore, httpClientFactory, setup.Global.EventBus);
+		using WasabiSynchronizer synchronizer = new(period: TimeSpan.FromSeconds(1), bitcoinStore.SmartHeaderChain, httpClientFactory.SharedWasabiClient, setup.Global.EventBus);
 		try
 		{
 			await synchronizer.StartAsync(CancellationToken.None);

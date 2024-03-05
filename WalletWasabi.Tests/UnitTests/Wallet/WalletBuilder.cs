@@ -39,7 +39,7 @@ public class WalletBuilder : IAsyncDisposable
 		BitcoinStore = new BitcoinStore(IndexStore, TransactionStore, new MempoolService(), smartHeaderChain, blockRepositoryMock);
 		Cache = new MemoryCache(new MemoryCacheOptions());
 		HttpClientFactory = new WasabiHttpClientFactory(torEndPoint: null, backendUriGetter: () => null!);
-		Synchronizer = new(period: TimeSpan.FromSeconds(3), BitcoinStore, HttpClientFactory, new EventBus());
+		Synchronizer = new(period: TimeSpan.FromSeconds(3), BitcoinStore.SmartHeaderChain, HttpClientFactory.SharedWasabiClient, new EventBus());
 	}
 
 	private IndexStore IndexStore { get; }

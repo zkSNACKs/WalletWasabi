@@ -73,9 +73,8 @@ public class Global
 		CoordinatorHttpClientFactory = BuildHttpClientFactory(() => Config.GetCoordinatorUri());
 
 		TimeSpan requestInterval = Network == Network.RegTest ? TimeSpan.FromSeconds(5) : TimeSpan.FromSeconds(30);
-		int maxFiltersToSync = Network == Network.Main ? 1000 : 10000; // On testnet, filters are empty, so it's faster to query them together
 
-		HostedServices.Register<WasabiSynchronizer>(() => new WasabiSynchronizer(requestInterval, BitcoinStore, HttpClientFactory, EventBus), "Wasabi Synchronizer");
+		HostedServices.Register<WasabiSynchronizer>(() => new WasabiSynchronizer(requestInterval, BitcoinStore.SmartHeaderChain, HttpClientFactory.SharedWasabiClient, EventBus), "Wasabi Synchronizer");
 		WasabiSynchronizer wasabiSynchronizer = HostedServices.Get<WasabiSynchronizer>();
 
 		var coordinatorUri = config.GetCoordinatorUri();
