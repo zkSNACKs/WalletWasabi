@@ -187,7 +187,7 @@ public class Startup
 
 		var serviceScopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
 		var serviceProvider = serviceScopeFactory.CreateScope().ServiceProvider;
-		app.MapWebSocketManager("/satoshi", serviceProvider.GetService<SatoshiWebSocketHandler>());
+		app.MapWebSocketManager("/api/satoshi", serviceProvider.GetService<SatoshiWebSocketHandler>());
 
 		app.UseResponseCompression();
 
