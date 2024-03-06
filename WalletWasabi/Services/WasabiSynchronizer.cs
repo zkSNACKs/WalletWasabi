@@ -11,7 +11,6 @@ using WalletWasabi.Blockchain.Analysis.FeesEstimation;
 using WalletWasabi.Blockchain.Blocks;
 using WalletWasabi.Models;
 using WalletWasabi.Services.Events;
-using WalletWasabi.Stores;
 using WalletWasabi.Tor.Socks5.Exceptions;
 using WalletWasabi.WabiSabi.Client;
 using WalletWasabi.WebClients.Wasabi;
@@ -119,21 +118,18 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 					.ConfigureAwait(false);
 
 				// NOT GenSocksServErr
-				BackendStatus = BackendStatus.Connected;
 				TorStatus = TorStatus.Running;
 				OnSynchronizeRequestFinished();
 			}
 			catch (HttpRequestException ex) when (ex.InnerException is TorException innerEx)
 			{
 				TorStatus = innerEx is TorConnectionException ? TorStatus.NotRunning : TorStatus.Running;
-				BackendStatus = BackendStatus.NotConnected;
 				OnSynchronizeRequestFinished();
 				throw;
 			}
 			catch (HttpRequestException ex) when (ex.Message.Contains("Not Found"))
 			{
 				TorStatus = TorStatus.Running;
-				BackendStatus = BackendStatus.NotConnected;
 
 				// Backend API version might be updated meanwhile. Trying to update the versions.
 				var result = await WasabiClient.CheckUpdatesAsync(cancel).ConfigureAwait(false);
@@ -150,7 +146,6 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 			catch (Exception)
 			{
 				TorStatus = TorStatus.Running;
-				BackendStatus = BackendStatus.NotConnected;
 				OnSynchronizeRequestFinished();
 				throw;
 			}
