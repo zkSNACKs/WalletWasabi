@@ -1,14 +1,59 @@
 using NBitcoin;
 using System.Linq;
+using WalletWasabi.Helpers;
 using WalletWasabi.Tests.Helpers;
 using WalletWasabi.WabiSabi.Backend;
+using WalletWasabi.WabiSabi.Client;
 using WalletWasabi.WabiSabi.Client.Batching;
+using WalletWasabi.WabiSabi.Client.CredentialDependencies;
 using Xunit;
 
 namespace WalletWasabi.Tests.UnitTests.WabiSabi.Client;
 
 public class PaymentAwareOutputProviderTests
 {
+	[Fact]
+	public void CreateOutputsForImpossiblePaymentTest()
+	{
+		var rpc = new MockRpcClient();
+		var wallet = new TestWallet("random-wallet", rpc);
+		var paymentBatch = new PaymentBatch();
+		var outputProvider = new PaymentAwareOutputProvider(wallet, paymentBatch);
+
+		var roundParameters = WabiSabiFactory.CreateRoundParameters(new WabiSabiConfig());
+		using Key key = new();
+		paymentBatch.AddPayment(
+			key.PubKey.GetAddress(ScriptPubKeyType.Segwit, rpc.Network),
+			Money.Coins(101.0001m)); // Too big, non-standard payment which cannot be done.
+
+		var registeredCoinsEffectiveValues = new[]
+			{ Money.Coins(100m) };
+		var theirCoinEffectiveValues = new[]
+			{ Money.Coins(0.2m), Money.Coins(0.1m), Money.Coins(0.05m), Money.Coins(0.0025m), Money.Coins(0.0001m) };
+		var availableVsize = roundParameters.MaxVsizeAllocationPerAlice - Constants.P2wpkhInputVirtualSize;
+
+		var outputs = outputProvider.GetOutputs(
+			roundId: uint256.Zero,
+			roundParameters,
+			registeredCoinsEffectiveValues,
+			theirCoinEffectiveValues,
+			availableVsize).ToArray();
+
+		var nonAwaredOutputProvider = new OutputProvider(wallet);
+		var decomposedOutputs = nonAwaredOutputProvider.GetOutputs(
+			uint256.Zero,
+			roundParameters,
+			registeredCoinsEffectiveValues,
+			theirCoinEffectiveValues,
+			availableVsize).ToArray();
+
+		decimal ToDecimal(TxOut o) => o.Value.ToDecimal(MoneyUnit.BTC);
+		Assert.Equal(outputs.Sum(ToDecimal), decomposedOutputs.Sum(ToDecimal));
+
+		// Make sure this doesn't throw
+		DependencyGraph.ResolveCredentialDependencies(registeredCoinsEffectiveValues, outputs, roundParameters.MiningFeeRate, availableVsize);
+	}
+
 	[Fact]
 	public void CreateOutputsForPaymentsTest()
 	{
@@ -23,10 +68,14 @@ public class PaymentAwareOutputProviderTests
 			key.PubKey.GetAddress(ScriptPubKeyType.Segwit, rpc.Network),
 			Money.Coins(0.00005432m));
 
+		var registeredCoinsEffectiveValues = new[]
+			{ Money.Coins(0.00484323m), Money.Coins(0.003m), Money.Coins(0.00004323m) };
+		var totalRegisteredEffectiveValue = registeredCoinsEffectiveValues.Sum().ToDecimal(MoneyUnit.BTC);
+
 		var outputs = outputProvider.GetOutputs(
 			roundId: uint256.Zero,
 			roundParameters,
-			new[] { Money.Coins(0.00484323m), Money.Coins(0.003m), Money.Coins(0.00004323m) },
+			registeredCoinsEffectiveValues,
 			new[] { Money.Coins(0.2m), Money.Coins(0.1m), Money.Coins(0.05m), Money.Coins(0.0025m), Money.Coins(0.0001m) },
 			int.MaxValue).ToArray();
 
@@ -34,7 +83,9 @@ public class PaymentAwareOutputProviderTests
 		Assert.Equal(outputs[0].Value, Money.Coins(0.00005432m));
 
 		Assert.True(outputs.Length > 2, $"There were {outputs.Length} outputs."); // The rest was decomposed
-		Assert.InRange(outputs.Sum(x => x.Value.ToDecimal(MoneyUnit.BTC)), 0.007500m, 0.007800m); // no money was lost
+		Assert.InRange(outputs.Sum(x => x.Value.ToDecimal(MoneyUnit.BTC)),
+			totalRegisteredEffectiveValue - 0.0002m,
+			totalRegisteredEffectiveValue); // no money was lost
 	}
 
 	[Theory]
