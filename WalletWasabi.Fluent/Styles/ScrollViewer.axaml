@@ -41,7 +41,7 @@
 
   <Style Selector="ScrollViewer ScrollBar">
     <Setter Property="ShowDelay" Value="0:0:0.1" />
-    <Setter Property="HideDelay" Value="0:0:2.0" />
+    <Setter Property="HideDelay" Value="0:0:1" />
   </Style>
 
 </Styles>

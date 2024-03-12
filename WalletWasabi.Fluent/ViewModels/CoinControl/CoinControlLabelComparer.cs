@@ -5,7 +5,7 @@ namespace WalletWasabi.Fluent.ViewModels.CoinControl;
 
 public static class CoinControlLabelComparer
 {
-	public static int Ascending(CoinControlItemViewModelBase? left, CoinControlItemViewModelBase? right)
+	public static int Ascending(CoinListItem? left, CoinListItem? right)
 	{
 		if (left is null)
 		{
@@ -28,12 +28,12 @@ public static class CoinControlLabelComparer
 		return privateScoreLeft > privateScoreRight ? -1 : 1;
 	}
 
-	public static int Descending(CoinControlItemViewModelBase? left, CoinControlItemViewModelBase? right)
+	public static int Descending(CoinListItem? left, CoinListItem? right)
 	{
 		return -Ascending(left, right);
 	}
 
-	private static int GetLabelPriority(CoinControlItemViewModelBase coin)
+	private static int GetLabelPriority(CoinListItem coin)
 	{
 		if (coin.Labels == CoinPocketHelper.PrivateFundsText)
 		{

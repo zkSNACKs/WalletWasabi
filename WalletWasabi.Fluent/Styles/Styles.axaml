@@ -9,9 +9,9 @@
     <FontFamily x:Key="WasabiLogoTextFont">avares://WalletWasabi.Fluent/Assets/Fonts#Objectivity</FontFamily>
     <sys:Int32 x:Key="MaxLabelLength">50</sys:Int32>
     <x:Double x:Key="LabelMaxWidth">120</x:Double>
+    <x:String x:Key="LabelsWatermarkText">Person or Company i.e. Alice, Bob, Pizza Inc</x:String>
   </Styles.Resources>
   <StyleInclude Source="avares://WalletWasabi.Fluent/Styles/ContextMenu.axaml" />
-  <StyleInclude Source="avares://WalletWasabi.Fluent/Styles/MenuFlyoutPresenter.axaml" />
   <StyleInclude Source="avares://WalletWasabi.Fluent/Styles/Button.axaml" />
   <StyleInclude Source="avares://WalletWasabi.Fluent/Styles/Checkmark.axaml" />
   <StyleInclude Source="avares://WalletWasabi.Fluent/Styles/ContentArea.axaml" />
@@ -42,7 +42,9 @@
   <StyleInclude Source="avares://WalletWasabi.Fluent/Styles/TileButton.axaml" />
   <StyleInclude Source="avares://WalletWasabi.Fluent/Styles/PreviewItem.axaml" />
   <StyleInclude Source="avares://WalletWasabi.Fluent/Styles/TagsBox.axaml" />
+  <StyleInclude Source="avares://WalletWasabi.Fluent/Styles/MenuItem.axaml" />
   <!--TODO @SuperJMN: Convert this to control? Is it worth the effort?-->
   <StyleInclude Source="avares://WalletWasabi.Fluent/Controls/PreviewMessageItem.axaml" />
   <StyleInclude Source="avares://WalletWasabi.Fluent/Styles/CopyablePasswordTextBox.axaml" />
+  <StyleInclude Source="avares://WalletWasabi.Fluent/Styles/ScrollBar.axaml" />
 </Styles>

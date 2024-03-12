@@ -9,15 +9,7 @@
              x:Class="WalletWasabi.Fluent.Views.Wallets.Home.History.Columns.IndicatorsColumnView"
              x:CompileBindings="True"
              x:DataType="viewmodel:HistoryItemViewModelBase">
-  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" Margin="10 0">
-
-    <Panel Background="Transparent">
-      <Button Classes="plain" ToolTip.Tip="Show Details"
-              Command="{Binding ShowDetailsCommand}">
-        <PathIcon Data="{StaticResource details_regular}" Height="15" Opacity="0.6"
-                  Foreground="{DynamicResource SystemAccentColor}" />
-      </Button>
-    </Panel>
+  <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="10" Margin="0 0 20 0">
 
     <!--First icon (Confirmation Status) -->
     <PathIcon Classes.Confirmed="{Binding Transaction.Status, ConverterParameter={x:Static model:TransactionStatus.Confirmed}, Converter={x:Static converters:EnumToBoolConverter.Instance}}"
@@ -32,11 +24,11 @@
         </Style>
         <Style Selector="PathIcon.Pending">
           <Setter Property="Data" Value="{StaticResource clock_regular}" />
-          <Setter Property="Height" Value="14" />
+          <Setter Property="Height" Value="15" />
         </Style>
         <Style Selector="PathIcon.SpeedUp">
           <Setter Property="Data" Value="{StaticResource rocket_regular}" />
-          <Setter Property="Height" Value="14" />
+          <Setter Property="Height" Value="15" />
         </Style>
       </PathIcon.Styles>
     </PathIcon>
@@ -62,13 +54,13 @@
                   Classes.CPFP="{Binding Transaction.Type, ConverterParameter={x:Static model:TransactionType.CPFP}, Converter={x:Static converters:EnumToBoolConverter.Instance}}">
           <PathIcon.Styles>
             <Style Selector="PathIcon.IncomingTransaction">
-              <Setter Property="Data" Value="{StaticResource incoming_arrow}" />
-              <Setter Property="Height" Value="13" />
+              <Setter Property="Data" Value="{StaticResource wallet_action_receive}" />
+              <Setter Property="Height" Value="15" />
               <Setter Property="ToolTip.Tip" Value="Incoming" />
             </Style>
             <Style Selector="PathIcon.OutgoingTransaction">
-              <Setter Property="Data" Value="{StaticResource outgoing_arrow}" />
-              <Setter Property="Height" Value="13" />
+              <Setter Property="Data" Value="{StaticResource wallet_action_send}" />
+              <Setter Property="Height" Value="15" />
               <Setter Property="ToolTip.Tip" Value="Outgoing" />
             </Style>
             <Style Selector="PathIcon.SelfTransfer">

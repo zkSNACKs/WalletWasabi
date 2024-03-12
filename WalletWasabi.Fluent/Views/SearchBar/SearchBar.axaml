@@ -95,6 +95,10 @@
       <Setter Property="IsVisible" Value="False" />
     </Style>
 
+    <Style Selector="TextBox#SearchBox:disabled /template/ Border#PART_BorderElement">
+      <Setter Property="Background" Value="{DynamicResource TextControlBackground}" />
+    </Style>
+
     <Style Selector="TextBox:pointerover">
       <Setter Property="Foreground" Value="White" />
       <Setter Property="Cursor" Value="Hand" />

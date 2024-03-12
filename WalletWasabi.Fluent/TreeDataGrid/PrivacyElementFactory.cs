@@ -7,15 +7,31 @@ internal class PrivacyElementFactory : TreeDataGridElementFactory
 {
 	protected override Control CreateElement(object? data)
 	{
-		return data is PrivacyTextCell ?
-			new TreeDataGridPrivacyTextCell() :
-			base.CreateElement(data);
+		if (data is PrivacyTextCell cell)
+		{
+			return cell.Type switch
+			{
+				PrivacyCellType.Amount => new TreeDataGridAmountPrivacyTextCell(),
+				PrivacyCellType.Date => new TreeDataGridDatePrivacyTextCell(),
+				_ => new TreeDataGridPrivacyTextCell()
+			};
+		}
+
+		return base.CreateElement(data);
 	}
 
 	protected override string GetDataRecycleKey(object? data)
 	{
-		return data is PrivacyTextCell ?
-			typeof(TreeDataGridPrivacyTextCell).FullName! :
-			base.GetDataRecycleKey(data);
+		if (data is PrivacyTextCell cell)
+		{
+			return cell.Type switch
+			{
+				PrivacyCellType.Amount => typeof(TreeDataGridAmountPrivacyTextCell).FullName!,
+				PrivacyCellType.Date => typeof(TreeDataGridDatePrivacyTextCell).FullName!,
+				_ => typeof(TreeDataGridPrivacyTextCell).FullName!
+			};
+		}
+
+		return base.GetDataRecycleKey(data);
 	}
 }

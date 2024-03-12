@@ -57,7 +57,7 @@
       <Grid DataContext="{Binding $parent.DataContext}">
 
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="70" />
+          <ColumnDefinition Width="82" />
           <ColumnDefinition Width="70" />
           <ColumnDefinition Width="1*" />
           <ColumnDefinition Width="3*" MaxWidth="400" />
@@ -67,7 +67,7 @@
 
         <ContentControl ContentTemplate="{StaticResource WasabiLogo}" />
 
-        <ContentControl Grid.Column="1" Grid.ColumnSpan="2" Margin="16,8,8,2.5"
+        <ContentControl Grid.Column="1" Grid.ColumnSpan="2" Margin="2,8,8,2.5"
                         VerticalAlignment="Center"
                         ContentTemplate="{StaticResource Title}" />
 

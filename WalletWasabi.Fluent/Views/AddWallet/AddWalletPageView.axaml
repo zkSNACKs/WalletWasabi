@@ -33,7 +33,8 @@
               <Border x:Name="PART_Border"
                       BorderThickness="{TemplateBinding BorderThickness}"
                       BorderBrush="{TemplateBinding BorderBrush}"
-                      Background="{TemplateBinding Background}">
+                      Background="{TemplateBinding Background}"
+                      CornerRadius="10">
                 <Grid RowDefinitions="5* 4*">
                   <Panel Grid.Row="0">
                     <PathIcon x:Name="PART_Icon"

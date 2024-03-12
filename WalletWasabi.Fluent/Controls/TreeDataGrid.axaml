@@ -1,9 +1,11 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
                     xmlns:historyItems="clr-namespace:WalletWasabi.Fluent.ViewModels.Wallets.Home.History.HistoryItems"
                     xmlns:walletcoins="clr-namespace:WalletWasabi.Fluent.ViewModels.Wallets.Advanced.WalletCoins"
                     xmlns:receive="clr-namespace:WalletWasabi.Fluent.ViewModels.Wallets.Receive"
-                    xmlns:converters="clr-namespace:WalletWasabi.Fluent.Converters">
+                    xmlns:converters="clr-namespace:WalletWasabi.Fluent.Converters"
+                    xmlns:treeDataGrid="clr-namespace:WalletWasabi.Fluent.TreeDataGrid">
 
   <Design.PreviewWith>
     <StackPanel Spacing="8">
@@ -20,9 +22,185 @@
     </StackPanel>
   </Design.PreviewWith>
 
-  <converters:IndentConverter x:Key="IndentConverter" Multiplier="10" />
+  <!-- TreeDataGridRow: Generic -->
+
+  <ControlTheme x:Key="GenericTreeDataGridRow" TargetType="TreeDataGridRow">
+
+    <Setter Property="Focusable" Value="False" />
+
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_SelectionIndicator">
+          <Panel>
+            <Rectangle Name="BackgroundRectangle" />
+            <TreeDataGridCellsPresenter Name="PART_CellsPresenter"
+                                        ElementFactory="{TemplateBinding ElementFactory}"
+                                        Items="{TemplateBinding Columns}"
+                                        Rows="{TemplateBinding Rows}"
+                                        Margin="0 0 -2 0" />
+          </Panel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^/template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource SystemControlTransparentBrush}" />
+    </Style>
+
+    <Style Selector="^/template/ Border#PART_SelectionIndicator">
+      <Setter Property="Margin" Value="0 5 0 0" />
+      <Setter Property="Background" Value="{DynamicResource Layer1BackgroundBrush}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="1" />
+      <Setter Property="CornerRadius" Value="30" />
+      <Setter Property="Height" Value="{StaticResource TreeDataGridRowHeight}" />
+    </Style>
+
+    <!-- Child item style -->
+    <Style Selector="^/template/ Border#PART_SelectionIndicator.isChild">
+      <Setter Property="Background" Value="{DynamicResource Layer2BackgroundBrush}" />
+      <Setter Property="Margin" Value="0" />
+      <Setter Property="CornerRadius" Value="0" />
+    </Style>
+
+    <!-- Last Child item style -->
+    <Style Selector="^/template/ Border#PART_SelectionIndicator.isLastChild">
+      <Setter Property="CornerRadius" Value="0 0 15 15" />
+    </Style>
+
+    <!-- Child's Parent pointerover -->
+    <Style Selector="^/template/ Border#PART_SelectionIndicator.isParentPointerOver">
+      <Setter Property="BorderBrush" Value="{DynamicResource DataGridRowIndicatorFadedBrush}" />
+      <Setter Property="BorderThickness" Value="1 0 1 0" />
+      <Setter Property="Padding" Value="0 1 0 1" />
+    </Style>
+
+    <!-- Last Child's Parent pointerover -->
+    <Style Selector="^/template/ Border#PART_SelectionIndicator.lastChildIsParentPointerOver">
+      <Setter Property="BorderBrush" Value="{DynamicResource DataGridRowIndicatorFadedBrush}" />
+      <Setter Property="BorderThickness" Value="1 0 1 1" />
+      <Setter Property="Padding" Value="0 1 0 0" />
+    </Style>
+
+    <!-- Child's Parent selected -->
+    <Style Selector="^/template/ Border#PART_SelectionIndicator.isParentSelected">
+      <Setter Property="BorderBrush" Value="{DynamicResource DataGridRowIndicatorBrush}" />
+      <Setter Property="BorderThickness" Value="1 0 1 0" />
+      <Setter Property="Padding" Value="0 1 0 1" />
+    </Style>
+
+    <!-- Last Child's Parent selected -->
+    <Style Selector="^/template/ Border#PART_SelectionIndicator.lastChildIsParentSelected">
+      <Setter Property="BorderBrush" Value="{DynamicResource DataGridRowIndicatorBrush}" />
+      <Setter Property="BorderThickness" Value="1 0 1 1" />
+      <Setter Property="Padding" Value="0 1 0 0" />
+    </Style>
+
+    <Style Selector="^:pointerover /template/ Border#PART_SelectionIndicator">
+      <Setter Property="BorderBrush" Value="{DynamicResource DataGridRowIndicatorFadedBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="^:selected /template/ Border#PART_SelectionIndicator">
+      <Setter Property="BorderBrush" Value="{DynamicResource DataGridRowIndicatorBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="^:selected /template/ TreeDataGridCellsPresenter#PART_CellsPresenter">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <!-- Expand style -->
+    <Style Selector="^/template/ Border#PART_SelectionIndicator.isExpanded">
+      <Setter Property="CornerRadius" Value="15 15 0 0" />
+    </Style>
+    <Style Selector="^:selected /template/ Border#PART_SelectionIndicator.isExpanded">
+      <Setter Property="BorderThickness" Value="1 1 1 0" />
+      <Setter Property="Padding" Value="0 0 0 1" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_SelectionIndicator.isExpanded">
+      <Setter Property="BorderThickness" Value="1 1 1 0" />
+      <Setter Property="Padding" Value="0 0 0 1" />
+    </Style>
+  </ControlTheme>
 
   <!-- TreeDataGridExpanderCell: HistoryTable.axaml -->
+
+  <ControlTheme x:Key="HistoryTableTreeDataGridRow" TargetType="TreeDataGridRow" BasedOn="{StaticResource GenericTreeDataGridRow}">
+
+    <Setter Property="Focusable" Value="False" />
+
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_SelectionIndicator"
+                x:CompileBindings="True" x:DataType="historyItems:HistoryItemViewModelBase"
+                Classes.isChild="{Binding IsChild}"
+                Classes.isLastChild="{Binding IsLastChild}"
+                Classes.isExpanded="{Binding IsExpanded}"
+                Classes.isParentPointerOver="{Binding IsParentPointerOver}"
+                Classes.isParentSelected="{Binding IsParentSelected}">
+          <Classes.lastChildIsParentPointerOver>
+            <MultiBinding Converter="{x:Static BoolConverters.And}">
+              <Binding Path="IsParentPointerOver" />
+              <Binding Path="IsLastChild" />
+            </MultiBinding>
+          </Classes.lastChildIsParentPointerOver>
+          <Classes.lastChildIsParentSelected>
+            <MultiBinding Converter="{x:Static BoolConverters.And}">
+              <Binding Path="IsParentSelected" />
+              <Binding Path="IsLastChild" />
+            </MultiBinding>
+          </Classes.lastChildIsParentSelected>
+          <i:Interaction.Behaviors>
+            <ExecuteCommandOnDoubleTappedBehavior Command="{Binding ShowDetailsCommand, Mode=OneWay}" />
+          </i:Interaction.Behaviors>
+          <Panel>
+            <Rectangle Name="BackgroundRectangle"
+                       Classes.selectAnimation="{Binding IsFlashing}" />
+            <TreeDataGridCellsPresenter Name="PART_CellsPresenter"
+                                        ElementFactory="{TemplateBinding ElementFactory}"
+                                        Items="{TemplateBinding Columns}"
+                                        Rows="{TemplateBinding Rows}"
+                                        Margin="0 0 -2 0" />
+          </Panel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^/template/ Rectangle#BackgroundRectangle.selectAnimation">
+      <Setter Property="Fill" Value="{DynamicResource SystemAccentColor}" />
+      <Setter Property="Opacity" Value="0" />
+      <Style.Animations>
+        <Animation Duration="1.8" Easing="{StaticResource FluentEasing}">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0" />
+          </KeyFrame>
+          <KeyFrame Cue="40%">
+            <Setter Property="Opacity" Value="0.7" />
+          </KeyFrame>
+          <KeyFrame Cue="50%">
+            <Setter Property="Opacity" Value="0.7" />
+          </KeyFrame>
+          <KeyFrame Cue="60%">
+            <Setter Property="Opacity" Value="0" />
+          </KeyFrame>
+          <KeyFrame Cue="70%">
+            <Setter Property="Opacity" Value="0.5" />
+          </KeyFrame>
+          <KeyFrame Cue="80%">
+            <Setter Property="Opacity" Value="0" />
+          </KeyFrame>
+          <KeyFrame Cue="90%">
+            <Setter Property="Opacity" Value="0.5" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="0" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+  </ControlTheme>
 
   <ControlTheme x:Key="HistoryTableTreeDataGridExpanderCell" TargetType="TreeDataGridExpanderCell">
 
@@ -57,7 +235,7 @@
 
     <Setter Property="Template">
       <ControlTemplate>
-        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Indent, Converter={StaticResource IndentConverter}}">
+        <Border Background="{TemplateBinding Background}">
           <DockPanel>
             <Border DockPanel.Dock="Left"
                     Margin="4 0"
@@ -75,172 +253,41 @@
     </Setter>
   </ControlTheme>
 
-  <!-- TreeDataGridRow: Generic -->
-
-  <ControlTheme x:Key="GenericTreeDataGridRow" TargetType="TreeDataGridRow">
-
-    <Setter Property="Focusable" Value="False" />
-
-    <Setter Property="Template">
-      <ControlTemplate>
-        <DockPanel LastChildFill="True">
-          <Border Name="PART_SelectionIndicator"
-                  BorderThickness="2 0 0 0"
-                  DockPanel.Dock="Left"
-                  VerticalAlignment="Stretch" />
-          <Panel>
-            <Rectangle Name="BackgroundRectangle" />
-            <TreeDataGridCellsPresenter Name="PART_CellsPresenter"
-                                        ElementFactory="{TemplateBinding ElementFactory}"
-                                        Items="{TemplateBinding Columns}"
-                                        Rows="{TemplateBinding Rows}"
-                                        Margin="0,0,-2,0" />
-          </Panel>
-        </DockPanel>
-      </ControlTemplate>
-    </Setter>
-
-    <Style Selector="^/template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="{DynamicResource SystemControlTransparentBrush}" />
-    </Style>
-    <Style Selector="^:pointerover /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="{DynamicResource DataGridRowSelectedBackgroundBrush}" />
-    </Style>
-    <Style Selector="^:selected /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="{DynamicResource DataGridRowSelectedUnfocusedBackgroundBrush}" />
-      <Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedUnfocusedBackgroundOpacity}" />
-    </Style>
-    <Style Selector="^:selected:focus /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="{DynamicResource DataGridRowSelectedBackgroundBrush}" />
-      <Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedBackgroundOpacity}" />
-    </Style>
-    <Style Selector="^:selected /template/ Border#PART_SelectionIndicator">
-      <Setter Property="BorderBrush" Value="{DynamicResource DataGridRowIndicatorBrush}" />
-    </Style>
-    <Style Selector="^/template/ Border#PART_SelectionIndicator">
-      <Setter Property="BorderBrush" Value="Transparent" />
-    </Style>
-    <Style Selector="^:selected /template/ TreeDataGridCellsPresenter#PART_CellsPresenter">
-      <Setter Property="Background" Value="Transparent" />
-    </Style>
-  </ControlTheme>
-
-  <!-- TreeDataGridRow: HistoryTable.axaml -->
-
-  <ControlTheme x:Key="HistoryTableTreeDataGridRow" TargetType="TreeDataGridRow" BasedOn="{StaticResource GenericTreeDataGridRow}">
-
-    <Setter Property="Focusable" Value="False" />
-    <Setter Property="Height" Value="37.5" />
-
-    <Setter Property="Template">
-      <ControlTemplate>
-        <DockPanel LastChildFill="True"
-                   Background="Transparent"
-                   x:CompileBindings="True" x:DataType="historyItems:HistoryItemViewModelBase">
-          <Interaction.Behaviors>
-            <ExecuteCommandOnDoubleTappedBehavior Command="{Binding ShowDetailsCommand, Mode=OneWay}" />
-          </Interaction.Behaviors>
-          <Border Name="PART_SelectionIndicator"
-                  BorderThickness="2 0 0 0"
-                  DockPanel.Dock="Left"
-                  VerticalAlignment="Stretch" />
-          <Panel>
-            <Rectangle Name="BackgroundRectangle"
-                       Classes.selectAnimation="{Binding IsFlashing}" />
-            <TreeDataGridCellsPresenter Name="PART_CellsPresenter"
-                                        ElementFactory="{TemplateBinding ElementFactory}"
-                                        Items="{TemplateBinding Columns}"
-                                        Rows="{TemplateBinding Rows}"
-                                        Margin="0,0,-2,0"
-                                        Classes.isChild="{Binding Transaction.IsChild}" />
-            <Rectangle Name="PART_Separator"
-                       Margin="-2,0,0,0"
-                       HorizontalAlignment="Stretch"
-                       VerticalAlignment="Bottom"
-                       IsHitTestVisible="False"
-                       Height="1" />
-          </Panel>
-        </DockPanel>
-      </ControlTemplate>
-    </Setter>
-
-    <Style Selector="^/template/ Rectangle#BackgroundRectangle.selectAnimation">
-      <Setter Property="Fill" Value="{DynamicResource SystemAccentColor}" />
-      <Setter Property="Opacity" Value="0" />
-      <Style.Animations>
-        <Animation Duration="1.5">
-          <KeyFrame KeyTime="0:0:0.0">
-            <Setter Property="Opacity" Value="0" />
-          </KeyFrame>
-          <KeyFrame KeyTime="0:0:0.25">
-            <Setter Property="Opacity" Value="0.5" />
-          </KeyFrame>
-          <KeyFrame KeyTime="0:0:0.50">
-            <Setter Property="Opacity" Value="0" />
-          </KeyFrame>
-          <KeyFrame KeyTime="0:0:0.75">
-            <Setter Property="Opacity" Value="0.5" />
-          </KeyFrame>
-          <KeyFrame KeyTime="0:0:1">
-            <Setter Property="Opacity" Value="0" />
-          </KeyFrame>
-          <KeyFrame KeyTime="0:0:1.25">
-            <Setter Property="Opacity" Value="0.5" />
-          </KeyFrame>
-          <KeyFrame KeyTime="0:0:1.5">
-            <Setter Property="Opacity" Value="0" />
-          </KeyFrame>
-        </Animation>
-      </Style.Animations>
-    </Style>
-    <Style Selector="^:selected /template/ TreeDataGridCellsPresenter#PART_CellsPresenter">
-      <Setter Property="Background" Value="Transparent" />
-    </Style>
-    <Style Selector="^/template/ TreeDataGridCellsPresenter#PART_CellsPresenter.isChild">
-      <Setter Property="Background" Value="{DynamicResource SystemListLowColor}" />
-    </Style>
-    <Style Selector="^:selected /template/ TreeDataGridCellsPresenter#PART_CellsPresenter.isChild">
-      <Setter Property="Background" Value="Transparent" />
-    </Style>
-    <Style Selector="^:pointerover /template/ TreeDataGridCellsPresenter#PART_CellsPresenter.isChild">
-      <Setter Property="Background" Value="Transparent" />
-    </Style>
-  </ControlTheme>
-
   <!-- TreeDataGridRow: SelectCoinsDialogView.axaml -->
 
   <ControlTheme x:Key="SelectCoinsDialogViewTreeDataGridRow" TargetType="TreeDataGridRow" BasedOn="{StaticResource GenericTreeDataGridRow}">
-    <!-- TODO: -->
-  </ControlTheme>
-
-  <!-- TreeDataGridRow: WalletCoinsView.axaml -->
-
-  <ControlTheme x:Key="WalletCoinsViewTreeDataGridRow" TargetType="TreeDataGridRow" BasedOn="{StaticResource GenericTreeDataGridRow}">
-
     <Setter Property="Focusable" Value="False" />
-    <Setter Property="Height" Value="47.5" />
 
     <Setter Property="Template">
       <ControlTemplate>
-        <DockPanel LastChildFill="True"
-                   Background="Transparent"
-                   x:CompileBindings="True" x:DataType="walletcoins:WalletCoinViewModel">
-          <Interaction.Behaviors>
-            <ExecuteCommandOnDoubleTappedBehavior Command="{Binding ToggleSelectionCommand, Mode=OneWay}" />
-          </Interaction.Behaviors>
-          <Border Name="PART_SelectionIndicator"
-                  BorderThickness="2 0 0 0"
-                  DockPanel.Dock="Left"
-                  VerticalAlignment="Stretch" />
+        <Border x:Name="PART_SelectionIndicator"
+                x:CompileBindings="True" x:DataType="treeDataGrid:ITreeDataGridExpanderItem"
+                Classes.isChild="{Binding IsChild}"
+                Classes.isLastChild="{Binding IsLastChild}"
+                Classes.isExpanded="{Binding IsExpanded}"
+                Classes.isParentPointerOver="{Binding IsParentPointerOver}"
+                Classes.isParentSelected="{Binding IsParentSelected}">
+          <Classes.lastChildIsParentPointerOver>
+            <MultiBinding Converter="{x:Static BoolConverters.And}">
+              <Binding Path="IsParentPointerOver" />
+              <Binding Path="IsLastChild" />
+            </MultiBinding>
+          </Classes.lastChildIsParentPointerOver>
+          <Classes.lastChildIsParentSelected>
+            <MultiBinding Converter="{x:Static BoolConverters.And}">
+              <Binding Path="IsParentSelected" />
+              <Binding Path="IsLastChild" />
+            </MultiBinding>
+          </Classes.lastChildIsParentSelected>
           <Panel>
             <Rectangle Name="BackgroundRectangle" />
             <TreeDataGridCellsPresenter Name="PART_CellsPresenter"
                                         ElementFactory="{TemplateBinding ElementFactory}"
                                         Items="{TemplateBinding Columns}"
                                         Rows="{TemplateBinding Rows}"
-                                        Margin="0,0,-2,0" />
+                                        Margin="0 0 -2 0" />
           </Panel>
-        </DockPanel>
+        </Border>
       </ControlTemplate>
     </Setter>
   </ControlTheme>
@@ -250,29 +297,23 @@
   <ControlTheme x:Key="ReceiveAddressesViewTreeDataGridRow" TargetType="TreeDataGridRow" BasedOn="{StaticResource GenericTreeDataGridRow}">
 
     <Setter Property="Focusable" Value="False" />
-    <Setter Property="Height" Value="37.5" />
 
     <Setter Property="Template">
       <ControlTemplate>
-        <DockPanel LastChildFill="True"
-                   Background="Transparent"
-                   x:CompileBindings="True" x:DataType="receive:AddressViewModel">
-          <Interaction.Behaviors>
+        <Border x:Name="PART_SelectionIndicator"
+                x:CompileBindings="True" x:DataType="receive:AddressViewModel">
+          <i:Interaction.Behaviors>
             <ExecuteCommandOnDoubleTappedBehavior Command="{Binding NavigateCommand, Mode=OneWay}" />
-          </Interaction.Behaviors>
-          <Border Name="PART_SelectionIndicator"
-                  BorderThickness="2 0 0 0"
-                  DockPanel.Dock="Left"
-                  VerticalAlignment="Stretch" />
+          </i:Interaction.Behaviors>
           <Panel>
             <Rectangle Name="BackgroundRectangle" />
             <TreeDataGridCellsPresenter Name="PART_CellsPresenter"
                                         ElementFactory="{TemplateBinding ElementFactory}"
                                         Items="{TemplateBinding Columns}"
                                         Rows="{TemplateBinding Rows}"
-                                        Margin="0,0,-2,0" />
+                                        Margin="0 0 -2 0" />
           </Panel>
-        </DockPanel>
+        </Border>
       </ControlTemplate>
     </Setter>
   </ControlTheme>

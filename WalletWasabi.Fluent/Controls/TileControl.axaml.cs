@@ -11,8 +11,6 @@ public class TileControl : ContentControl
 
 	public static readonly StyledProperty<bool> IsBottomContentVisibleProperty = AvaloniaProperty.Register<TileControl, bool>(nameof(IsBottomContentVisible), true);
 
-	public static readonly StyledProperty<Thickness> SeparatorMarginProperty = AvaloniaProperty.Register<TileControl, Thickness>(nameof(SeparatorMargin));
-
 	public static readonly StyledProperty<double> BottomPartHeightProperty = AvaloniaProperty.Register<TileControl, double>(nameof(BottomPartHeight));
 
 	public string Title
@@ -31,12 +29,6 @@ public class TileControl : ContentControl
 	{
 		get => GetValue(IsBottomContentVisibleProperty);
 		set => SetValue(IsBottomContentVisibleProperty, value);
-	}
-
-	public Thickness SeparatorMargin
-	{
-		get => GetValue(SeparatorMarginProperty);
-		set => SetValue(SeparatorMarginProperty, value);
 	}
 
 	public double BottomPartHeight

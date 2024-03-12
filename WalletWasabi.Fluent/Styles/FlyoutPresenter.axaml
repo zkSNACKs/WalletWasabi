@@ -27,7 +27,7 @@
     <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
     <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
     <Setter Property="TextElement.Foreground" Value="{DynamicResource AcrylicTrimForeground}" />
-    <Setter Property="CornerRadius" Value="8 8 8 8" />
+    <Setter Property="CornerRadius" Value="{StaticResource OverlayCornerRadius}" />
     <Setter Property="Template">
       <ControlTemplate>
         <Panel x:Name="RootPanel">

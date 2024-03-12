@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:treeDataGrid="clr-namespace:WalletWasabi.Fluent.TreeDataGrid"
+             xmlns:core="clr-namespace:WalletWasabi.Fluent.ViewModels.CoinControl.Core"
+             xmlns:behaviors="clr-namespace:WalletWasabi.Fluent.Behaviors"
+             xmlns:coins="clr-namespace:WalletWasabi.Fluent.ViewModels.Wallets.Coins"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WalletWasabi.Fluent.Views.Wallets.Coins.CoinListView"
+             x:DataType="coins:CoinListViewModel"
+             x:CompileBindings="True">
+  <Panel>
+    <TreeDataGrid x:Name="TreeDataGrid" Source="{Binding TreeDataGridSource}" IsVisible="{Binding !!CoinItems.Count}">
+      <TreeDataGrid.Styles>
+        <Style Selector="treeDataGrid|TreeDataGridPlainTextCell">
+          <Setter Property="FontFamily" Value="{StaticResource MonospacedFont}" />
+          <Setter Property="Opacity" Value="1" />
+          <Setter Property="FontSize" Value="14" />
+          <Setter Property="Margin" Value="20 0" />
+          <Setter Property="Background" Value="Transparent" />
+          <Setter Property="Foreground" Value="{DynamicResource TextForegroundColor}" />
+        </Style>
+        <Style Selector="TreeDataGridExpanderCell">
+          <Setter Property="Theme" Value="{StaticResource SelectCoinsDialogViewTreeDataGridExpanderCell}" />
+        </Style>
+        <Style Selector="TreeDataGridRow" x:DataType="core:CoinListItem">
+          <Setter Property="Theme" Value="{StaticResource SelectCoinsDialogViewTreeDataGridRow}" />
+          <Setter Property="IsPointerOver" Value="{Binding IsPointerOverProxy, Mode=OneWayToSource}" />
+          <Setter Property="IsSelected" Value="{Binding IsSelectedProxy, Mode=OneWayToSource}" />
+        </Style>
+      </TreeDataGrid.Styles>
+      <Interaction.Behaviors>
+        <behaviors:SetLastChildBehavior />
+      </Interaction.Behaviors>
+      <TreeDataGrid.ElementFactory>
+        <treeDataGrid:PlainTextElementFactory />
+      </TreeDataGrid.ElementFactory>
+    </TreeDataGrid>
+    <DummyRowsControl Margin="{StaticResource HistoryTablePlaceholderPanelMargin}"
+                      RowHeight="{StaticResource TreeDataGridRowHeight}"
+                      IsVisible="{Binding !#TreeDataGrid.IsVisible}">
+      <DummyRowsControl.RowTemplate>
+        <ControlTemplate>
+          <Border CornerRadius="15" Background="{DynamicResource Layer1BackgroundBrush}" Margin="2" />
+        </ControlTemplate>
+      </DummyRowsControl.RowTemplate>
+    </DummyRowsControl>
+  </Panel>
+</UserControl>

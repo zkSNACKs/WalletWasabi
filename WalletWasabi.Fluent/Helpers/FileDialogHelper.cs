@@ -52,6 +52,13 @@ public static class FileDialogHelper
 		MimeTypes = new[] { "image/png" }
 	};
 
+	public static FilePickerFileType Svg { get; } = new("SVG Files")
+	{
+		Patterns = new[] {"*.svg"},
+		AppleUniformTypeIdentifiers = new[] {"public.svg-image"},
+		MimeTypes = new[] {"image/svg+xml"}
+	};
+
 	private static IStorageProvider? GetStorageProvider()
 	{
 		if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
@@ -109,6 +116,11 @@ public static class FileDialogHelper
 						fileTypeFilters.Add(Png);
 						break;
 					}
+				case "svg":
+				{
+					fileTypeFilters.Add(Svg);
+					break;
+				}
 			}
 		}
 

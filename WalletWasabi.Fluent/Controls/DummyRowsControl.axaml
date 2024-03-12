@@ -1,0 +1,39 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <ControlTheme x:Key="{x:Type DummyRowsControl}" TargetType="DummyRowsControl">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ItemsControl ItemsSource="{TemplateBinding Items}">
+          <ItemsControl.OpacityMask>
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+              <LinearGradientBrush.GradientStops>
+                <GradientStop Offset="0" Color="Black"/>
+                <GradientStop Offset="1" Color="Transparent"/>
+              </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+          </ItemsControl.OpacityMask>
+
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <TemplatedControl
+                  Height="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DummyRowsControl}, Path=RowHeight}"
+                  Template="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DummyRowsControl}, Path=RowTemplate}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <Design.PreviewWith>
+    <DummyRowsControl RowHeight="35" Width="200" Height="200">
+      <DummyRowsControl.RowTemplate>
+        <ControlTemplate>
+          <Button Content="Hi" />
+        </ControlTemplate>
+      </DummyRowsControl.RowTemplate>
+    </DummyRowsControl>
+  </Design.PreviewWith>
+
+</ResourceDictionary>

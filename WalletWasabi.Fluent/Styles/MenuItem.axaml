@@ -1,0 +1,5 @@
+<Styles xmlns="https://github.com/avaloniaui">
+  <Style Selector="MenuItem">
+    <Setter Property="CornerRadius" Value="8" />
+  </Style>
+</Styles>

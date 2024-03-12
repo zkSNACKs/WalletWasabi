@@ -7,27 +7,52 @@ using ReactiveUI;
 using WalletWasabi.Fluent.Extensions;
 using WalletWasabi.Fluent.Models.UI;
 using WalletWasabi.Fluent.Models.Wallets;
+using WalletWasabi.Fluent.TreeDataGrid;
 
 namespace WalletWasabi.Fluent.ViewModels.Wallets.Home.History.HistoryItems;
 
-public abstract partial class HistoryItemViewModelBase : ViewModelBase
+public abstract partial class HistoryItemViewModelBase : ViewModelBase, ITreeDataGridExpanderItem
 {
 	[AutoNotify] private bool _isFlashing;
 	[AutoNotify] private bool _isExpanded;
+	[AutoNotify] private bool _isPointerOver;
+	[AutoNotify] private bool _isParentPointerOver;
+	[AutoNotify] private bool _isSelected;
+	[AutoNotify] private bool _isParentSelected;
 
 	protected HistoryItemViewModelBase(TransactionModel transaction)
 	{
 		Transaction = transaction;
-
+		IsChild = transaction.IsChild;
 		ClipboardCopyCommand = ReactiveCommand.CreateFromTask<string>(text => UiContext.Clipboard.SetTextAsync(text));
 
 		this.WhenAnyValue(x => x.IsFlashing)
 			.Where(x => x)
 			.SubscribeAsync(async _ =>
 			{
-				await Task.Delay(1260);
+				await Task.Delay(1800);
 				IsFlashing = false;
 			});
+
+		this.WhenAnyValue(x => x.IsPointerOver)
+			.Do(x =>
+			{
+				foreach (var child in Children)
+				{
+					child.IsParentPointerOver = x;
+				}
+			})
+			.Subscribe();
+
+		this.WhenAnyValue(x => x.IsSelected)
+			.Do(x =>
+			{
+				foreach (var child in Children)
+				{
+					child.IsParentSelected = x;
+				}
+			})
+			.Subscribe();
 	}
 
 	protected HistoryItemViewModelBase(UiContext uiContext, TransactionModel transaction) : this(transaction)
@@ -35,9 +60,29 @@ public abstract partial class HistoryItemViewModelBase : ViewModelBase
 		UiContext = uiContext;
 	}
 
+	/// <summary>
+	/// Proxy property to prevent stack overflow due to internal bug in Avalonia where the OneWayToSource Binding
+	/// is replaced by a TwoWay one.when
+	/// </summary>
+	public bool IsPointerOverProxy
+	{
+		get => IsPointerOver;
+		set => IsPointerOver = value;
+	}
+
+	public bool IsSelectedProxy
+	{
+		get => IsSelected;
+		set => IsSelected = value;
+	}
+
 	public TransactionModel Transaction { get; }
 
 	public ObservableCollection<HistoryItemViewModelBase> Children { get; } = new();
+
+	public bool IsChild { get; set; }
+
+	public bool IsLastChild { get; set; }
 
 	public ICommand? ShowDetailsCommand { get; protected set; }
 

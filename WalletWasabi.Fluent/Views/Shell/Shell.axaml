@@ -12,30 +12,28 @@
     <RegisterNotificationHostBehavior />
   </Interaction.Behaviors>
   <Panel>
-    <shell:Background />
     <shell:MainScreen x:CompileBindings="False"
                       IsHitTestVisible="{Binding $parent.DataContext.IsMainContentEnabled^, FallbackValue=True}">
-      <!-- TODO: Enable it when introducing UI Refreshment -->
-      <!-- <shell:MainScreen.Transitions> -->
-      <!--   <Transitions> -->
-      <!--     <EffectTransition Property="Effect" -->
-      <!--                       Delay="0:0:0.25" -->
-      <!--                       Duration="0:0:0.25" -->
-      <!--                       Easing="{StaticResource FluentEasing}"/> -->
-      <!--   </Transitions> -->
-      <!-- </shell:MainScreen.Transitions> -->
-      <!-- <shell:MainScreen.Styles> -->
-      <!--   <Style Selector="shell|MainScreen[IsHitTestVisible=True]"> -->
-      <!--     <Setter Property="Effect"> -->
-      <!--       <BlurEffect Radius="0.0" /> -->
-      <!--     </Setter> -->
-      <!--   </Style> -->
-      <!--   <Style Selector="shell|MainScreen[IsHitTestVisible=False]"> -->
-      <!--     <Setter Property="Effect"> -->
-      <!--       <BlurEffect Radius="3.0" /> -->
-      <!--     </Setter> -->
-      <!--   </Style> -->
-      <!-- </shell:MainScreen.Styles> -->
+      <shell:MainScreen.Transitions>
+        <Transitions>
+          <EffectTransition Property="Effect"
+                            Delay="0:0:0.25"
+                            Duration="0:0:0.25"
+                            Easing="{StaticResource FluentEasing}" />
+        </Transitions>
+      </shell:MainScreen.Transitions>
+      <shell:MainScreen.Styles>
+        <Style Selector="shell|MainScreen[IsHitTestVisible=True]">
+          <Setter Property="Effect">
+            <BlurEffect Radius="0.0" />
+          </Setter>
+        </Style>
+        <Style Selector="shell|MainScreen[IsHitTestVisible=False]">
+          <Setter Property="Effect">
+            <BlurEffect Radius="3.0" />
+          </Setter>
+        </Style>
+      </shell:MainScreen.Styles>
     </shell:MainScreen>
     <shell:Dialogs />
   </Panel>

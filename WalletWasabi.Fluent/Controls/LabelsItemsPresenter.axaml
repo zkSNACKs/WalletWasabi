@@ -1,22 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:g="clr-namespace:System.Collections.Generic;assembly=System.Collections">
-
-  <Design.PreviewWith>
-    <Border BorderBrush="Black" BorderThickness="1" Width="250" Height="50">
-      <LabelsItemsPresenter HorizontalAlignment="Left" VerticalAlignment="Center">
-        <LabelsItemsPresenter.ItemsSource>
-          <g:List x:TypeArguments="x:String">
-            <x:String>Label 1</x:String>
-            <x:String>Label 2</x:String>
-            <x:String>Label 3</x:String>
-            <x:String>Label 4</x:String>
-          </g:List>
-        </LabelsItemsPresenter.ItemsSource>
-      </LabelsItemsPresenter>
-    </Border>
-  </Design.PreviewWith>
-
   <ControlTheme x:Key="LabelBorder" TargetType="Border">
     <Setter Property="Margin" Value="0" />
     <Setter Property="Padding" Value="12,5,12,5" />
@@ -24,9 +8,8 @@
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="MinHeight" Value="0" />
     <Setter Property="MinWidth" Value="38" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="Background" Value="{DynamicResource InvisibleButtonBackgroundColor}" />
-    <Setter Property="CornerRadius" Value="2" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type LabelsItemsPresenter}" TargetType="LabelsItemsPresenter">
@@ -36,11 +19,11 @@
     <Setter Property="BorderBrush" Value="{DynamicResource TagsBoxBorderBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
     <Setter Property="MaxLabelWidth" Value="{DynamicResource LabelMaxWidth}" />
+    <Setter Property="Background" Value="{DynamicResource TagsBoxItemBackground}" />
 
     <Setter Property="Template">
       <ControlTemplate>
         <Border Name="PART_Border"
-                Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
                 CornerRadius="{TemplateBinding CornerRadius}"
@@ -58,12 +41,14 @@
         <Panel Margin="0 0 4 0">
           <Border Theme="{StaticResource LabelBorder}"
                   ToolTip.Tip="{Binding}"
+                  Background="{Binding Background, RelativeSource={RelativeSource AncestorType={x:Type LabelsItemsPresenter}}}"
                   BorderBrush="{Binding BorderBrush, RelativeSource={RelativeSource AncestorType={x:Type LabelsItemsPresenter}}}">
             <TextBlock Text="{Binding}"
                        TextTrimming="CharacterEllipsis"
                        TextWrapping="NoWrap"
                        Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type LabelsItemsPresenter}}}"
-                       MaxWidth="{Binding MaxLabelWidth, RelativeSource={RelativeSource AncestorType={x:Type LabelsItemsPresenter}}}" />
+                       MaxWidth="{Binding MaxLabelWidth, RelativeSource={RelativeSource AncestorType={x:Type LabelsItemsPresenter}}}">
+            </TextBlock>
           </Border>
         </Panel>
       </DataTemplate>
@@ -97,5 +82,23 @@
     </Setter>
 
   </ControlTheme>
+
+  <Design.PreviewWith>
+    <Border BorderBrush="Black" BorderThickness="1" Width="250" Height="50">
+      <StackPanel>
+        <LabelsItemsPresenter HorizontalAlignment="Left" VerticalAlignment="Center">
+          <LabelsItemsPresenter.ItemsSource>
+            <g:List x:TypeArguments="x:String">
+              <x:String>Label 1</x:String>
+              <x:String>Label 2</x:String>
+              <x:String>Label 3</x:String>
+              <x:String>Label 4</x:String>
+            </g:List>
+          </LabelsItemsPresenter.ItemsSource>
+        </LabelsItemsPresenter>
+        <Border Background="Red" Theme="{StaticResource LabelBorder}" Width="200" Height="20" />
+      </StackPanel>
+    </Border>
+  </Design.PreviewWith>
 
 </ResourceDictionary>

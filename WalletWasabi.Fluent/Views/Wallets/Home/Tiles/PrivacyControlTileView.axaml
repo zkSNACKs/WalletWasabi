@@ -12,9 +12,7 @@
   <TileControl Title="PRIVACY PROGRESS" IsBottomContentVisible="{Binding HasPrivateBalance}">
 
     <DockPanel>
-      <privacyBar:PrivacyBarView IsVisible="{Binding PrivacyBar.HasProgress}" DockPanel.Dock="Bottom" />
-      <!--TODO: Uncomment this code to show the new Privacy Bar -->
-      <!--<Panel IsVisible="{Binding IsPrivacyProgressDisplayed^}" DockPanel.Dock="Bottom" Height="6">
+      <Panel IsVisible="{Binding IsPrivacyProgressDisplayed^}" DockPanel.Dock="Bottom" Height="6">
 
         <Panel.Styles>
           <Style Selector="ProgressBar">
@@ -23,22 +21,21 @@
           </Style>
         </Panel.Styles>
 
-        <ProgressBar />
+        <ProgressBar Background="{DynamicResource PrivacyLevelNoneBrush}" />
         <ProgressBar Maximum="{Binding TotalAmount^}" Background="{x:Null}"
                      Value="{Binding SemiPrivateAndPrivateAmount^}" ToolTip.Tip="Semi-private funds"  Foreground="#5769954A" />
         <ProgressBar Maximum="{Binding TotalAmount^}" Background="{x:Null}"
                      Value="{Binding PrivateAmount^}" ToolTip.Tip="Private funds" Foreground="#A169954A" />
-      </Panel>-->
+      </Panel>
       <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
         <Button Command="{Binding ShowDetailsCommand}" Classes="plain"
                 ToolTip.Tip="Show Details" VerticalAlignment="Center" HorizontalAlignment="Center"
                 Height="36" Width="36">
-          <Image Source="{StaticResource privacy_indicator_good}" />
+          <Image Source="{StaticResource privacy_indicator_good}" Opacity="0.6" />
         </Button>
-        <TextBlock
-          HorizontalAlignment="Center"
-          TextAlignment="Center"
-          Text="{Binding PercentText}" Classes="h2" />
+        <TextBlock HorizontalAlignment="Center"
+                   TextAlignment="Center"
+                   Text="{Binding PercentText}" Classes="h2 bold" />
       </StackPanel>
     </DockPanel>
 

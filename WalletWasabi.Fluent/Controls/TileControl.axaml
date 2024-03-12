@@ -11,21 +11,15 @@
 
   <ControlTheme x:Key="{x:Type TileControl}" TargetType="TileControl">
 
-    <Setter Property="SeparatorMargin" Value="0 6" />
     <Setter Property="BottomPartHeight" Value="22" />
 
     <Setter Property="Template">
       <ControlTemplate>
-        <Border CornerRadius="2" BorderThickness="1" Background="{DynamicResource TileRegionColor}"
-                BorderBrush="{DynamicResource TileBorderColor}"
+        <Border CornerRadius="15" Background="{DynamicResource TileRegionColor}"
                 Margin="0 0 10 0" Padding="12">
           <DockPanel>
-            <TextBlock Text="{TemplateBinding Title}" DockPanel.Dock="Top" Classes="h8 bold" />
-            <StackPanel DockPanel.Dock="Bottom" Name="PART_BottomContent"
-                        IsVisible="{TemplateBinding IsBottomContentVisible}">
-              <Separator DockPanel.Dock="Bottom" Margin="{TemplateBinding SeparatorMargin}" />
-              <ContentPresenter Content="{TemplateBinding BottomContent}" />
-            </StackPanel>
+            <TextBlock Text="{TemplateBinding Title}" Opacity="0.6" FontWeight="Bold" DockPanel.Dock="Top" Classes="h8" />
+            <ContentPresenter Content="{TemplateBinding BottomContent}" DockPanel.Dock="Bottom" IsVisible="{TemplateBinding IsBottomContentVisible}" />
             <ContentPresenter Name="PART_Content" Content="{TemplateBinding Content}" />
           </DockPanel>
         </Border>

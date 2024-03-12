@@ -1,0 +1,23 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    x:ClassModifier="internal">
+  <Design.PreviewWith>
+    <Border Padding="20">
+      <StackPanel Spacing="20">
+        <RadioButton Theme="{StaticResource ToggleRadioButton}" Content="Click Me!" />
+        <RadioButton Theme="{StaticResource ToggleRadioButton}" Content="Or click me!" />
+        <RadioButton Theme="{StaticResource ToggleRadioButton}" Content="Disabled" IsEnabled="False" />
+        <RadioButton Theme="{StaticResource ToggleRadioButton}" Content="Three state" IsThreeState="True" />
+      </StackPanel>
+    </Border>
+  </Design.PreviewWith>
+
+  <SolidColorBrush x:Key="ToggleButtonBackground" Color="{DynamicResource Layer2BackgroundBrush}" />
+  <SolidColorBrush x:Key="ToggleButtonBackgroundPressed" Color="{DynamicResource Layer2BackgroundBrushLight1}" />
+  <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="{DynamicResource Layer2BackgroundBrushLight2}" />
+  <SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver" Color="{DynamicResource Layer2BackgroundBrushLight2}" />
+  <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="{DynamicResource Layer2BackgroundBrushLight2}" />
+
+  <ControlTheme x:Key="ToggleRadioButton" TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}" />
+
+</ResourceDictionary>

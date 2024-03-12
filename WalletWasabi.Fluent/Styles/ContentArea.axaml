@@ -6,6 +6,7 @@
 
   <Style Selector="ContentArea :is(TextBlock).title">
     <Setter Property="TextWrapping" Value="Wrap" />
+    <Setter Property="FontWeight" Value="Bold" />
   </Style>
 
   <Style Selector="ContentArea :is(Control).caption TextBlock">
