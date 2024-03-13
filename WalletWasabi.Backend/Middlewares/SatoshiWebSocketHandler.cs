@@ -190,21 +190,21 @@ public class SatoshiWebSocketHandler : WebSocketHandlerBase
 		return filters;
 	}
 
-	Action<AllFeeEstimate> NotifyFeeEstimations(WebSocket ws) =>
+	private Action<AllFeeEstimate> NotifyFeeEstimations(WebSocket ws) =>
 		allFeeEstimate =>
 		{
 			var message = new MiningFeeRatesMessage(allFeeEstimate);
 			ws.SendAsync(message.ToByteArray(), WebSocketMessageType.Binary, true, CancellationToken.None);
 		};
 
-	Action<ExchangeRate> NotifyExchangeRate(WebSocket ws) =>
+	private Action<ExchangeRate> NotifyExchangeRate(WebSocket ws) =>
 		exchangeRate =>
 		{
 			var message = new ExchangeRateMessage(exchangeRate);
 			ws.SendAsync(message.ToByteArray(), WebSocketMessageType.Binary, true, CancellationToken.None);
 		};
 
-	Action<FilterModel> SendFilter(WebSocket ws) =>
+	private Action<FilterModel> SendFilter(WebSocket ws) =>
 		filter =>
 		{
 			var message = new FilterMessage(filter);

@@ -23,14 +23,14 @@ public class IndexBuilderService
 	private const long Stopping = 2;
 	private const long Stopped = 3;
 
+	private readonly EventBus _eventBus;
+
 	/// <summary>
 	/// 0: Not started, 1: Running, 2: Stopping, 3: Stopped
 	/// </summary>
 	private long _serviceStatus;
 
 	private long _workerCount;
-
-	private readonly EventBus _eventBus;
 
 	public IndexBuilderService(IndexType indexType, IRPCClient rpc, BlockNotifier blockNotifier, string indexFilePath, EventBus eventBus)
 	{

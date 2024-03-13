@@ -72,7 +72,7 @@ public class Global
 		HttpClientFactory = BuildHttpClientFactory(() => Config.GetBackendUri());
 		CoordinatorHttpClientFactory = BuildHttpClientFactory(() => Config.GetCoordinatorUri());
 
-		TimeSpan requestInterval = Network == Network.RegTest ? TimeSpan.FromSeconds(5) : TimeSpan.FromSeconds(30);
+		TimeSpan requestInterval = Network == Network.RegTest ? TimeSpan.FromSeconds(15) : TimeSpan.FromSeconds(90);
 
 		HostedServices.Register<WasabiSynchronizer>(() => new WasabiSynchronizer(requestInterval, BitcoinStore.SmartHeaderChain, HttpClientFactory.SharedWasabiClient, EventBus), "Wasabi Synchronizer");
 		WasabiSynchronizer wasabiSynchronizer = HostedServices.Get<WasabiSynchronizer>();
