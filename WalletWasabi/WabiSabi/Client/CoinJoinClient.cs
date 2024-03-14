@@ -147,11 +147,15 @@ public class CoinJoinClient
 			{
 				if (!IsRoundEconomic(roundParameters.MiningFeeRate, RoundStatusUpdater.CoinJoinFeeRateMedians, FeeRateMedianTimeFrame))
 				{
-					throw new CoinJoinClientException(CoinjoinError.UneconomicalRound, "Uneconomical round skipped.");
+					string roundSkippedMessage = "Uneconomical round skipped.";
+					currentRoundState.LogInfo(roundSkippedMessage);
+					throw new CoinJoinClientException(CoinjoinError.UneconomicalRound, roundSkippedMessage);
 				}
 				if (SkipFactors.ShouldSkipRoundRandomly(SecureRandom, roundParameters.MiningFeeRate, RoundStatusUpdater.CoinJoinFeeRateMedians, currentRoundState.Id))
 				{
-					throw new CoinJoinClientException(CoinjoinError.RandomlySkippedRound, "Round skipped randomly for better privacy.");
+					string roundSkippedMessage = "Round skipped randomly for better privacy.";
+					currentRoundState.LogInfo(roundSkippedMessage);
+					throw new CoinJoinClientException(CoinjoinError.RandomlySkippedRound, roundSkippedMessage);
 				}
 			}
 
@@ -165,7 +169,7 @@ public class CoinJoinClient
 			if (!roundParameters.AllowedInputTypes.Contains(ScriptType.P2WPKH) || !roundParameters.AllowedOutputTypes.Contains(ScriptType.P2WPKH))
 			{
 				excludeRound = currentRoundState.Id;
-				currentRoundState.LogInfo($"Skipping the round since it doesn't support P2WPKH inputs and outputs.");
+				currentRoundState.LogInfo("Skipping the round since it doesn't support P2WPKH inputs and outputs.");
 
 				continue;
 			}
