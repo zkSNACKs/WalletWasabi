@@ -48,7 +48,7 @@ public class CoinJoinCoinSelector
 			wallet.RedCoinIsolation ? Constants.SemiPrivateThreshold : 0);
 
 	/// <param name="liquidityClue">Weakly prefer not to select inputs over this.</param>
-	public ImmutableList<TCoin> SelectCoinsForRound<TCoin>(IEnumerable<TCoin> coins, bool stopWhenAllMixed, UtxoSelectionParameters parameters, Money liquidityClue)
+	public ImmutableList<TCoin> SelectCoinsForRound<TCoin>(IEnumerable<TCoin> coins, bool stopWhenAllMixed, UtxoSelectionParameters parameters, Money liquidityClue, Money[]? pendingPaymentsAmount = null)
 		where TCoin : class, ISmartCoin, IEquatable<TCoin>
 	{
 		liquidityClue = liquidityClue > Money.Zero
@@ -80,6 +80,55 @@ public class CoinJoinCoinSelector
 			.Where(x => x.IsRedCoin(SemiPrivateThreshold))
 			.ToArray();
 
+		if (WalletPrivateButHasPendingPayments(pendingPaymentsAmount, semiPrivateCoins.Length, redCoins.Length))
+		{
+			var maxRegistreableAmountPrivateCoins = privateCoins.OrderByDescending(x => x.Amount).Take(MaxInputsRegistrableByWallet).Sum(x => x.Amount);
+			var orderedPendingPaymentsAmount = pendingPaymentsAmount!.OrderBy(x => x.Satoshi).Take(10).ToList(); // TODO: Create Constant for max outputs.
+
+			// TODO: WE NEED TO TAKE FEE ESTIMATION INTO ACCOUNT IN THIS FUNCTION
+			if (maxRegistreableAmountPrivateCoins > orderedPendingPaymentsAmount.First())
+			{
+
+				var combinations = privateCoins.CombinationsWithoutRepetition(1, MaxInputsRegistrableByWallet);
+				var combinationsWithSum = combinations.Select(x =>
+				{
+					var xList = x.ToList();
+					return new
+					{
+						Amount = xList.Sum(y => y.Amount),
+						NbInputs = xList.Count,
+						Combination = xList
+					};
+				}).ToList();
+
+				while (orderedPendingPaymentsAmount.Count > 0)
+				{
+					var sumPendingPaymentsAmount = orderedPendingPaymentsAmount.Sum(x => x.Satoshi);
+					var possibleCombinationsForAmount =
+						combinationsWithSum.Where(x => x.Amount > sumPendingPaymentsAmount).ToList();
+
+					if (!possibleCombinationsForAmount.Any())
+					{
+						orderedPendingPaymentsAmount.RemoveLast(); // TODO: Remove biggest, is it really correct??
+						continue;
+					}
+
+					var minInputsCount = possibleCombinationsForAmount.Min(x => x.NbInputs);
+					return possibleCombinationsForAmount
+						.Where(x => x.NbInputs == minInputsCount)
+						.OrderBy(x => x.Amount)
+						.BiasedRandomElement(80, Rnd)!
+						.Combination
+						.ToImmutableList();
+				}
+			}
+			else if (!stopWhenAllMixed || orderedPendingPaymentsAmount.First() >= privateCoins.Sum(x => x.Amount))
+			{
+				// We shouldn't continue, because we cannot do any payment anyway.
+				return ImmutableList<TCoin>.Empty;
+			}
+		}
+
 		if (stopWhenAllMixed && semiPrivateCoins.Length + redCoins.Length == 0)
 		{
 			Logger.LogDebug("No suitable coins for this round.");
@@ -103,9 +152,14 @@ public class CoinJoinCoinSelector
 
 		Logger.LogDebug($"{nameof(allowedNonPrivateCoins)}: {allowedNonPrivateCoins.Count} coins, valued at {Money.Satoshis(allowedNonPrivateCoins.Sum(x => x.Amount)).ToString(false, true)} BTC.");
 
+		// If WalletPrivateButHasPendingPayments is true here it means that the wallet has a pending payment, but is doesn't have a combination
+		// of MaxInputsRegistrableByWallet coins that allows the payment to be performed, therefore it's interesting to consolidate.
 		int inputCount = Math.Min(
 			privateCoins.Length + allowedNonPrivateCoins.Count,
-			ConsolidationMode ? MaxInputsRegistrableByWallet : Generator.GetInputTarget());
+			ConsolidationMode || WalletPrivateButHasPendingPayments(pendingPaymentsAmount, semiPrivateCoins.Length, redCoins.Length)
+				? MaxInputsRegistrableByWallet :
+				Generator.GetInputTarget());
+
 		if (ConsolidationMode)
 		{
 			Logger.LogDebug($"Consolidation mode is on.");
@@ -396,6 +450,9 @@ public class CoinJoinCoinSelector
 
 		return false;
 	}
+
+	private static bool WalletPrivateButHasPendingPayments(Money[]? pendingPaymentsSum, int semiPrivateCoinsLength, int redCoinsLength) =>
+		pendingPaymentsSum is not null && pendingPaymentsSum.Length > 0 && semiPrivateCoinsLength + redCoinsLength == 0;
 
 	private static double GetAnonLoss<TCoin>(IEnumerable<TCoin> coins)
 		where TCoin : ISmartCoin

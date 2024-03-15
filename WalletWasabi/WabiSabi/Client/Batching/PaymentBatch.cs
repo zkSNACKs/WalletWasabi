@@ -102,6 +102,7 @@ public class PaymentBatch
 		MovePaymentsTo(InProgressPayments, payment => payment with { State = new PendingPayment(payment.State) });
 
 	public bool AreTherePendingPayments => PendingPayments.Any();
+	public Money[] SumPendingPayments => PendingPayments.Select(x => x.Amount).ToArray();
 
 	private void MovePaymentsTo<TOldState, TNewState>(
 		IEnumerable<TOldState> payments,
