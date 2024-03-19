@@ -109,6 +109,7 @@ public class SatoshiWebSocketHandler : WebSocketHandlerBase
 
 						// Send the best block height
 						await SendVersionAsync(socketState.WebSocket, cancellationToken);
+						await SendLegalDocumentVersionAsync(socketState.WebSocket, cancellationToken);
 						await SendBlockHeightAsync(socketState.WebSocket, cancellationToken);
 						await StartSendingFiltersAsync(socketState.WebSocket, bestKnownBlockHash, cancellationToken);
 					}
@@ -157,6 +158,12 @@ public class SatoshiWebSocketHandler : WebSocketHandlerBase
 		var clientVersion = Constants.ClientVersion;
 		var backendVersion = new Version(int.Parse(Constants.BackendMajorVersion), 0, 0);
 		var message = new VersionMessage(clientVersion, backendVersion);
+		return webSocket.SendAsync(message.ToByteArray(), WebSocketMessageType.Binary, true, cancellationToken);
+	}
+
+	private Task SendLegalDocumentVersionAsync(WebSocket webSocket, CancellationToken cancellationToken)
+	{
+		var message = new LegalDocumentVersionMessage(Constants.Ww2LegalDocumentsVersion);
 		return webSocket.SendAsync(message.ToByteArray(), WebSocketMessageType.Binary, true, cancellationToken);
 	}
 

@@ -16,7 +16,8 @@ public enum ResponseMessage
 	BlockHeight,
 	ExchangeRate,
 	MiningFeeRates,
-	Version
+	SoftwareVersion,
+	LegalDocumentVersion
 }
 
 public record FilterMessage(FilterModel filterModel)

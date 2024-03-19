@@ -32,7 +32,7 @@ public class UpdateManager : IDisposable
 
 		// The feature is disabled on linux at the moment because we install Wasabi Wallet as a Debian package.
 		DownloadNewVersion = downloadNewVersion && !RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-		VersionChangedSubscription = eventBus.Subscribe<VersionChanged>(OnVersionChanged);
+		VersionChangedSubscription = eventBus.Subscribe<SoftwareVersionChanged>(OnVersionChanged);
 	}
 
 	public event EventHandler<UpdateStatus2>? UpdateAvailableToGet;
@@ -52,19 +52,19 @@ public class UpdateManager : IDisposable
 	/// <remarks>Defensive copy of the token to avoid issues with <see cref="CancellationTokenSource"/> being disposed.</remarks>
 	private CancellationToken CancellationToken { get; }
 
-	private async void OnVersionChanged(VersionChanged versionChanged)
+	private async void OnVersionChanged(SoftwareVersionChanged softwareVersionChanged)
 	{
 		// If the client version locally is greater than or equal to the backend's reported client version, then good.
-		var clientUpToDate = Helpers.Constants.ClientVersion >= versionChanged.ClientVersion;
+		var clientUpToDate = Helpers.Constants.ClientVersion >= softwareVersionChanged.ClientVersion;
 
 		// If ClientSupportBackendVersionMin <= backend major <= ClientSupportBackendVersionMax, then our software is compatible.
 		var backendCompatible =
-			int.Parse(Helpers.Constants.ClientSupportBackendVersionMax) >= versionChanged.ServerVersion.Major &&
-			versionChanged.ServerVersion.Major >= int.Parse(Helpers.Constants.ClientSupportBackendVersionMin);
+			int.Parse(Helpers.Constants.ClientSupportBackendVersionMax) >= softwareVersionChanged.ServerVersion.Major &&
+			softwareVersionChanged.ServerVersion.Major >= int.Parse(Helpers.Constants.ClientSupportBackendVersionMin);
 
 		var tries = 0;
 		bool updateAvailable = !clientUpToDate || !backendCompatible;
-		Version targetVersion = versionChanged.ClientVersion;
+		Version targetVersion = softwareVersionChanged.ClientVersion;
 
 		if (!updateAvailable)
 		{
@@ -74,7 +74,7 @@ public class UpdateManager : IDisposable
 		}
 
 		var isReadyToInstall = false;
-		var clientVersion = versionChanged.ClientVersion;
+		var clientVersion = softwareVersionChanged.ClientVersion;
 
 		if (DownloadNewVersion)
 		{

@@ -13,4 +13,5 @@ public enum FeeRateSource
 public record MiningFeeRatesChanged(FeeRateSource Source, AllFeeEstimate AllFeeEstimate);
 public record ServerTipHeightChanged(uint Height);
 public record ConnectionStateChanged(bool Connected);
-public record VersionChanged(Version ClientVersion, Version ServerVersion);
+public record SoftwareVersionChanged(Version ClientVersion, Version ServerVersion);
+public record LegalDocumentVersionChanged(Version Version);
