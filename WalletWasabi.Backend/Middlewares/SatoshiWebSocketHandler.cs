@@ -9,7 +9,7 @@ using WalletWasabi.Backend.Models;
 using WalletWasabi.Blockchain.Analysis.FeesEstimation;
 using WalletWasabi.Blockchain.BlockFilters;
 using WalletWasabi.Extensions;
-using WalletWasabi.Logging;
+using WalletWasabi.Helpers;
 using WalletWasabi.Services;
 using WalletWasabi.Synchronizarion;
 
@@ -108,6 +108,7 @@ public class SatoshiWebSocketHandler : WebSocketHandlerBase
 						socketState.Handshaked = true;
 
 						// Send the best block height
+						await SendVersionAsync(socketState.WebSocket, cancellationToken);
 						await SendBlockHeightAsync(socketState.WebSocket, cancellationToken);
 						await StartSendingFiltersAsync(socketState.WebSocket, bestKnownBlockHash, cancellationToken);
 					}
@@ -148,6 +149,14 @@ public class SatoshiWebSocketHandler : WebSocketHandlerBase
 		var lastFilter = _indexBuilderService.GetLastFilter();
 		var bestBlockHight = lastFilter.Header.Height;
 		var message = new BlockHeightMessage(bestBlockHight);
+		return webSocket.SendAsync(message.ToByteArray(), WebSocketMessageType.Binary, true, cancellationToken);
+	}
+
+	private Task SendVersionAsync(WebSocket webSocket, CancellationToken cancellationToken)
+	{
+		var clientVersion = Constants.ClientVersion;
+		var backendVersion = new Version(int.Parse(Constants.BackendMajorVersion), 0, 0);
+		var message = new VersionMessage(clientVersion, backendVersion);
 		return webSocket.SendAsync(message.ToByteArray(), WebSocketMessageType.Binary, true, cancellationToken);
 	}
 

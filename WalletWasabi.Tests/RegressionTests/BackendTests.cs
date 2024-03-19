@@ -60,15 +60,6 @@ public class BackendTests : IClassFixture<RegTestFixture>
 	}
 
 	[Fact]
-	public async Task GetClientVersionAsync()
-	{
-		WasabiClient client = new(BackendHttpClient);
-		var uptodate = await client.CheckUpdatesAsync(CancellationToken.None);
-		Assert.True(uptodate.BackendCompatible);
-		Assert.True(uptodate.ClientUpToDate);
-	}
-
-	[Fact]
 	public async Task BroadcastReplayTxAsync()
 	{
 		await using RegTestSetup setup = await RegTestSetup.InitializeTestEnvironmentAsync(RegTestFixture, numberOfBlocksToGenerate: 1);

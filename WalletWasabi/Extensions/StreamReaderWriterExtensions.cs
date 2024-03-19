@@ -83,4 +83,19 @@ public static class StreamReaderWriterExtensions
 
 		return new AllFeeEstimate(estimations);
 	}
+
+	public static void Write(this BinaryWriter writer, Version version)
+	{
+		writer.Write(version.Major);
+		writer.Write(version.Minor);
+		writer.Write(version.Build);
+	}
+
+	public static Version ReadVersion(this BinaryReader reader)
+	{
+		return new Version(
+			major: reader.ReadInt32(),
+			minor: reader.ReadInt32(),
+			build: reader.ReadInt32());
+	}
 }

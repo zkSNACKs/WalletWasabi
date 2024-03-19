@@ -105,7 +105,6 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 		{
 			SynchronizeResponse response;
 
-			ushort lastUsedApiVersion = WasabiClient.ApiVersion;
 			try
 			{
 				if (SmartHeaderChain.TipHash is null)
@@ -125,22 +124,6 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 			{
 				TorStatus = innerEx is TorConnectionException ? TorStatus.NotRunning : TorStatus.Running;
 				OnSynchronizeRequestFinished();
-				throw;
-			}
-			catch (HttpRequestException ex) when (ex.Message.Contains("Not Found"))
-			{
-				TorStatus = TorStatus.Running;
-
-				// Backend API version might be updated meanwhile. Trying to update the versions.
-				var result = await WasabiClient.CheckUpdatesAsync(cancel).ConfigureAwait(false);
-
-				// If the backend is compatible and the Api version updated then we just used the wrong API.
-				if (result.BackendCompatible && lastUsedApiVersion != WasabiClient.ApiVersion)
-				{
-					// Next request will be fine, do not throw exception.
-					TriggerRound();
-					return;
-				}
 				throw;
 			}
 			catch (Exception)
