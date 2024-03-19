@@ -135,7 +135,7 @@ public class Config
 	public string? MainNetCoordinatorUri => GetEffectiveValue<NullableStringValue, string?>(nameof(MainNetCoordinatorUri));
 	public string? TestNetCoordinatorUri => GetEffectiveValue<NullableStringValue, string?>(nameof(TestNetCoordinatorUri));
 	public string? RegTestCoordinatorUri => GetEffectiveValue<NullableStringValue, string?>(nameof(RegTestCoordinatorUri));
-	public bool UseTor => GetEffectiveValue<BoolValue, bool>(nameof(UseTor));
+	public bool UseTor => GetEffectiveValue<BoolValue, bool>(nameof(UseTor)) && Network != Network.RegTest;
 	public int TorSocksPort => GetEffectiveValue<IntValue, int>(nameof(TorSocksPort));
 	public int TorControlPort => GetEffectiveValue<IntValue, int>(nameof(TorControlPort));
 	public bool TerminateTorOnExit => GetEffectiveValue<BoolValue, bool>(nameof(TerminateTorOnExit));

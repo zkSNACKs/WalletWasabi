@@ -15,6 +15,7 @@ using WalletWasabi.BitcoinCore.Rpc;
 using WalletWasabi.Blockchain.BlockFilters;
 using WalletWasabi.Blockchain.Blocks;
 using WalletWasabi.Logging;
+using WalletWasabi.Services;
 using WalletWasabi.Tests.XunitConfiguration;
 using WalletWasabi.Tor.Http;
 using WalletWasabi.Tor.Http.Extensions;
@@ -56,15 +57,6 @@ public class BackendTests : IClassFixture<RegTestFixture>
 		var rate = exchangeRates[0];
 		Assert.Equal("USD", rate.Ticker);
 		Assert.True(rate.Rate > 0);
-	}
-
-	[Fact]
-	public async Task GetClientVersionAsync()
-	{
-		WasabiClient client = new(BackendHttpClient);
-		var uptodate = await client.CheckUpdatesAsync(CancellationToken.None);
-		Assert.True(uptodate.BackendCompatible);
-		Assert.True(uptodate.ClientUpToDate);
 	}
 
 	[Fact]
@@ -114,8 +106,7 @@ public class BackendTests : IClassFixture<RegTestFixture>
 
 		var indexBuilderServiceDir = Helpers.Common.GetWorkDir();
 		var indexFilePath = Path.Combine(indexBuilderServiceDir, $"Index{rpc.Network}.dat");
-
-		IndexBuilderService indexBuilderService = new(IndexType.SegwitTaproot, rpc, global.HostedServices.Get<BlockNotifier>(), indexFilePath);
+		IndexBuilderService indexBuilderService = new(IndexType.SegwitTaproot, rpc, global.HostedServices.Get<BlockNotifier>(), indexFilePath, new EventBus());
 		try
 		{
 			indexBuilderService.Synchronize();

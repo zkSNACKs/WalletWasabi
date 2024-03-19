@@ -99,25 +99,6 @@ public class LiveServerTests : IAsyncLifetime
 
 	[Theory]
 	[MemberData(nameof(GetNetworks))]
-	public async Task CheckUpdatesTestsAsync(Network network)
-	{
-		using CancellationTokenSource ctsTimeout = new(TimeSpan.FromMinutes(2));
-
-		WasabiClient client = MakeWasabiClient(network);
-		UpdateStatus updateStatus = await client.CheckUpdatesAsync(ctsTimeout.Token);
-
-		Assert.True(updateStatus.BackendCompatible);
-		Assert.True(updateStatus.ClientUpToDate);
-		Assert.Equal(new Version(1, 0), updateStatus.LegalDocumentsVersion);
-		Assert.Equal((ushort)4, updateStatus.CurrentBackendMajorVersion);
-		Assert.Equal(WalletWasabi.Helpers.Constants.ClientVersion.ToString(3), updateStatus.ClientVersion.ToString());
-
-		var versions = await client.GetVersionsAsync(ctsTimeout.Token);
-		Assert.Equal(versions.LegalDocumentsVersion, updateStatus.LegalDocumentsVersion);
-	}
-
-	[Theory]
-	[MemberData(nameof(GetNetworks))]
 	public async Task GetLegalDocumentsTestsAsync(Network network)
 	{
 		using CancellationTokenSource ctsTimeout = new(TimeSpan.FromMinutes(2));

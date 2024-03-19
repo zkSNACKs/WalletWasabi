@@ -218,22 +218,6 @@ public class WasabiClient
 		return (Version.Parse(resp.ClientVersion), ushort.Parse(resp.BackendMajorVersion), Version.Parse(resp.Ww2LegalDocumentsVersion));
 	}
 
-	public async Task<UpdateStatus> CheckUpdatesAsync(CancellationToken cancel)
-	{
-		var (clientVersion, backendMajorVersion, legalDocumentsVersion) = await GetVersionsAsync(cancel).ConfigureAwait(false);
-		var clientUpToDate = Helpers.Constants.ClientVersion >= clientVersion; // If the client version locally is greater than or equal to the backend's reported client version, then good.
-		var backendCompatible = int.Parse(Helpers.Constants.ClientSupportBackendVersionMax) >= backendMajorVersion && backendMajorVersion >= int.Parse(Helpers.Constants.ClientSupportBackendVersionMin); // If ClientSupportBackendVersionMin <= backend major <= ClientSupportBackendVersionMax, then our software is compatible.
-		var currentBackendMajorVersion = backendMajorVersion;
-
-		if (backendCompatible)
-		{
-			// Only refresh if compatible.
-			ApiVersion = currentBackendMajorVersion;
-		}
-
-		return new UpdateStatus(backendCompatible, clientUpToDate, legalDocumentsVersion, currentBackendMajorVersion, clientVersion);
-	}
-
 	#endregion software
 
 	#region wasabi

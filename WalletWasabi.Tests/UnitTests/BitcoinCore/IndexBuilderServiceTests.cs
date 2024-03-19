@@ -9,6 +9,7 @@ using WalletWasabi.BitcoinCore.Rpc;
 using WalletWasabi.BitcoinCore.Rpc.Models;
 using WalletWasabi.Blockchain.BlockFilters;
 using WalletWasabi.Blockchain.Blocks;
+using WalletWasabi.Services;
 using Xunit;
 
 namespace WalletWasabi.Tests.UnitTests.BitcoinCore;
@@ -28,7 +29,7 @@ public class IndexBuilderServiceTests
 			}),
 		};
 		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(IndexType.SegwitTaproot, rpc, blockNotifier, "filters.txt");
+		var indexer = new IndexBuilderService(IndexType.SegwitTaproot, rpc, blockNotifier, "filters.txt", new EventBus());
 
 		indexer.Synchronize();
 
@@ -55,7 +56,7 @@ public class IndexBuilderServiceTests
 			}
 		};
 		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(IndexType.SegwitTaproot, rpc, blockNotifier, "filters.txt");
+		var indexer = new IndexBuilderService(IndexType.SegwitTaproot, rpc, blockNotifier, "filters.txt", new EventBus());
 
 		indexer.Synchronize();
 
@@ -86,7 +87,7 @@ public class IndexBuilderServiceTests
 			OnGetVerboseBlockAsync = (hash) => Task.FromResult(blockchain.Single(x => x.Hash == hash))
 		};
 		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(IndexType.SegwitTaproot, rpc, blockNotifier, "filters.txt");
+		var indexer = new IndexBuilderService(IndexType.SegwitTaproot, rpc, blockNotifier, "filters.txt", new EventBus());
 
 		indexer.Synchronize();
 
@@ -156,7 +157,7 @@ public class IndexBuilderServiceTests
 			OnGetVerboseBlockAsync = (hash) => Task.FromResult(blockchain.Single(x => x.Hash == hash))
 		};
 		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(IndexType.SegwitTaproot, rpc, blockNotifier, "filters.txt");
+		var indexer = new IndexBuilderService(IndexType.SegwitTaproot, rpc, blockNotifier, "filters.txt", new EventBus());
 
 		indexer.Synchronize();
 
@@ -182,7 +183,7 @@ public class IndexBuilderServiceTests
 			}),
 		};
 		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(IndexType.Taproot, rpc, blockNotifier, "filters.txt");
+		var indexer = new IndexBuilderService(IndexType.Taproot, rpc, blockNotifier, "filters.txt", new EventBus());
 
 		indexer.Synchronize();
 
@@ -209,7 +210,7 @@ public class IndexBuilderServiceTests
 			}
 		};
 		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(IndexType.Taproot, rpc, blockNotifier, "filters.txt");
+		var indexer = new IndexBuilderService(IndexType.Taproot, rpc, blockNotifier, "filters.txt", new EventBus());
 
 		indexer.Synchronize();
 
@@ -240,7 +241,7 @@ public class IndexBuilderServiceTests
 			OnGetVerboseBlockAsync = (hash) => Task.FromResult(blockchain.Single(x => x.Hash == hash))
 		};
 		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(IndexType.Taproot, rpc, blockNotifier, "filters.txt");
+		var indexer = new IndexBuilderService(IndexType.Taproot, rpc, blockNotifier, "filters.txt", new EventBus());
 
 		indexer.Synchronize();
 
@@ -268,7 +269,7 @@ public class IndexBuilderServiceTests
 			OnGetVerboseBlockAsync = (hash) => Task.FromResult(blockchain.Single(x => x.Hash == hash))
 		};
 		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(IndexType.Taproot, rpc, blockNotifier, "filters.txt");
+		var indexer = new IndexBuilderService(IndexType.Taproot, rpc, blockNotifier, "filters.txt", new EventBus());
 
 		indexer.Synchronize();
 

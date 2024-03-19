@@ -1,22 +1,17 @@
 using NBitcoin.RPC;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using WalletWasabi.Backend.Models;
 using WalletWasabi.Backend.Models.Responses;
 using WalletWasabi.Bases;
 using WalletWasabi.Blockchain.Analysis.FeesEstimation;
-using WalletWasabi.Blockchain.BlockFilters;
 using WalletWasabi.Blockchain.Blocks;
-using WalletWasabi.Logging;
 using WalletWasabi.Models;
-using WalletWasabi.Stores;
+using WalletWasabi.Services.Events;
 using WalletWasabi.Tor.Socks5.Exceptions;
-using WalletWasabi.Tor.Socks5.Models.Fields.OctetFields;
 using WalletWasabi.WabiSabi.Client;
 using WalletWasabi.WebClients.Wasabi;
 
@@ -30,15 +25,26 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 
 	private BackendStatus _backendStatus;
 
-	public WasabiSynchronizer(TimeSpan period, int maxFiltersToSync, BitcoinStore bitcoinStore, WasabiHttpClientFactory httpClientFactory) : base(period)
+	public WasabiSynchronizer(TimeSpan period, SmartHeaderChain smartHeaderChain, WasabiClient wasabiClient, EventBus eventBus) : base(period)
 	{
-		MaxFiltersToSync = maxFiltersToSync;
-
 		LastResponse = null;
-		SmartHeaderChain = bitcoinStore.SmartHeaderChain;
-		FilterProcessor = new FilterProcessor(bitcoinStore);
-		HttpClientFactory = httpClientFactory;
-		WasabiClient = httpClientFactory.SharedWasabiClient;
+		SmartHeaderChain = smartHeaderChain;
+		WasabiClient = wasabiClient;
+
+		EventBus = eventBus;
+		ExchangeRateChangedSubscription = EventBus.Subscribe((ExchangeRateChanged e) => UsdExchangeRate = e.UsdBtcRate);
+		FeeEstimationChangedSubscription = EventBus.Subscribe(
+			(MiningFeeRatesChanged e) =>
+			{
+				LastAllFeeEstimate = e.AllFeeEstimate;
+				AllFeeEstimateArrived?.Invoke(this, e.AllFeeEstimate);
+			});
+		BackendConnectionChangedSubscription = EventBus.Subscribe(
+			(ConnectionStateChanged e) =>
+			{
+				BackendStatus = e.Connected ? BackendStatus.Connected : BackendStatus.NotConnected;
+				SynchronizeRequestFinished?.Invoke(this, e.Connected);
+			});
 	}
 
 	#region EventsPropertiesMembers
@@ -55,8 +61,11 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 	public TaskCompletionSource<bool> InitialRequestTcs { get; } = new();
 
 	public SynchronizeResponse? LastResponse { get; private set; }
-	public WasabiHttpClientFactory HttpClientFactory { get; }
-	private WasabiClient WasabiClient { get; }
+	public WasabiClient WasabiClient { get; }
+	private EventBus EventBus { get; }
+	private IDisposable ExchangeRateChangedSubscription { get; }
+	private IDisposable FeeEstimationChangedSubscription { get; }
+	private IDisposable BackendConnectionChangedSubscription { get; }
 
 	/// <summary>Gets the Bitcoin price in USD.</summary>
 	public decimal UsdExchangeRate
@@ -85,13 +94,8 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 
 	private DateTimeOffset BackendStatusChangedAt { get; set; } = DateTimeOffset.UtcNow;
 	public TimeSpan BackendStatusChangedSince => DateTimeOffset.UtcNow - BackendStatusChangedAt;
-	private int MaxFiltersToSync { get; }
 	private SmartHeaderChain SmartHeaderChain { get; }
-	private FilterProcessor FilterProcessor { get; }
-
-	public AllFeeEstimate? LastAllFeeEstimate => LastResponse?.AllFeeEstimate;
-
-	public bool InError => BackendStatus != BackendStatus.Connected;
+	public AllFeeEstimate? LastAllFeeEstimate { get; private set; }
 
 	#endregion EventsPropertiesMembers
 
@@ -101,7 +105,6 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 		{
 			SynchronizeResponse response;
 
-			ushort lastUsedApiVersion = WasabiClient.ApiVersion;
 			try
 			{
 				if (SmartHeaderChain.TipHash is null)
@@ -110,69 +113,28 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 				}
 
 				response = await WasabiClient
-					.GetSynchronizeAsync(SmartHeaderChain.TipHash, MaxFiltersToSync, EstimateSmartFeeMode.Conservative, cancel)
+					.GetSynchronizeAsync(SmartHeaderChain.TipHash, 1, EstimateSmartFeeMode.Conservative, cancel)
 					.ConfigureAwait(false);
 
 				// NOT GenSocksServErr
-				BackendStatus = BackendStatus.Connected;
 				TorStatus = TorStatus.Running;
 				OnSynchronizeRequestFinished();
 			}
 			catch (HttpRequestException ex) when (ex.InnerException is TorException innerEx)
 			{
 				TorStatus = innerEx is TorConnectionException ? TorStatus.NotRunning : TorStatus.Running;
-				BackendStatus = BackendStatus.NotConnected;
 				OnSynchronizeRequestFinished();
 				throw;
-			}
-			catch (HttpRequestException ex) when (ex.Message.Contains("Not Found"))
-			{
-				TorStatus = TorStatus.Running;
-				BackendStatus = BackendStatus.NotConnected;
-
-				// Backend API version might be updated meanwhile. Trying to update the versions.
-				var result = await WasabiClient.CheckUpdatesAsync(cancel).ConfigureAwait(false);
-
-				// If the backend is compatible and the Api version updated then we just used the wrong API.
-				if (result.BackendCompatible && lastUsedApiVersion != WasabiClient.ApiVersion)
-				{
-					// Next request will be fine, do not throw exception.
-					TriggerRound();
-					return;
-				}
-				else
-				{
-					throw;
-				}
 			}
 			catch (Exception)
 			{
 				TorStatus = TorStatus.Running;
-				BackendStatus = BackendStatus.NotConnected;
 				OnSynchronizeRequestFinished();
 				throw;
 			}
 
-			// If it's not fully synced or reorg happened.
-			if (response.Filters.Count() == MaxFiltersToSync || response.FiltersResponseState == FiltersResponseState.BestKnownHashNotFound)
-			{
-				TriggerRound();
-			}
-
-			ExchangeRate? exchangeRate = response.ExchangeRates.FirstOrDefault();
-			if (exchangeRate is { Rate: > 0 })
-			{
-				UsdExchangeRate = exchangeRate.Rate;
-			}
-
-			await FilterProcessor.ProcessAsync((uint)response.BestHeight, response.FiltersResponseState, response.Filters).ConfigureAwait(false);
-
 			LastResponse = response;
 			ResponseArrived?.Invoke(this, response);
-			if (response.AllFeeEstimate is { } allFeeEstimate)
-			{
-				AllFeeEstimateArrived?.Invoke(this, allFeeEstimate);
-			}
 		}
 		catch (HttpRequestException)
 		{
@@ -188,8 +150,6 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 
 		// One time trigger for the UI about the first request.
 		InitialRequestTcs.TrySetResult(isBackendConnected);
-
-		SynchronizeRequestFinished?.Invoke(this, isBackendConnected);
 	}
 
 	protected bool RaiseAndSetIfChanged<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
@@ -202,5 +162,13 @@ public class WasabiSynchronizer : PeriodicRunner, INotifyPropertyChanged, IThird
 		field = value;
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		return true;
+	}
+
+	public override void Dispose()
+	{
+		ExchangeRateChangedSubscription.Dispose();
+		FeeEstimationChangedSubscription.Dispose();
+		BackendConnectionChangedSubscription.Dispose();
+		base.Dispose();
 	}
 }

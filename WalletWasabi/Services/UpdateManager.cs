@@ -11,18 +11,19 @@ using System.Threading.Tasks;
 using WalletWasabi.Helpers;
 using WalletWasabi.Logging;
 using WalletWasabi.Microservices;
-using WalletWasabi.Models;
+using WalletWasabi.Services.Events;
 using WalletWasabi.Tor.Http;
 
 namespace WalletWasabi.Services;
 
+public record UpdateStatus2(bool ClientUpToDate, bool BackendCompatible, bool IsReadyToInstall, Version ClientVersion);
 public class UpdateManager : IDisposable
 {
 	private string InstallerPath { get; set; } = "";
 	private const byte MaxTries = 2;
 	private const string ReleaseURL = "https://api.github.com/repos/zkSNACKs/WalletWasabi/releases/latest";
 
-	public UpdateManager(string dataDir, bool downloadNewVersion, IHttpClient httpClient, UpdateChecker updateChecker)
+	public UpdateManager(string dataDir, bool downloadNewVersion, IHttpClient httpClient, EventBus eventBus)
 	{
 		InstallerDir = Path.Combine(dataDir, "Installer");
 		HttpClient = httpClient;
@@ -31,12 +32,11 @@ public class UpdateManager : IDisposable
 
 		// The feature is disabled on linux at the moment because we install Wasabi Wallet as a Debian package.
 		DownloadNewVersion = downloadNewVersion && !RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-
-		UpdateChecker = updateChecker;
-		UpdateChecker.UpdateStatusChanged += UpdateChecker_UpdateStatusChangedAsync;
+		VersionChangedSubscription = eventBus.Subscribe<SoftwareVersionChanged>(OnVersionChanged);
 	}
 
-	public event EventHandler<UpdateStatus>? UpdateAvailableToGet;
+	public event EventHandler<UpdateStatus2>? UpdateAvailableToGet;
+	private IDisposable VersionChangedSubscription { get; }
 
 	public string InstallerDir { get; }
 	private IHttpClient HttpClient { get; }
@@ -47,17 +47,24 @@ public class UpdateManager : IDisposable
 	///<summary>Install new version on shutdown or not.</summary>
 	public bool DoUpdateOnClose { get; set; }
 
-	private UpdateChecker UpdateChecker { get; }
 	private CancellationTokenSource CancellationTokenSource { get; } = new();
 
 	/// <remarks>Defensive copy of the token to avoid issues with <see cref="CancellationTokenSource"/> being disposed.</remarks>
 	private CancellationToken CancellationToken { get; }
 
-	private async void UpdateChecker_UpdateStatusChangedAsync(object? sender, UpdateStatus updateStatus)
+	private async void OnVersionChanged(SoftwareVersionChanged softwareVersionChanged)
 	{
+		// If the client version locally is greater than or equal to the backend's reported client version, then good.
+		var clientUpToDate = Helpers.Constants.ClientVersion >= softwareVersionChanged.ClientVersion;
+
+		// If ClientSupportBackendVersionMin <= backend major <= ClientSupportBackendVersionMax, then our software is compatible.
+		var backendCompatible =
+			int.Parse(Helpers.Constants.ClientSupportBackendVersionMax) >= softwareVersionChanged.ServerVersion.Major &&
+			softwareVersionChanged.ServerVersion.Major >= int.Parse(Helpers.Constants.ClientSupportBackendVersionMin);
+
 		var tries = 0;
-		bool updateAvailable = !updateStatus.ClientUpToDate || !updateStatus.BackendCompatible;
-		Version targetVersion = updateStatus.ClientVersion;
+		bool updateAvailable = !clientUpToDate || !backendCompatible;
+		Version targetVersion = softwareVersionChanged.ClientVersion;
 
 		if (!updateAvailable)
 		{
@@ -65,6 +72,9 @@ public class UpdateManager : IDisposable
 			Cleanup();
 			return;
 		}
+
+		var isReadyToInstall = false;
+		var clientVersion = softwareVersionChanged.ClientVersion;
 
 		if (DownloadNewVersion)
 		{
@@ -76,8 +86,8 @@ public class UpdateManager : IDisposable
 					(string installerPath, Version newVersion) = await GetInstallerAsync(targetVersion, CancellationToken).ConfigureAwait(false);
 					InstallerPath = installerPath;
 					Logger.LogInfo($"Version {newVersion} downloaded successfully.");
-					updateStatus.IsReadyToInstall = true;
-					updateStatus.ClientVersion = newVersion;
+					isReadyToInstall = true;
+					clientVersion = newVersion;
 					break;
 				}
 				catch (OperationCanceledException ex)
@@ -98,7 +108,7 @@ public class UpdateManager : IDisposable
 			} while (tries < MaxTries);
 		}
 
-		UpdateAvailableToGet?.Invoke(this, updateStatus);
+		UpdateAvailableToGet?.Invoke(this, new UpdateStatus2(clientUpToDate, backendCompatible, isReadyToInstall, clientVersion));
 	}
 
 	/// <summary>
@@ -366,8 +376,7 @@ public class UpdateManager : IDisposable
 
 	public void Dispose()
 	{
-		UpdateChecker.UpdateStatusChanged -= UpdateChecker_UpdateStatusChangedAsync;
-
+		VersionChangedSubscription.Dispose();
 		CancellationTokenSource.Cancel();
 		CancellationTokenSource.Dispose();
 	}
