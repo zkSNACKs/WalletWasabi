@@ -74,10 +74,8 @@ public class ReorgTest : IClassFixture<RegTestFixture>
 
 		await rpc.GenerateAsync(2); // Generate two, so we can test for two reorg
 
-		var node = RegTestFixture.BackendRegTestNode;
-
 		await using WasabiHttpClientFactory httpClientFactory = new(torEndPoint: null, backendUriGetter: () => new Uri(RegTestFixture.BackendEndPoint));
-		using WasabiSynchronizer synchronizer = new(period: TimeSpan.FromSeconds(3), 1000, bitcoinStore, httpClientFactory);
+		using WasabiSynchronizer synchronizer = new(period: TimeSpan.FromSeconds(3), bitcoinStore.SmartHeaderChain, httpClientFactory.SharedWasabiClient, setup.Global.EventBus);
 
 		try
 		{

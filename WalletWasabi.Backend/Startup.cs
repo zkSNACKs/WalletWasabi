@@ -24,6 +24,13 @@ using WalletWasabi.Userfacing;
 using WalletWasabi.WabiSabi;
 using WalletWasabi.WabiSabi.Models.Serialization;
 using WalletWasabi.WebClients;
+using System.Net.WebSockets;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using System.Net;
+using WalletWasabi.Services;
 
 [assembly: ApiController]
 
@@ -132,9 +139,29 @@ public class Startup
 			var global = serviceProvider.GetRequiredService<Global>();
 			return global.CoinJoinMempoolManager;
 		});
+		services.AddSingleton(serviceProvider =>
+		{
+			var global = serviceProvider.GetRequiredService<Global>();
+			return global.IndexBuilderService;
+		});
+		services.AddSingleton(serviceProvider =>
+		{
+			var global = serviceProvider.GetRequiredService<Global>();
+			return global.RpcClient;
+		});
+		services.AddSingleton(serviceProvider =>
+		{
+			var global = serviceProvider.GetRequiredService<Global>();
+			return global.EventBus;
+		});
 		services.AddStartupTask<InitConfigStartupTask>();
 
 		services.AddResponseCompression();
+
+		services.AddWebSocketHandlers();
+
+		services.AddHostedService<ExchangeRateFetcher>();
+		services.AddHostedService<MiningFeeRateFetcher>();
 	}
 
 	[SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "This method gets called by the runtime. Use this method to configure the HTTP request pipeline")]
@@ -152,6 +179,15 @@ public class Startup
 		// https://www.tpeczek.com/2017/10/exploring-head-method-behavior-in.html
 		// https://github.com/tpeczek/Demo.AspNetCore.Mvc.CosmosDB/blob/master/Demo.AspNetCore.Mvc.CosmosDB/Middlewares/HeadMethodMiddleware.cs
 		app.UseMiddleware<HeadMethodMiddleware>();
+
+		// Enables websocket
+		var webSocketOptions = new WebSocketOptions();
+		webSocketOptions.AllowedOrigins.Add("*");
+		app.UseWebSockets(webSocketOptions);
+
+		var serviceScopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+		var serviceProvider = serviceScopeFactory.CreateScope().ServiceProvider;
+		app.MapWebSocketManager("/api/satoshi", serviceProvider.GetService<SatoshiWebSocketHandler>());
 
 		app.UseResponseCompression();
 

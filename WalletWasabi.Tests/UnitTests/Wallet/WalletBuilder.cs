@@ -39,7 +39,7 @@ public class WalletBuilder : IAsyncDisposable
 		BitcoinStore = new BitcoinStore(IndexStore, TransactionStore, new MempoolService(), smartHeaderChain, blockRepositoryMock);
 		Cache = new MemoryCache(new MemoryCacheOptions());
 		HttpClientFactory = new WasabiHttpClientFactory(torEndPoint: null, backendUriGetter: () => null!);
-		Synchronizer = new(period: TimeSpan.FromSeconds(3), 1000, BitcoinStore, HttpClientFactory);
+		Synchronizer = new(period: TimeSpan.FromSeconds(3), BitcoinStore.SmartHeaderChain, HttpClientFactory.SharedWasabiClient, new EventBus());
 	}
 
 	private IndexStore IndexStore { get; }
@@ -61,7 +61,7 @@ public class WalletBuilder : IAsyncDisposable
 
 		var serviceConfiguration = new ServiceConfiguration(new UriEndPoint(new Uri("http://www.nomatter.dontcare")), Money.Coins(WalletWasabi.Helpers.Constants.DefaultDustThreshold));
 
-		HybridFeeProvider feeProvider = new(Synchronizer, null);
+		HybridFeeProvider feeProvider = new(new EventBus());
 		SmartBlockProvider blockProvider = new(BitcoinStore.BlockRepository, rpcBlockProvider: null, null, null, Cache);
 
 		WalletFactory walletFactory = new(DataDir, Network.RegTest, BitcoinStore, Synchronizer, serviceConfiguration, feeProvider, blockProvider);

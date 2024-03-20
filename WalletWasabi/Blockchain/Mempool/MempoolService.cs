@@ -78,7 +78,7 @@ public class MempoolService
 	/// <summary>
 	/// Tries to perform mempool cleanup with the help of the backend.
 	/// </summary>
-	public async Task<bool> TryPerformMempoolCleanupAsync(WasabiHttpClientFactory httpClientFactory)
+	public async Task<bool> TryPerformMempoolCleanupAsync(WasabiClient wasabiClient)
 	{
 		// If already cleaning, then no need to run it that often.
 		if (Interlocked.CompareExchange(ref _cleanupInProcess, 1, 0) == 1)
@@ -101,7 +101,7 @@ public class MempoolService
 			Logger.LogInfo("Start cleaning out mempool...");
 			{
 				var compactness = 10;
-				var allMempoolHashes = await httpClientFactory.SharedWasabiClient.GetMempoolHashesAsync(compactness).ConfigureAwait(false);
+				var allMempoolHashes = await wasabiClient.GetMempoolHashesAsync(compactness).ConfigureAwait(false);
 
 				int removedTxCount;
 
