@@ -32,7 +32,7 @@
   <a href="https://github.com/zkSNACKs/WalletWasabi/blob/master/PGP.txt">
     PGP
   </a>
-</div>
+</h3>
 
 <br>
 <br>
