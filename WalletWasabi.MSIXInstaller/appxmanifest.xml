@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap rescap">
+
+  <Identity Name="WalletWasabi" Publisher="CN=David Anthoff, O=David Anthoff, S=California, C=US" Version="1.0.0.8" />
+
+  <Properties>
+    <DisplayName>Wasabi Wallet</DisplayName>
+    <PublisherDisplayName>David Anthoff</PublisherDisplayName>
+    <Logo>Images\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.15063.0" MaxVersionTested="10.0.15063.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-us"/>
+  </Resources>
+
+  <Applications>
+    <Application Id="WalletWasabi" Executable="WalletWasabi\wassabee.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements DisplayName="Wasabi Wallet" Description="Wasabi is a wallet" BackgroundColor="transparent" Square150x150Logo="Images\WASSABEE-Square150x150Logo.scale-100.png" Square44x44Logo="Images\WASSABEE-Square44x44Logo.scale-100.png">
+        <uap:DefaultTile Wide310x150Logo="Images\WASSABEE-Wide310x150Logo.scale-100.png" />
+        <uap:SplashScreen Image="Images\SplashScreen.scale-200.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <Capability Name="internetClient"/>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>
