@@ -928,16 +928,17 @@ public class PocketSelectionTests
 		pockets.Add(LabelTestExtensions.CreateSingleCoinPocket(1.0m, "Dan"));
 		pockets.Add(LabelTestExtensions.CreateSingleCoinPocket(1.0m, "Dan, Lucas"));
 
-		// Other pocket can be used case.
+		// Other pocket cannot be used case.
 		var recipient = "Lucas";
 		var selection = CreateLabelSelectionViewModel(Money.Parse("0.5"), recipient);
 		await selection.ResetAsync(pockets.ToArray());
 		var output = await selection.AutoSelectPocketsAsync();
-		Assert.True(selection.IsOtherSelectionPossible(output.SelectMany(x => x.Coins), recipient));
+		Assert.False(selection.IsOtherSelectionPossible(output.SelectMany(x => x.Coins), recipient));
 
 		// No other pocket can be used case.
 		recipient = "Adam";
 		selection = CreateLabelSelectionViewModel(Money.Parse("0.5"), recipient);
+		await selection.ResetAsync(pockets.ToArray());
 		output = await selection.AutoSelectPocketsAsync();
 		Assert.False(selection.IsOtherSelectionPossible(output.SelectMany(x => x.Coins), recipient));
 
