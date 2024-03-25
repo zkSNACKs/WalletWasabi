@@ -34,6 +34,7 @@
         <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/TreeDataGrid.axaml" />
         <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/AmountControl.axaml" />
         <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/ContentControl.axaml" />
+        <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/SubActionButton.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>

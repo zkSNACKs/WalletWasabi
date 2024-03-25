@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:login="using:WalletWasabi.Fluent.ViewModels.Login"
              xmlns:conv="using:WalletWasabi.Fluent.Converters"
+             xmlns:generic="clr-namespace:System.Collections.Generic;assembly=System.Collections"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" d:DesignWidth="428" d:DesignHeight="371"
              x:DataType="login:LoginViewModel"
              x:CompileBindings="True"
@@ -31,6 +33,35 @@
       </DockPanel.Styles>
 
       <StackPanel MaxWidth="400" DockPanel.Dock="Bottom" Spacing="30">
+
+
+        <SubActionButton>
+          <SubActionButton.ItemsSource>
+            <generic:List x:TypeArguments="system:String">
+              <x:String>Item 0</x:String>
+              <x:String>Item 1</x:String>
+              <x:String>Item 2</x:String>
+            </generic:List>
+          </SubActionButton.ItemsSource>
+          <SubActionButton.Flyout>
+            <MenuFlyout ItemsSource="{Binding $parent[SubActionButton].ItemsSource}"
+                        Placement="BottomEdgeAlignedLeft">
+              <MenuFlyout.ItemTemplate>
+                <DataTemplate DataType="system:String">
+                  <Border Width="300" Background="Red">
+                    <TextBlock Text="{Binding .}" Margin="12" />
+                  </Border>
+                </DataTemplate>
+              </MenuFlyout.ItemTemplate>
+            </MenuFlyout>
+          </SubActionButton.Flyout>
+          <StackPanel Orientation="Horizontal" Spacing="15">
+            <PathIcon Data="{StaticResource wallet_action_send}" />
+            <TextBlock Text="Send" />
+          </StackPanel>
+        </SubActionButton>
+
+
         <TextBlock Text="{Binding WalletName}"
                    TextWrapping="Wrap"
                    TextAlignment="Center"

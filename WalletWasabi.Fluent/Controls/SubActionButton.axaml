@@ -1,0 +1,111 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:generic="clr-namespace:System.Collections.Generic;assembly=System.Collections"
+                    xmlns:system="clr-namespace:System;assembly=System.Runtime">
+
+  <Design.PreviewWith>
+    <Border Padding="0">
+      <Border Padding="60">
+        <StackPanel Spacing="20">
+
+          <SubActionButton>
+            <SubActionButton.ItemsSource>
+              <generic:List x:TypeArguments="system:String">
+                <x:String>Item 0</x:String>
+                <x:String>Item 1</x:String>
+                <x:String>Item 2</x:String>
+              </generic:List>
+            </SubActionButton.ItemsSource>
+            <SubActionButton.Flyout>
+              <MenuFlyout ItemsSource="{Binding $parent[SubActionButton].ItemsSource}">
+                <MenuFlyout.ItemTemplate>
+                  <DataTemplate DataType="system:String">
+                    <Border Width="300" Background="Red">
+                      <TextBlock Text="{Binding .}" Margin="12" />
+                    </Border>
+                    <!-- <MenuItem Header="{Binding .}" /> -->
+                  </DataTemplate>
+                </MenuFlyout.ItemTemplate>
+              </MenuFlyout>
+            </SubActionButton.Flyout>
+            <StackPanel Orientation="Horizontal" Spacing="15">
+              <PathIcon Data="{StaticResource wallet_action_send}" />
+              <TextBlock Text="Send" />
+            </StackPanel>
+          </SubActionButton>
+
+          <SubActionButton CornerRadius="16" Content="Rounded">
+            <!-- <SubActionButton.ItemsSource> -->
+            <!--   <generic:List x:TypeArguments="system:String"> -->
+            <!--     <x:String>Item 0</x:String> -->
+            <!--     <x:String>Item 1</x:String> -->
+            <!--     <x:String>Item 2</x:String> -->
+            <!--   </generic:List> -->
+            <!-- </SubActionButton.ItemsSource> -->
+            <!-- <SubActionButton.Flyout> -->
+            <!--   <MenuFlyout ItemsSource="{Binding $parent[SubActionButton].ItemsSource}"> -->
+            <!--     <MenuFlyout.ItemTemplate> -->
+            <!--       <DataTemplate DataType="x:String"> -->
+            <!--         <MenuItem Header="{Binding .}" /> -->
+            <!--       </DataTemplate> -->
+            <!--     </MenuFlyout.ItemTemplate> -->
+            <!--   </MenuFlyout> -->
+            <!-- </SubActionButton.Flyout> -->
+
+            <SubActionButton.Flyout>
+              <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                <MenuItem Header="Item 0" />
+                <MenuItem Header="Item 1" />
+                <MenuItem Header="Item 2" />
+              </MenuFlyout>
+            </SubActionButton.Flyout>
+          </SubActionButton>
+
+          <SplitButton IsEnabled="False">Disabled</SplitButton>
+
+        </StackPanel>
+      </Border>
+    </Border>
+  </Design.PreviewWith>
+
+  <Thickness x:Key="ActionButtonPadding">20,10</Thickness>
+
+  <ControlTheme x:Key="{x:Type SubActionButton}"
+                TargetType="SubActionButton"
+                BasedOn="{StaticResource {x:Type SplitButton}}">
+
+    <!-- TODO: Add Icon property support in the template or add InnerRight/InnerLeft content -->
+
+    <!-- TODO: Add custom style for Wasabi -->
+
+    <!-- <Setter Property="Flyout"> -->
+    <!--     <MenuFlyout ItemsSource="{TemplateBinding ItemsSource}"> -->
+    <!-- -->
+    <!--     </MenuFlyout> -->
+    <!-- </Setter> -->
+
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Background" Value="{DynamicResource ActionButtonBackgroundColor}" />
+    <Setter Property="Padding" Value="{StaticResource ActionButtonPadding}" />
+    <Setter Property="Foreground" Value="{DynamicResource ActionButtonForegroundColor}" />
+
+    <Style Selector="^:pointerover">
+      <Setter Property="Background" Value="{DynamicResource ActionButtonPointerOverBackgroundColor}" />
+    </Style>
+
+    <Style Selector="^:pressed">
+      <Setter Property="Background" Value="{DynamicResource ActionButtonPressedBackgroundColor}" />
+    </Style>
+
+    <Style Selector="^:disabled">
+      <Setter Property="Background" Value="{DynamicResource ActionButtonDisabledBackgroundColor}" />
+    </Style>
+
+    <Style Selector="^/template/ PathIcon">
+      <Setter Property="Foreground" Value="{DynamicResource ActionButtonForegroundColor}" />
+    </Style>
+
+  </ControlTheme>
+
+</ResourceDictionary>
