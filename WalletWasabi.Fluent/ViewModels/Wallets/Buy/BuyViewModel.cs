@@ -34,8 +34,8 @@ public partial class BuyViewModel : RoutableViewModel, IOrderManager
 	private readonly ReadOnlyObservableCollection<OrderViewModel> _orders;
 	private readonly SourceCache<OrderViewModel, int> _ordersCache;
 	private readonly Wallet _wallet;
-
 	[AutoNotify] private OrderViewModel? _emptyOrder; // Used to track the "Empty" order (with empty ConversationId)
+
 	[AutoNotify] private OrderViewModel? _selectedOrder;
 
 	public BuyViewModel(UiContext uiContext, WalletViewModel walletVm)
@@ -56,6 +56,7 @@ public partial class BuyViewModel : RoutableViewModel, IOrderManager
 		_ordersCache
 			.Connect()
 			.Sort(SortExpressionComparer<OrderViewModel>.Descending(x => x.OrderNumber))
+			.DisposeMany()
 			.Bind(out _orders)
 			.Subscribe();
 

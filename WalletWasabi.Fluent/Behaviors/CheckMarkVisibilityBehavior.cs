@@ -3,58 +3,48 @@ using Avalonia.Controls;
 using ReactiveUI;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using Avalonia.Xaml.Interactivity;
 using WalletWasabi.Fluent.Extensions;
+using Avalonia.VisualTree;
+using Avalonia.Xaml.Interactions.Custom;
 
 namespace WalletWasabi.Fluent.Behaviors;
 
-public class CheckMarkVisibilityBehavior : Behavior<PathIcon>
+public class CheckMarkVisibilityBehavior : AttachedToVisualTreeBehavior<PathIcon>
 {
-	private CompositeDisposable? _disposables;
-
-	public static readonly StyledProperty<TextBox> OwnerTextBoxProperty =
-		AvaloniaProperty.Register<CheckMarkVisibilityBehavior, TextBox>(nameof(OwnerTextBox));
-
-	[ResolveByName]
-	public TextBox OwnerTextBox
+	protected override void OnAttachedToVisualTree(CompositeDisposable disposable)
 	{
-		get => GetValue(OwnerTextBoxProperty);
-		set => SetValue(OwnerTextBoxProperty, value);
-	}
+		if (AssociatedObject is null)
+		{
+			return;
+		}
 
-	protected override void OnAttached()
-	{
-		this.WhenAnyValue(x => x.OwnerTextBox)
+		var ownerTextBox =
+			AssociatedObject.FindAncestorOfType<TextBox>();
+
+		if (ownerTextBox is null)
+		{
+			return;
+		}
+
+		var hasErrors = ownerTextBox.GetObservable(DataValidationErrors.HasErrorsProperty);
+		var text = ownerTextBox.GetObservable(TextBox.TextProperty);
+
+		hasErrors.ToSignal()
+			.Merge(text.ToSignal())
+			.Throttle(TimeSpan.FromMilliseconds(100))
+			.ObserveOn(RxApp.MainThreadScheduler)
 			.Subscribe(
-				x =>
+				_ =>
 				{
-					_disposables?.Dispose();
-
-					if (x is not null)
+					if (AssociatedObject is { })
 					{
-						_disposables = new CompositeDisposable();
-
-						var hasErrors = OwnerTextBox.GetObservable(DataValidationErrors.HasErrorsProperty);
-						var text = OwnerTextBox.GetObservable(TextBox.TextProperty);
-
-						hasErrors.ToSignal()
-							.Merge(text.ToSignal())
-							.Throttle(TimeSpan.FromMilliseconds(100))
-							.ObserveOn(RxApp.MainThreadScheduler)
-							.Subscribe(
-								_ =>
-								{
-									if (AssociatedObject is { })
-									{
-										AssociatedObject.Opacity =
-											!DataValidationErrors.GetHasErrors(OwnerTextBox) &&
-											!string.IsNullOrEmpty(OwnerTextBox.Text)
-												? 1
-												: 0;
-									}
-								})
-							.DisposeWith(_disposables);
+						AssociatedObject.Opacity =
+							!DataValidationErrors.GetHasErrors(ownerTextBox) &&
+							!string.IsNullOrEmpty(ownerTextBox.Text)
+								? 1
+								: 0;
 					}
-				});
+				})
+			.DisposeWith(disposable);
 	}
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NBitcoin;
+using WalletWasabi.Fluent.Infrastructure;
 using WalletWasabi.Fluent.Models.UI;
 using WalletWasabi.Fluent.Validation;
 using WalletWasabi.Fluent.ViewModels.Navigation;
@@ -9,6 +10,7 @@ using WalletWasabi.Userfacing;
 
 namespace WalletWasabi.Fluent.ViewModels.Settings;
 
+[AppLifetime]
 [NavigationMetaData(
 	Title = "Bitcoin",
 	Caption = "Manage Bitcoin settings",

@@ -1,16 +1,16 @@
 using DynamicData;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using WalletWasabi.Blockchain.TransactionProcessing;
 using WalletWasabi.Fluent.Extensions;
 using WalletWasabi.Fluent.Helpers;
-using WalletWasabi.Fluent.Models.UI;
+using WalletWasabi.Fluent.Infrastructure;
 using WalletWasabi.Fluent.Models.Wallets;
 using WalletWasabi.Fluent.ViewModels.Navigation;
 
 namespace WalletWasabi.Fluent.ViewModels.Wallets.Notifications;
 
+[AppLifetime]
 public partial class WalletNotificationsViewModel : ViewModelBase
 {
 	private readonly IWalletSelector _walletSelector;

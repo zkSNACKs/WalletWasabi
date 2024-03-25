@@ -1,6 +1,7 @@
-using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ReactiveUI;
+using WalletWasabi.Fluent.Infrastructure;
 using WalletWasabi.Fluent.Models.Wallets;
 using WalletWasabi.Fluent.ViewModels.Login;
 using WalletWasabi.Fluent.ViewModels.Navigation;
@@ -8,8 +9,11 @@ using WalletWasabi.Wallets;
 
 namespace WalletWasabi.Fluent.ViewModels.Wallets;
 
-public partial class WalletPageViewModel : ViewModelBase
+[AppLifetime]
+public partial class WalletPageViewModel : ViewModelBase, IDisposable
 {
+	private readonly CompositeDisposable _disposables = new();
+
 	[AutoNotify] private bool _isLoggedIn;
 	[AutoNotify] private bool _isSelected;
 	[AutoNotify] private bool _isLoading;
@@ -31,21 +35,25 @@ public partial class WalletPageViewModel : ViewModelBase
 		this.WhenAnyValue(x => x.IsLoggedIn)
 			.Where(x => !x)
 			.Do(_ => ShowLogin())
-			.Subscribe();
+			.Subscribe()
+			.DisposeWith(_disposables);
 
 		// Show Loading page when wallet is logged in
 		this.WhenAnyValue(x => x.IsLoggedIn)
 			.Where(x => x)
 			.Do(_ => ShowWalletLoading())
-			.Subscribe();
+			.Subscribe()
+			.DisposeWith(_disposables);
 
 		// Show main Wallet UI when wallet load is completed
 		this.WhenAnyObservable(x => x.WalletModel.Loader.LoadCompleted)
 			.Do(_ => ShowWallet())
-			.Subscribe();
+			.Subscribe()
+			.DisposeWith(_disposables);
 
 		this.WhenAnyValue(x => x.WalletModel.Auth.IsLoggedIn)
-			.BindTo(this, x => x.IsLoggedIn);
+			.BindTo(this, x => x.IsLoggedIn)
+			.DisposeWith(_disposables);
 
 		// Navigate to current page when IsSelected and CurrentPage change
 		this.WhenAnyValue(x => x.IsSelected, x => x.CurrentPage)
@@ -53,9 +61,12 @@ public partial class WalletPageViewModel : ViewModelBase
 			.Select(t => t.Item2)
 			.WhereNotNull()
 			.Do(x => UiContext.Navigate().To(x, NavigationTarget.HomeScreen, NavigationMode.Clear))
-			.Subscribe();
+			.Subscribe()
+			.DisposeWith(_disposables);
 
-		this.WhenAnyValue(x => x.WalletModel.Name).BindTo(this, x => x.Title);
+		this.WhenAnyValue(x => x.WalletModel.Name)
+			.BindTo(this, x => x.Title)
+			.DisposeWith(_disposables);
 
 		SetIcon();
 	}
@@ -84,11 +95,14 @@ public partial class WalletPageViewModel : ViewModelBase
 
 		// Pass IsSelected down to WalletViewModel.IsSelected
 		this.WhenAnyValue(x => x.IsSelected)
-			.BindTo(WalletViewModel, x => x.IsSelected);
+			.BindTo(WalletViewModel, x => x.IsSelected)
+			.DisposeWith(_disposables);
 
 		CurrentPage = WalletViewModel;
 		IsLoading = false;
 	}
+
+	public void Dispose() => _disposables.Dispose();
 
 	private void SetIcon()
 	{

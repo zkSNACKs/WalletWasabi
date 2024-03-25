@@ -10,12 +10,14 @@ using WalletWasabi.Daemon;
 using WalletWasabi.Exceptions;
 using WalletWasabi.Fluent.Extensions;
 using WalletWasabi.Fluent.Helpers;
+using WalletWasabi.Fluent.Infrastructure;
 using WalletWasabi.Helpers;
 using WalletWasabi.Logging;
 using WalletWasabi.Userfacing;
 
 namespace WalletWasabi.Fluent.Models.UI;
 
+[AppLifetime]
 [AutoInterface]
 public partial class ApplicationSettings : ReactiveObject
 {

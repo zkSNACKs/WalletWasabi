@@ -32,27 +32,29 @@ public partial class SearchPasswordViewModel : RoutableViewModel
 		SetupCancel(enableCancel: true, enableCancelOnEscape: true, enableCancelOnPressed: true);
 
 		EnableBack = false;
-
-		model.Progress
-			 .Do(t => SetStatus(t.Percentage, t.RemainingTime))
-			 .Subscribe();
 	}
 
 	protected override void OnNavigatedTo(bool isInHistory, CompositeDisposable disposables)
 	{
 		base.OnNavigatedTo(isInHistory, disposables);
 
-		var cts = new CancellationTokenSource();
+		var cts = new CancellationTokenSource()
+			.DisposeWith(disposables);
+
+		_model.Progress
+			.Do(t => SetStatus(t.Percentage, t.RemainingTime))
+			.Subscribe()
+			.DisposeWith(disposables);
 
 		var t = FindPasswordAsync(cts.Token);
 
-		disposables.Add(Disposable.Create(async () =>
-		{
-			cts.Cancel();
-			await t;
-		}));
-
-		disposables.Add(cts);
+		Disposable.Create(
+				async () =>
+				{
+					cts.Cancel();
+					await t;
+				})
+			.DisposeWith(disposables);
 	}
 
 	private async Task FindPasswordAsync(CancellationToken token)

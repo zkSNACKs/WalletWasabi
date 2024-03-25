@@ -98,7 +98,9 @@ public class CoinSelectorViewModel : ViewModelBase, IDisposable
 							UpdateSelection(coinItemsCollection, initialCoinSelection);
 							ExpandSelectedItems();
 						})
-					.Subscribe();
+					.Subscribe()
+					.DisposeWith(_disposables);
+
 		_wallet = wallet;
 	}
 

@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,8 +12,9 @@ using WalletWasabi.Wallets;
 
 namespace WalletWasabi.Fluent.ViewModels.Wallets.Buy.Workflows;
 
-public abstract partial class Workflow : ReactiveObject
+public abstract partial class Workflow : ReactiveObject, IDisposable
 {
+	private readonly CompositeDisposable _disposables = new();
 	[AutoNotify] private IWorkflowStep? _currentStep;
 	[AutoNotify] private Conversation _conversation;
 	[AutoNotify] private bool _isCompleted;
@@ -32,7 +34,8 @@ public abstract partial class Workflow : ReactiveObject
 					step.Conversation = x;
 				}
 			})
-			.Subscribe();
+			.Subscribe()
+			.DisposeWith(_disposables);
 	}
 
 	public event EventHandler<Exception>? OnStepError;
@@ -144,11 +147,14 @@ public abstract partial class Workflow : ReactiveObject
 		// Dereference of a possibly null reference.
 		// Reason: this warning is dubious here.
 		// The parameter of WhenAnyValue() is an Expression (from System.Linq.Expressions).
-		// It's not directly executable code and therefore it cannot raise a NullReferenceException
+		// It's not directly executable code, therefore it cannot raise a NullReferenceException
 		// Also, null propagation isn't allowed by the compiler inside such an Expression,
 		// so the only way to remove this warning is to make CurrentStep non-nullable, which doesn't make sense by design.
 		this.WhenAnyValue(x => x.CurrentStep.Conversation)
-			.BindTo(this, x => x.Conversation);
+			.BindTo(this, x => x.Conversation)
+			.DisposeWith(_disposables);
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 	}
+
+	public void Dispose() => _disposables.Dispose();
 }

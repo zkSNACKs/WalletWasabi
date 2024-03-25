@@ -2,12 +2,14 @@ using System.Reactive.Linq;
 using System.Windows.Input;
 using ReactiveUI;
 using WalletWasabi.Fluent.Helpers;
+using WalletWasabi.Fluent.Infrastructure;
 using WalletWasabi.Fluent.Models.UI;
 using WalletWasabi.Fluent.Models.Wallets;
 using WalletWasabi.Helpers;
 
 namespace WalletWasabi.Fluent.ViewModels.StatusIcon;
 
+[AppLifetime]
 public partial class StatusIconViewModel : ViewModelBase
 {
 	[AutoNotify] private string? _versionText;

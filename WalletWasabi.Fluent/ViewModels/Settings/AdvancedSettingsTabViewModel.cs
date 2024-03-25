@@ -1,8 +1,10 @@
+using WalletWasabi.Fluent.Infrastructure;
 using WalletWasabi.Fluent.Models.UI;
 using WalletWasabi.Fluent.ViewModels.Navigation;
 
 namespace WalletWasabi.Fluent.ViewModels.Settings;
 
+[AppLifetime]
 [NavigationMetaData(
 	Title = "Advanced",
 	Caption = "Manage advanced settings",

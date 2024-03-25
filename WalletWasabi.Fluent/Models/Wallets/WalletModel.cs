@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using NBitcoin;
 using ReactiveUI;
 using WalletWasabi.Fluent.Helpers;
+using WalletWasabi.Fluent.Infrastructure;
 using WalletWasabi.Fluent.ViewModels.Wallets.Labels;
 using WalletWasabi.Wallets;
 
@@ -12,12 +12,12 @@ namespace WalletWasabi.Fluent.Models.Wallets;
 
 public partial interface IWalletModel : INotifyPropertyChanged;
 
+[AppLifetime]
 [AutoInterface]
 public partial class WalletModel : ReactiveObject
 {
 	private readonly Lazy<IWalletCoinjoinModel> _coinjoin;
 	private readonly Lazy<IWalletCoinsModel> _coins;
-	private readonly ISubject<IAddress> _newAddressGenerated = new Subject<IAddress>();
 
 	[AutoNotify] private bool _isLoggedIn;
 
@@ -62,7 +62,8 @@ public partial class WalletModel : ReactiveObject
 			 .Do(_ => Loader.Stop())
 			 .Subscribe();
 
-		this.WhenAnyValue(x => x.Auth.IsLoggedIn).BindTo(this, x => x.IsLoggedIn);
+		this.WhenAnyValue(x => x.Auth.IsLoggedIn)
+			.BindTo(this, x => x.IsLoggedIn);
 	}
 
 	public IAddressesModel Addresses { get; }

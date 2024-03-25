@@ -11,6 +11,7 @@ using DynamicData.Binding;
 using NBitcoin;
 using ReactiveUI;
 using WalletWasabi.Fluent.Extensions;
+using WalletWasabi.Fluent.Infrastructure;
 using WalletWasabi.Fluent.Models.UI;
 using WalletWasabi.Fluent.Models.Wallets;
 using WalletWasabi.Fluent.ViewModels.Navigation;
@@ -24,6 +25,7 @@ using WalletWasabi.Wallets;
 
 namespace WalletWasabi.Fluent.ViewModels.Wallets;
 
+[AppLifetime]
 public partial class WalletViewModel : RoutableViewModel, IWalletViewModel
 {
 	[AutoNotify(SetterModifier = AccessModifier.Protected)] private bool _isCoinJoining;

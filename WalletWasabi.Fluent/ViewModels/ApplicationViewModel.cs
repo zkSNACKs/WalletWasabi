@@ -5,12 +5,14 @@ using System.Windows.Input;
 using Avalonia.Controls;
 using ReactiveUI;
 using WalletWasabi.Fluent.Helpers;
+using WalletWasabi.Fluent.Infrastructure;
 using WalletWasabi.Fluent.Models.UI;
 using WalletWasabi.Fluent.Providers;
 using WalletWasabi.Services.Terminate;
 
 namespace WalletWasabi.Fluent.ViewModels;
 
+[AppLifetime]
 public partial class ApplicationViewModel : ViewModelBase, ICanShutdownProvider
 {
 	private readonly IMainWindowService _mainWindowService;

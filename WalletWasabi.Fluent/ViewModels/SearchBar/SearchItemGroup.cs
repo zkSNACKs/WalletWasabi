@@ -20,7 +20,6 @@ public class SearchItemGroup : IDisposable
 		changes
 			.Sort(SortExpressionComparer<ISearchItem>.Ascending(x => x.Priority))
 			.Bind(out _items)
-			.DisposeMany()
 			.ObserveOn(RxApp.MainThreadScheduler)
 			.Subscribe()
 			.DisposeWith(_disposables);

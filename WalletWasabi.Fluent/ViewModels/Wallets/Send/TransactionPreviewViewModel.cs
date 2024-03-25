@@ -10,7 +10,6 @@ using NBitcoin;
 using NBitcoin.Policy;
 using ReactiveUI;
 using WalletWasabi.Blockchain.TransactionBuilding;
-using WalletWasabi.Blockchain.TransactionOutputs;
 using WalletWasabi.Blockchain.Transactions;
 using WalletWasabi.Exceptions;
 using WalletWasabi.Fluent.Extensions;
@@ -19,7 +18,6 @@ using WalletWasabi.Fluent.Models;
 using WalletWasabi.Fluent.Models.Transactions;
 using WalletWasabi.Fluent.Models.Wallets;
 using WalletWasabi.Fluent.Models.UI;
-using WalletWasabi.Fluent.ViewModels.CoinControl;
 using WalletWasabi.Fluent.ViewModels.Dialogs.Base;
 using WalletWasabi.Fluent.ViewModels.Navigation;
 using WalletWasabi.Logging;
@@ -63,57 +61,13 @@ public partial class TransactionPreviewViewModel : RoutableViewModel
 		};
 
 		DisplayedTransactionSummary = CurrentTransactionSummary;
-
-		PrivacySuggestions.WhenAnyValue(x => x.PreviewSuggestion)
-			.DoAsync(async x =>
-			{
-				if (x?.Transaction is { } transaction)
-				{
-					UpdateTransaction(PreviewTransactionSummary, transaction);
-					await PrivacySuggestions.UpdatePreviewWarningsAsync(_info, transaction, _cancellationTokenSource.Token);
-				}
-				else
-				{
-					DisplayedTransactionSummary = CurrentTransactionSummary;
-					PrivacySuggestions.ClearPreviewWarnings();
-				}
-			})
-			.Subscribe();
-
-		PrivacySuggestions.WhenAnyValue(x => x.SelectedSuggestion)
-			.SubscribeAsync(async suggestion =>
-			{
-				PrivacySuggestions.SelectedSuggestion = null;
-
-				if (suggestion is { })
-				{
-					await ApplyPrivacySuggestionAsync(suggestion);
-				}
-			});
-
-		this.WhenAnyValue(x => x.Transaction)
-			.WhereNotNull()
-			.Throttle(TimeSpan.FromMilliseconds(100))
-			.ObserveOn(RxApp.MainThreadScheduler)
-			.Do(_ =>
-			{
-				_cancellationTokenSource.Cancel();
-				_cancellationTokenSource = new();
-			})
-			.DoAsync(async transaction =>
-			{
-				await CheckChangePocketAvailableAsync(transaction);
-				await PrivacySuggestions.BuildPrivacySuggestionsAsync(_info, transaction, _cancellationTokenSource.Token);
-			})
-			.Subscribe();
-
+		
 		SetupCancel(enableCancel: true, enableCancelOnEscape: true, enableCancelOnPressed: false);
 		EnableBack = true;
 
 		if (PreferPsbtWorkflow)
 		{
 			SkipCommand = ReactiveCommand.CreateFromTask(OnConfirmAsync);
-
 			NextCommand = ReactiveCommand.CreateFromTask(OnExportPsbtAsync);
 
 			_nextButtonText = "Save PSBT file";
@@ -127,15 +81,16 @@ public partial class TransactionPreviewViewModel : RoutableViewModel
 
 		AdjustFeeCommand = ReactiveCommand.CreateFromTask(OnAdjustFeeAsync);
 
-		UndoCommand = ReactiveCommand.Create(() =>
-		{
-			if (_undoHistory.TryPop(out var previous))
-			{
-				_info = previous.Item2;
-				UpdateTransaction(CurrentTransactionSummary, previous.Item1, false);
-				CanUndo = _undoHistory.Count != 0;
-			}
-		});
+		UndoCommand = ReactiveCommand.Create(
+				() =>
+				{
+					if (_undoHistory.TryPop(out var previous))
+					{
+						_info = previous.Item2;
+						UpdateTransaction(CurrentTransactionSummary, previous.Item1, false);
+						CanUndo = _undoHistory.Count != 0;
+					}
+				});
 
 		ChangeCoinsCommand = ReactiveCommand.CreateFromTask(OnChangeCoinsAsync);
 	}
@@ -360,6 +315,56 @@ public partial class TransactionPreviewViewModel : RoutableViewModel
 	protected override void OnNavigatedTo(bool isInHistory, CompositeDisposable disposables)
 	{
 		base.OnNavigatedTo(isInHistory, disposables);
+
+		PrivacySuggestions.WhenAnyValue(x => x.PreviewSuggestion)
+			.DoAsync(
+				async x =>
+				{
+					if (x?.Transaction is { } transaction)
+					{
+						UpdateTransaction(PreviewTransactionSummary, transaction);
+						await PrivacySuggestions.UpdatePreviewWarningsAsync(_info, transaction, _cancellationTokenSource.Token);
+					}
+					else
+					{
+						DisplayedTransactionSummary = CurrentTransactionSummary;
+						PrivacySuggestions.ClearPreviewWarnings();
+					}
+				})
+			.Subscribe()
+			.DisposeWith(disposables);
+
+		PrivacySuggestions.WhenAnyValue(x => x.SelectedSuggestion)
+			.SubscribeAsync(
+				async suggestion =>
+				{
+					PrivacySuggestions.SelectedSuggestion = null;
+
+					if (suggestion is { })
+					{
+						await ApplyPrivacySuggestionAsync(suggestion);
+					}
+				})
+			.DisposeWith(disposables);
+
+		this.WhenAnyValue(x => x.Transaction)
+			.WhereNotNull()
+			.Throttle(TimeSpan.FromMilliseconds(100))
+			.ObserveOn(RxApp.MainThreadScheduler)
+			.Do(
+				_ =>
+				{
+					_cancellationTokenSource.Cancel();
+					_cancellationTokenSource = new();
+				})
+			.DoAsync(
+				async transaction =>
+				{
+					await CheckChangePocketAvailableAsync(transaction);
+					await PrivacySuggestions.BuildPrivacySuggestionsAsync(_info, transaction, _cancellationTokenSource.Token);
+				})
+			.Subscribe()
+			.DisposeWith(disposables);
 
 		if (!isInHistory)
 		{

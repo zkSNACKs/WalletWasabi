@@ -26,7 +26,7 @@ public partial class WelcomeStep : WorkflowStep<BuyAnythingClient.Product?>
 
 		Products = new(productsEnum.Select(x => new EnumValue<BuyAnythingClient.Product>(x, x.GetDescription() ?? "")));
 		_product = Products.FirstOrDefault(x => x.Value == Value) ?? Products.FirstOrDefault();
-
+		
 		this.WhenAnyValue(x => x.Product)
 			.Select(x => x?.Value)
 			.BindTo(this, x => x.Value);

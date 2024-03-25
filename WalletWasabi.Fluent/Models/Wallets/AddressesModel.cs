@@ -6,10 +6,12 @@ using System.Reactive.Subjects;
 using DynamicData;
 using WalletWasabi.Blockchain.Keys;
 using WalletWasabi.Blockchain.TransactionProcessing;
+using WalletWasabi.Fluent.Infrastructure;
 using WalletWasabi.Wallets;
 
 namespace WalletWasabi.Fluent.Models.Wallets;
 
+[AppLifetime]
 [AutoInterface]
 public partial class AddressesModel
 {

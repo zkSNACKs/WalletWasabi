@@ -1,4 +1,5 @@
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ReactiveUI;
@@ -11,8 +12,10 @@ using AddressAction = System.Action<WalletWasabi.Fluent.Models.Wallets.IAddress>
 
 namespace WalletWasabi.Fluent.ViewModels.Wallets.Receive;
 
-public partial class AddressViewModel : ViewModelBase
+public partial class AddressViewModel : ViewModelBase, IDisposable
 {
+	private readonly CompositeDisposable _disposables = new();
+
 	[AutoNotify] private string _addressText;
 	[AutoNotify] private LabelsArray _labels;
 
@@ -22,7 +25,9 @@ public partial class AddressViewModel : ViewModelBase
 		Address = address;
 		_addressText = address.Text;
 
-		this.WhenAnyValue(x => x.Address.Labels).BindTo(this, viewModel => viewModel.Labels);
+		this.WhenAnyValue(x => x.Address.Labels)
+			.BindTo(this, viewModel => viewModel.Labels)
+			.DisposeWith(_disposables);
 
 		CopyAddressCommand = ReactiveCommand.CreateFromTask(() => UiContext.Clipboard.SetTextAsync(AddressText));
 		HideAddressCommand = ReactiveCommand.CreateFromTask(PromptHideAddressAsync);
@@ -57,5 +62,10 @@ public partial class AddressViewModel : ViewModelBase
 		{
 			await UiContext.Clipboard.ClearAsync();
 		}
+	}
+
+	public void Dispose()
+	{
+		_disposables.Dispose();
 	}
 }

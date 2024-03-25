@@ -2,10 +2,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using ReactiveUI;
+using WalletWasabi.Fluent.Infrastructure;
 using WalletWasabi.Fluent.ViewModels.Navigation;
 
 namespace WalletWasabi.Fluent.ViewModels.Dialogs.Base;
 
+[AppLifetime]
 public partial class DialogScreenViewModel : TargettedNavigationStack
 {
 	[AutoNotify] private bool _isDialogOpen;

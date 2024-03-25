@@ -29,6 +29,7 @@ public partial class ReceiveAddressesViewModel : RoutableViewModel
 		_wallet.Addresses.Unused
 			.ToObservableChangeSet()
 			.Transform(CreateAddressViewModel)
+			.DisposeMany()
 			.Bind(out var unusedAddresses)
 			.Subscribe()
 			.DisposeWith(disposables);

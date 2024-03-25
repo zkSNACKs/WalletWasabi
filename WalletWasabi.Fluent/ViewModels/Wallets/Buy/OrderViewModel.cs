@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,13 +19,12 @@ using WalletWasabi.Logging;
 
 namespace WalletWasabi.Fluent.ViewModels.Wallets.Buy;
 
-public partial class OrderViewModel : ViewModelBase
+public partial class OrderViewModel : ViewModelBase, IDisposable
 {
 	private readonly ReadOnlyObservableCollection<MessageViewModel> _messages;
 	private readonly SourceList<MessageViewModel> _messagesList;
 	private readonly IWalletModel _wallet;
 	private readonly IOrderManager _orderManager;
-	private readonly BuyAnythingManager _buyAnythingManager;
 
 	[AutoNotify] private string _title;
 	[AutoNotify] private string? _sibId = "New Order";
@@ -33,19 +33,21 @@ public partial class OrderViewModel : ViewModelBase
 	[AutoNotify] private bool _hasUnreadMessages;
 
 	private CancellationTokenSource _cts;
+	private CompositeDisposable _disposables = new();
 
 	public OrderViewModel(UiContext uiContext, IWalletModel wallet, Workflow workflow, IOrderManager orderManager, int orderNumber, CancellationToken cancellationToken)
 	{
 		_orderManager = orderManager;
 		_title = workflow.Conversation.MetaData.Title;
-		_buyAnythingManager = Services.HostedServices.Get<BuyAnythingManager>();
 
-		_messagesList = new SourceList<MessageViewModel>();
+		_messagesList = new SourceList<MessageViewModel>()
+			.DisposeWith(_disposables);
 
 		_messagesList
 			.Connect()
 			.Bind(out _messages)
-			.Subscribe();
+			.Subscribe()
+			.DisposeWith(_disposables);
 
 		UiContext = uiContext;
 		_wallet = wallet;
@@ -74,7 +76,9 @@ public partial class OrderViewModel : ViewModelBase
 		ResetOrderCommand = ReactiveCommand.Create(ResetOrder, CanResetObs);
 
 		// TODO: Remove this once we use newer version of DynamicData
-		HasUnreadMessagesObs.BindTo(this, x => x.HasUnreadMessages);
+		HasUnreadMessagesObs
+			.BindTo(this, x => x.HasUnreadMessages)
+			.DisposeWith(_disposables);
 
 		this.WhenAnyValue(x => x.Workflow.Conversation)
 			.Do(conversation =>
@@ -83,21 +87,26 @@ public partial class OrderViewModel : ViewModelBase
 				SibId = conversation.Id.OrderNumber == "" ? null : conversation.Id.OrderNumber;
 				RefreshMessageList(conversation);
 			})
-			.Subscribe();
+			.Subscribe()
+			.DisposeWith(_disposables);
 
 		this.WhenAnyValue(x => x.Workflow.CurrentStep.IsBusy)
-			.BindTo(this, x => x.IsBusy);
+			.BindTo(this, x => x.IsBusy)
+			.DisposeWith(_disposables);
 
 		this.WhenAnyValue(x => x.Workflow.IsCompleted)
-			.BindTo(this, x => x.IsCompleted);
+			.BindTo(this, x => x.IsCompleted)
+			.DisposeWith(_disposables);
 
-		_cts = new CancellationTokenSource();
+		_cts = new CancellationTokenSource()
+			.DisposeWith(_disposables);
 
 		// Handle Workflow Step Execution Errors and show UI message
 		Observable
 			.FromEventPattern<Exception>(Workflow, nameof(Workflow.OnStepError))
 			.DoAsync(async e => await _orderManager.OnError(e.EventArgs))
-			.Subscribe();
+			.Subscribe()
+			.DisposeWith(_disposables);
 
 		StartWorkflow(_cts.Token);
 	}
@@ -223,5 +232,11 @@ public partial class OrderViewModel : ViewModelBase
 				Logger.LogError($"Error while processing order: {ex}).");
 			}
 		});
+	}
+
+	public void Dispose()
+	{
+		Workflow.Dispose();
+		_disposables.Dispose();
 	}
 }

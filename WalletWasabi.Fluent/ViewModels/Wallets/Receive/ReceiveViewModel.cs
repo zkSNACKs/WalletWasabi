@@ -1,3 +1,4 @@
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using DynamicData.Binding;
@@ -20,9 +21,10 @@ namespace WalletWasabi.Fluent.ViewModels.Wallets.Receive;
 	NavBarPosition = NavBarPosition.None,
 	NavigationTarget = NavigationTarget.DialogScreen,
 	Searchable = false)]
-public partial class ReceiveViewModel : RoutableViewModel
+public partial class ReceiveViewModel : RoutableViewModel, IDisposable
 {
 	private readonly IWalletModel _wallet;
+	private readonly CompositeDisposable _disposables = new();
 
 	private ReceiveViewModel(IWalletModel wallet)
 	{
@@ -54,6 +56,12 @@ public partial class ReceiveViewModel : RoutableViewModel
 
 	public IObservable<bool> HasUnusedAddresses => _wallet.Addresses.Unused.ToObservableChangeSet().Count().Select(i => i > 0);
 
+	protected override void OnNavigatedTo(bool isInHistory, CompositeDisposable disposables)
+	{
+		base.OnNavigatedTo(isInHistory, disposables);
+		SuggestionLabels.Activate(disposables);
+	}
+
 	private void OnNext()
 	{
 		SuggestionLabels.ForceAdd = true;
@@ -67,4 +75,6 @@ public partial class ReceiveViewModel : RoutableViewModel
 	{
 		UiContext.Navigate(NavigationTarget.DialogScreen).To().ReceiveAddresses(_wallet);
 	}
+
+	public void Dispose() => _disposables.Dispose();
 }
