@@ -19,7 +19,7 @@ public class CoreNodeParams
 		int? txIndex,
 		int? prune,
 		int? disableWallet,
-		string mempoolReplacement,
+		string? mempoolReplacement,
 		string userAgent,
 		Money? fallbackFee,
 		IMemoryCache cache)
@@ -48,7 +48,7 @@ public class CoreNodeParams
 	public int? TxIndex { get; }
 	public int? Prune { get; }
 	public int? DisableWallet { get; }
-	public string MempoolReplacement { get; }
+	public string? MempoolReplacement { get; }
 	public string UserAgent { get; }
 	public Money? FallbackFee { get; }
 	public int? Listen { get; set; }
