@@ -17,6 +17,7 @@ using WalletWasabi.Logging;
 using WalletWasabi.WabiSabi.Backend.Models;
 using WalletWasabi.WabiSabi.Client.Banning;
 using WalletWasabi.WabiSabi.Client.CoinJoin.Client;
+using WalletWasabi.WabiSabi.Client.CoinJoin.Manager.Logic;
 using WalletWasabi.WabiSabi.Client.CoinJoinProgressEvents;
 using WalletWasabi.WabiSabi.Client.RoundStateAwaiters;
 using WalletWasabi.WabiSabi.Client.StatusChangedEvents;
@@ -182,47 +183,39 @@ public class CoinJoinManager : BackgroundService
 
 			async Task<IEnumerable<SmartCoin>> SanityChecksAndGetCoinCandidatesFunc()
 			{
-				if (WalletsBlockedByUi.ContainsKey(walletToStart.WalletId))
-				{
-					throw new CoinJoinClientException(CoinjoinError.UserInSendWorkflow);
-				}
-
-				if (walletToStart.IsUnderPlebStop && !startCommand.OverridePlebStop)
-				{
-					walletToStart.LogTrace("PlebStop preventing coinjoin.");
-
-					throw new CoinJoinClientException(CoinjoinError.NotEnoughUnprivateBalance);
-				}
-
 				if (WasabiBackendStatusProvide.LastResponse is not { } synchronizerResponse)
 				{
 					throw new CoinJoinClientException(CoinjoinError.BackendNotSynchronized);
 				}
 
-				var coinCandidates = await SelectCandidateCoinsAsync(walletToStart, synchronizerResponse.BestHeight).ConfigureAwait(false);
+				var walletCheck = await CoinJoinLogic.CheckWalletStartCoinJoinAsync(
+					wallet: walletToStart,
+					walletBlockedByUi: WalletsBlockedByUi.ContainsKey(walletToStart.WalletId),
+					overridePlebStop: startCommand.OverridePlebStop).ConfigureAwait(false);
 
-				// If there are pending payments, ignore already achieved privacy.
-				if (!walletToStart.BatchedPayments.AreTherePendingPayments)
+				if (walletCheck is not CoinjoinError.None)
 				{
-					// If all coins are already private, then don't mix.
-					if (await walletToStart.IsWalletPrivateAsync().ConfigureAwait(false))
-					{
-						walletToStart.LogTrace("All mixed!");
-						throw new CoinJoinClientException(CoinjoinError.AllCoinsPrivate);
-					}
+					throw new CoinJoinClientException(walletCheck);
+				}
 
-					// If coin candidates are already private and the user doesn't override the StopWhenAllMixed, then don't mix.
-					if (coinCandidates.All(x => !x.Confirmed || x.IsPrivate(walletToStart.AnonScoreTarget)) && startCommand.StopWhenAllMixed)
-					{
-						throw new CoinJoinClientException(
-							CoinjoinError.NoCoinsEligibleToMix,
-							$"All coin candidates are already private and {nameof(startCommand.StopWhenAllMixed)} was {startCommand.StopWhenAllMixed}");
-					}
+				var walletCoins = await walletToStart.GetCoinjoinCoinCandidatesAsync().ConfigureAwait(false);
+
+				var coinsCheck = CoinJoinLogic.CheckCoinsStartCoinJoin(
+					walletCoins,
+					synchronizerResponse.BestHeight,
+					walletToStart.AnonScoreTarget,
+					CoinRefrigerator,
+					CoinPrison,
+					out var coinsToMix);
+
+				if (coinsCheck is not CoinjoinError.None)
+				{
+					throw new CoinJoinClientException(coinsCheck);
 				}
 
 				NotifyWalletStartedCoinJoin(walletToStart);
 
-				return coinCandidates;
+				return coinsToMix;
 			}
 
 			var coinJoinTracker = await coinJoinTrackerFactory.CreateAndStartAsync(walletToStart, startCommand.OutputWallet, SanityChecksAndGetCoinCandidatesFunc, startCommand.StopWhenAllMixed, startCommand.OverridePlebStop).ConfigureAwait(false);
@@ -291,64 +284,6 @@ public class CoinJoinManager : BackgroundService
 		}
 
 		await WaitAndHandleResultOfTasksAsync(nameof(trackedAutoStarts), trackedAutoStarts.Values.Select(x => x.Task).ToArray()).ConfigureAwait(false);
-	}
-
-	private async Task<IEnumerable<SmartCoin>> SelectCandidateCoinsAsync(IWallet walletToStart, int bestHeight)
-	{
-		var coinCandidates = new CoinsView(await walletToStart.GetCoinjoinCoinCandidatesAsync().ConfigureAwait(false))
-			.Available()
-			.Where(x => !CoinRefrigerator.IsFrozen(x))
-			.ToArray();
-
-		// If there is no available coin candidates, then don't mix.
-		if (coinCandidates.Length == 0)
-		{
-			throw new CoinJoinClientException(CoinjoinError.NoCoinsEligibleToMix, "No candidate coins available to mix.");
-		}
-
-		var bannedCoins = coinCandidates.Where(x => CoinPrison.TryGetOrRemoveBannedCoin(x, out _)).ToArray();
-		var immatureCoins = coinCandidates.Where(x => x.Transaction.IsImmature(bestHeight)).ToArray();
-		var unconfirmedCoins = coinCandidates.Where(x => !x.Confirmed).ToArray();
-		var excludedCoins = coinCandidates.Where(x => x.IsExcludedFromCoinJoin).ToArray();
-
-		coinCandidates = coinCandidates
-			.Except(bannedCoins)
-			.Except(immatureCoins)
-			.Except(unconfirmedCoins)
-			.Except(excludedCoins)
-			.ToArray();
-
-		if (coinCandidates.Length == 0)
-		{
-			var anyNonPrivateUnconfirmed = unconfirmedCoins.Any(x => !x.IsPrivate(walletToStart.AnonScoreTarget));
-			var anyNonPrivateImmature = immatureCoins.Any(x => !x.IsPrivate(walletToStart.AnonScoreTarget));
-			var anyNonPrivateBanned = bannedCoins.Any(x => !x.IsPrivate(walletToStart.AnonScoreTarget));
-			var anyNonPrivateExcluded = excludedCoins.Any(x => !x.IsPrivate(walletToStart.AnonScoreTarget));
-
-			var errorMessage = $"Coin candidates are empty! {nameof(anyNonPrivateUnconfirmed)}:{anyNonPrivateUnconfirmed} {nameof(anyNonPrivateImmature)}:{anyNonPrivateImmature} {nameof(anyNonPrivateBanned)}:{anyNonPrivateBanned} {nameof(anyNonPrivateExcluded)}:{anyNonPrivateExcluded}";
-
-			if (anyNonPrivateUnconfirmed)
-			{
-				throw new CoinJoinClientException(CoinjoinError.NoConfirmedCoinsEligibleToMix, errorMessage);
-			}
-
-			if (anyNonPrivateImmature)
-			{
-				throw new CoinJoinClientException(CoinjoinError.OnlyImmatureCoinsAvailable, errorMessage);
-			}
-
-			if (anyNonPrivateBanned)
-			{
-				throw new CoinJoinClientException(CoinjoinError.CoinsRejected, errorMessage);
-			}
-
-			if (anyNonPrivateExcluded)
-			{
-				throw new CoinJoinClientException(CoinjoinError.OnlyExcludedCoinsAvailable, errorMessage);
-			}
-		}
-
-		return coinCandidates;
 	}
 
 	private bool TryRemoveTrackedAutoStart(ConcurrentDictionary<IWallet, TrackedAutoStart> trackedAutoStarts, IWallet wallet)

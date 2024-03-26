@@ -22,7 +22,7 @@ public interface IWallet
 
 	IDestinationProvider DestinationProvider { get; }
 	OutputProvider OutputProvider => new(DestinationProvider);
-	PaymentBatch BatchedPayments => new();
+	PaymentBatch BatchedPayments { get; }
 
 	int AnonScoreTarget { get; }
 	bool ConsolidationMode { get; }
