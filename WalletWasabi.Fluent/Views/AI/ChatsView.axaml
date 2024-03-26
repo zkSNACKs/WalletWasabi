@@ -1,0 +1,49 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:c="using:WalletWasabi.Fluent.Controls"
+             xmlns:vm="using:WalletWasabi.Fluent.ViewModels.AI"
+             xmlns:viewsAi="clr-namespace:WalletWasabi.Fluent.Views.AI"
+             mc:Ignorable="d"
+             x:DataType="vm:ChatsViewModel"
+             x:CompileBindings="True"
+             x:Class="WalletWasabi.Fluent.Views.AI.ChatsView"
+             d:DesignWidth="600" d:DesignHeight="600">
+
+  <c:ContentArea Title="{Binding Title}"
+                 EnableBack="{Binding EnableBack}"
+                 EnableNext="False"
+                 NextContent="Continue"
+                 EnableCancel="{Binding EnableCancel}"
+                 IsBusy="{Binding IsBusy}"
+                 Caption="Chat with Blyss Confidential AI."
+                 ScrollViewer.VerticalScrollBarVisibility="Disabled">
+
+    <DockPanel>
+      <Border Background="{DynamicResource BuyAnythingConversationsBackground}" CornerRadius="5 0 0 5">
+        <viewsAi:OrdersListView Width="200" DockPanel.Dock="Left" />
+      </Border>
+      <Border Background="{DynamicResource BuyAnythingChatBackground}" CornerRadius="0 5 5 0">
+        <DockPanel>
+
+          <viewsAi:ChatInputView DockPanel.Dock="Bottom"
+                                  DataContext="{Binding SelectedChat}" />
+
+          <Panel DockPanel.Dock="Bottom" Height="15" Margin="10 0">
+            <ProgressBar IsIndeterminate="{Binding IsBusy}"
+                         IsVisible="{Binding IsBusy}"
+                         VerticalAlignment="Center"
+                         Value="50"
+                         DataContext="{Binding SelectedChat}" />
+          </Panel>
+
+          <viewsAi:ChatMessagesView DataContext="{Binding SelectedChat}" />
+
+        </DockPanel>
+      </Border>
+    </DockPanel>
+
+  </c:ContentArea>
+
+</UserControl>

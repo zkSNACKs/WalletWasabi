@@ -1,3 +1,4 @@
+using System;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.CodeAnalysis;
@@ -25,7 +26,7 @@ internal abstract class GeneratorStep
 	protected SyntaxTree AddSource(string name, string source)
 	{
 		var syntaxTree = SyntaxFactory.ParseSyntaxTree(source, Context.Context.ParseOptions);
-		Context.Context.AddSource(name, SourceText.From(source, Encoding.UTF8));
+		Context.Context.AddSource($"{Guid.NewGuid()}_{name}", SourceText.From(source, Encoding.UTF8));
 
 		lock (_lock)
 		{

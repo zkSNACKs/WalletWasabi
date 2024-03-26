@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:WalletWasabi.Fluent.ViewModels.AI"
+             xmlns:vmMessage="clr-namespace:WalletWasabi.Fluent.ViewModels.AI.Messages"
+             xmlns:c="clr-namespace:WalletWasabi.Fluent.Controls"
+             xmlns:behaviors="clr-namespace:WalletWasabi.Fluent.Behaviors"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WalletWasabi.Fluent.Views.AI.ChatMessagesView"
+             x:DataType="vm:ChatViewModel"
+             x:CompileBindings="True">
+
+  <ScrollViewer x:Name="MessagesScrollViewer"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
+    <ItemsControl x:Name="MessagesItemsControl"
+                           ItemsSource="{Binding Messages}">
+      <ItemsControl.Styles>
+        <Style Selector="ContentPresenter > c|PreviewMessageItem">
+          <Setter Property="Margin" Value="5 5 5 0" />
+        </Style>
+        <Style Selector="ContentPresenter > c|PreviewMessageItem > Border">
+          <Setter Property="CornerRadius" Value="10" />
+          <Setter Property="MaxWidth" Value="330" />
+          <Setter Property="Padding" Value="15 10" />
+        </Style>
+        <Style Selector="TextBlock">
+          <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+      </ItemsControl.Styles>
+
+      <ItemsControl.DataTemplates>
+
+        <DataTemplate DataType="vmMessage:AssistantMessageViewModel">
+          <c:PreviewMessageItem CopyableContent="{Binding Message}"
+                                CopyButtonPlacement="Right"
+                                HorizontalAlignment="Left">
+            <Border Background="{DynamicResource AssistantMessageBackground}">
+              <TextBlock Text="{Binding Message}" />
+            </Border>
+          </c:PreviewMessageItem>
+        </DataTemplate>
+
+        <DataTemplate DataType="vmMessage:UserMessageViewModel">
+          <c:PreviewMessageItem CopyableContent="{Binding Message}"
+                                CopyButtonPlacement="Left"
+                                HorizontalAlignment="Right"
+                                IsEditButtonVisible="False">
+            <Border Background="{DynamicResource UserMessageBackground}">
+              <TextBlock Text="{Binding Message}" />
+            </Border>
+          </c:PreviewMessageItem>
+        </DataTemplate>
+      </ItemsControl.DataTemplates>
+
+      <Interaction.Behaviors>
+        <behaviors:ScrollToEndOnItemsChangedBehavior ScrollViewer="MessagesScrollViewer" />
+      </Interaction.Behaviors>
+    </ItemsControl>
+  </ScrollViewer>
+
+</UserControl>

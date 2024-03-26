@@ -99,6 +99,12 @@
           "Avalonia.Xaml.Interactivity": "11.0.5"
         }
       },
+      "CommunityToolkit.Mvvm": {
+        "type": "Direct",
+        "requested": "[8.1.0, )",
+        "resolved": "8.1.0",
+        "contentHash": "xxOt7lu9a5kB5Fs9RfcxzVlKnhuuPe+w7AXHtmCFtS3oldrsUhEMxHfNulluXSscUUoGxZ0jh55Om12ZP6abHA=="
+      },
       "DynamicData": {
         "type": "Direct",
         "requested": "[8.1.1, )",

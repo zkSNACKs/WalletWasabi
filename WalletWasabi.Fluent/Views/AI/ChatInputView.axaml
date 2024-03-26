@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:behaviors="clr-namespace:WalletWasabi.Fluent.Behaviors"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:vm="clr-namespace:WalletWasabi.Fluent.ViewModels.AI"
+             xmlns:ai="clr-namespace:WalletWasabi.Fluent.Views.AI"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WalletWasabi.Fluent.Views.AI.ChatInputView"
+             x:DataType="vm:ChatViewModel"
+             x:CompileBindings="True">
+
+  <DockPanel DockPanel.Dock="Bottom" Margin="10 0 10 10">
+
+    <Button DockPanel.Dock="Right"
+            Margin="10 0 0 0"
+            Classes="action"
+            IsDefault="True"
+            TabIndex="1"
+            Command="{Binding SendMessageCommand}"
+            Content="Send">
+      <i:Interaction.Behaviors>
+        <behaviors:FocusOnAttachedBehavior />
+      </i:Interaction.Behaviors>
+    </Button>
+
+    <Panel IsEnabled="{Binding !IsBusy}">
+      <ai:UserInputView />
+    </Panel>
+  </DockPanel>
+
+</UserControl>

@@ -22,6 +22,7 @@ using System.Collections.ObjectModel;
 using WalletWasabi.Daemon;
 using LogLevel = WalletWasabi.Logging.LogLevel;
 using System.Threading;
+using WalletWasabi.Fluent.AI;
 
 namespace WalletWasabi.Fluent.Desktop;
 
@@ -32,6 +33,9 @@ public class Program
 	// yet and stuff might break.
 	public static async Task<int> Main(string[] args)
 	{
+		// TDOO: For testing only
+		// await Repl.RunAsync();
+
 		// Crash reporting must be before the "single instance checking".
 		Logger.InitializeDefaults(Path.Combine(Config.DataDir, "Logs.txt"), LogLevel.Info);
 		try

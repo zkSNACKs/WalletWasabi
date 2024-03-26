@@ -26,6 +26,7 @@
 		<PackageReference Include="DynamicData" />
 		<PackageReference Include="System.Runtime" />
 		<PackageReference Include="QRackers" />
+		<PackageReference Include="CommunityToolkit.Mvvm" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\WalletWasabi.Daemon\WalletWasabi.Daemon.csproj" />

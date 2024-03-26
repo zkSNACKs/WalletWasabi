@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:c="using:WalletWasabi.Fluent.Controls"
+             xmlns:dialogs="clr-namespace:WalletWasabi.Fluent.ViewModels.AI.Dialogs"
+             mc:Ignorable="d" d:DesignWidth="428" d:DesignHeight="371"
+             x:DataType="dialogs:ConfirmDeleteChatDialogViewModel"
+             x:CompileBindings="True"
+             x:Class="WalletWasabi.Fluent.Views.AI.Dialogs.ConfirmDeleteChatDialogView">
+  <c:ContentArea Title="{Binding Title}"
+                 ScrollViewer.VerticalScrollBarVisibility="Disabled">
+    <c:QuestionControl YesCommand="{Binding NextCommand}"
+                       NoCommand="{Binding CancelCommand}"
+                       HighlightButton="YesButton">
+      <c:QuestionControl.IconContent>
+        <Viewbox MaxHeight="100" Margin="0 0 0 20">
+          <PathIcon Data="{StaticResource delete_regular}" Opacity="0.6" />
+        </Viewbox>
+      </c:QuestionControl.IconContent>
+      <StackPanel Spacing="10">
+        <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="Do you wish to delete this chat?" />
+      </StackPanel>
+    </c:QuestionControl>
+  </c:ContentArea>
+</UserControl>
