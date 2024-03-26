@@ -185,7 +185,6 @@ public partial class OrderViewModel : ViewModelBase
 		{
 			return new UserMessageViewModel(Workflow, message)
 			{
-				UiMessage = message.Text,
 				OriginalText = message.Text,
 				IsUnread = message.IsUnread
 			};

@@ -46,7 +46,7 @@ public partial class UserMessageViewModel : MessageViewModel
 		Message = newMessage;
 		IsUnread = newMessage.IsUnread;
 		OriginalText = newMessage.Text;
-		UiMessage = newMessage.Text;
+		UiMessage = ParseRawMessage(newMessage);
 
 		Workflow.CurrentStep = currentStep;
 		Workflow.Conversation = editor.Conversation;

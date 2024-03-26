@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Text;
 using WalletWasabi.WebClients.ShopWare.Models;
 
 namespace WalletWasabi.BuyAnything;
@@ -27,7 +29,49 @@ public abstract record DataCarrier
 	public static readonly DataCarrier NoData = new NoData();
 }
 
-public record ChatMessage(MessageSource Source, string Text, bool IsUnread, string? StepName, DataCarrier? Data = null)
+public record ChatMessage
 {
+	public ChatMessage(MessageSource source, string text, bool isUnread, string? stepName, DataCarrier? data = null)
+	{
+		Source = source;
+		Text = AddUnixTimestampIfMissing(text);
+		IsUnread = isUnread;
+		StepName = stepName;
+		Data = data;
+		CreatedAt = ReadUnixTimestamp();
+	}
+
 	public bool IsMyMessage => Source == MessageSource.User;
+	public MessageSource Source { get; }
+	public string Text { get; set; }
+	public bool IsUnread { get; set; }
+	public string? StepName { get; }
+	public DataCarrier? Data { get; set; }
+	public DateTimeOffset CreatedAt { get; }
+
+	private DateTimeOffset ReadUnixTimestamp()
+	{
+		int secondAt = Text.IndexOf('@', 1);
+
+		if (long.TryParse(Text[1..secondAt], out long unixTimestamp))
+		{
+			DateTimeOffset dateTime = DateTimeOffset.FromUnixTimeMilliseconds(unixTimestamp).ToLocalTime();
+			return dateTime;
+		}
+
+		return DateTimeOffset.UtcNow;
+	}
+
+	private string AddUnixTimestampIfMissing(string text)
+	{
+		if (!text.StartsWith('@'))
+		{
+			var now = DateTimeOffset.UtcNow;
+			StringBuilder sb = new();
+			sb.Append($"@{now.ToUnixTimeMilliseconds()}@");
+			sb.Append(text);
+			return sb.ToString();
+		}
+		return text;
+	}
 }

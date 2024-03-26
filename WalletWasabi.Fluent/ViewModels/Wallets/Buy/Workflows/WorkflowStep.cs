@@ -174,7 +174,9 @@ public abstract partial class WorkflowStep<TValue> : ReactiveObject, IWorkflowSt
 
 			if (StringValue(value) is { } userMessage)
 			{
-				newMessage = newMessage with { Text = userMessage };
+				var timestamp = GetTimestampFromMessage(chatMessage);
+
+				newMessage = newMessage with { Text = timestamp + userMessage };
 				updatedConversation = updatedConversation.ReplaceMessage(chatMessage, newMessage);
 			}
 
@@ -182,6 +184,21 @@ public abstract partial class WorkflowStep<TValue> : ReactiveObject, IWorkflowSt
 		}
 
 		return newMessage;
+	}
+
+	private string GetTimestampFromMessage(ChatMessage message)
+	{
+		var text = message.Text;
+		if (text.StartsWith('@'))
+		{
+			int secondAt = text.IndexOf('@', 1);
+
+			if (secondAt != -1)
+			{
+				return text[0..(secondAt + 1)];
+			}
+		}
+		return "";
 	}
 
 	/// <summary>
