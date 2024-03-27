@@ -133,23 +133,13 @@ public partial class ConfirmRecoveryWordsViewModel : RoutableViewModel
 
 	private async Task OnNextAsync()
 	{
-		var dialogCaption = "Store your passphrase safely, it cannot be reset if lost.\n" +
-			"It's needed to open and to recover your wallet.\n" +
-			"It's a recovery words extension for more security.";
-		var password = await Navigate().To().CreatePasswordDialog("Add Passphrase", dialogCaption, enableEmpty: true).GetResultAsync();
+		IsBusy = true;
 
-		if (password is { })
-		{
-			IsBusy = true;
+		var walletSettings = await UiContext.WalletRepository.NewWalletAsync(_options);
 
-			var options = _options with { Password = password };
+		IsBusy = false;
 
-			var walletSettings = await UiContext.WalletRepository.NewWalletAsync(options);
-
-			IsBusy = false;
-
-			await Navigate().To().CoinJoinProfiles(walletSettings, options).GetResultAsync();
-		}
+		await Navigate().To().CoinJoinProfiles(walletSettings, _options).GetResultAsync();
 	}
 
 	private void OnCancel()
