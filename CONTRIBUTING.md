@@ -387,3 +387,88 @@ If you absolutely must reference `UiContext` in the constructor, you can create 
 ```
 
 In this case, no additional constructors will be generated, and the analyzer will be satisfied.
+
+# Pull Requests
+
+### Committing Patches
+
+In general, [commits should be atomic](https://en.wikipedia.org/wiki/Atomic_commit#Atomic_commit_convention)
+and diffs should be easy to read. For this reason, do not mix any formatting
+fixes or code moves with actual code changes.
+
+Make sure each individual commit is hygienic: that it builds successfully on its
+own without warnings, errors, regressions, or test failures.
+
+Commit messages should be verbose by default consisting of a short subject line
+(50 chars max), a blank line and detailed explanatory text as separate
+paragraph(s), unless the title alone is self-explanatory (like "Correct typo
+in readme.md") in which case a single title line is sufficient. Commit messages should be
+helpful to people reading your code in the future, so explain the reasoning for
+your decisions. Further explanation [here](https://chris.beams.io/posts/git-commit/).
+
+If a particular commit references another issue, please add the reference. For
+example: `refs #1234` or `fixes #4321`. Using the `fixes` or `closes` keywords
+will cause the corresponding issue to be closed when the pull request is merged.
+
+Commit messages should never contain any `@` mentions (usernames prefixed with "@").
+
+Please refer to the [Git manual](https://git-scm.com/doc) for more information
+about Git.
+
+  - Push changes to your fork
+  - Create pull request
+
+### Features
+
+When adding a new feature, thought must be given to the long term technical debt
+and maintenance that feature may require after inclusion. Before proposing a new
+feature that will require maintenance, please consider if you are willing to
+maintain it (including bug fixing). If features get orphaned with no maintainer
+in the future, they may be removed by the Repository Maintainer.
+
+### Refactoring
+
+Refactoring is a necessary part of any software project's evolution. The
+following guidelines cover refactoring pull requests for the project.
+
+There are three categories of refactoring: code-only moves, code style fixes, and
+code refactoring. In general, refactoring pull requests should not mix these
+three kinds of activities in order to make refactoring pull requests easy to
+review and uncontroversial. In all cases, refactoring PRs must not change the
+behaviour of code within the pull request (bugs must be preserved as is).
+
+Project maintainers aim for a quick turnaround on refactoring pull requests, so
+where possible keep them short, uncomplex and easy to verify.
+
+Pull requests that refactor the code should not be made by new contributors. It
+requires a certain level of experience to know where the code belongs to and to
+understand the full ramification (including rebase effort of open pull requests).
+
+Trivial pull requests or pull requests that refactor the code with no clear
+benefits may be immediately closed by the maintainers to reduce unnecessary
+workload on reviewing.
+
+### Squashing Commits
+
+If your pull request contains fixup commits (commits that change the same line of code repeatedly) or too fine-grained
+commits, you may be asked to [squash](https://git-scm.com/docs/git-rebase#_interactive_mode) your commits
+before it will be reviewed.
+
+Please refrain from creating several pull requests for the same change.
+Use the pull request that is already open (or was created earlier) to amend
+changes. This preserves the discussion and review that happened earlier for
+the respective change set.
+
+The length of time required for peer review is unpredictable and will vary from
+pull request to pull request.
+
+### Merging Pull Requests
+
+There are different ways to merge commits on GitHub. By default, the "Create merge commit" should be used. If there are several commits addressing the same change, the author can be asked to squash commits. For example:
+
+- Fix code format
+- Fix code format again
+- More code format fix
+
+Avoid squashing excessively. The objective is not to achieve a brief commit history but rather a sequential one, where each commit encapsulates a single logical change in the code, as detailed by its commit message.
+
