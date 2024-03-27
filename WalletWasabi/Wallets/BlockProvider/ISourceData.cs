@@ -23,18 +23,18 @@ public enum P2pSourceDataStatusCode
 	/// <summary>Block was successfully downloaded.</summary>
 	Success,
 
-	/// <summary>Operation was cancelled.</summary>
-	Cancelled,
-
 	/// <summary>There is no connected P2P node to download the block from.</summary>
 	NoPeerAvailable,
 
-	/// <summary>P2P node returned a block to us but it is not valid.</summary>
-	InvalidBlockProvided,
-
 	/// <summary>Failed to get block.</summary>
 	/// <remarks>This covers for example networking errors.</remarks>
-	Failure
+	Failure,
+
+	/// <summary>Operation was cancelled.</summary>
+	Cancelled,
+
+	/// <summary>P2P node returned a block to us but it is not valid.</summary>
+	InvalidBlockProvided
 }
 
 public interface ISourceData
@@ -47,8 +47,8 @@ public interface ISourceData
 /// </summary>
 public record EmptySourceData(Source Source) : ISourceData
 {
-	public static EmptySourceData FileSystemCache = new(Source.FileSystemCache);
-	public static EmptySourceData TrustedFullNode = new(Source.TrustedFullNode);
+	public static readonly EmptySourceData FileSystemCache = new(Source.FileSystemCache);
+	public static readonly EmptySourceData TrustedFullNode = new(Source.TrustedFullNode);
 }
 
 /// <summary>
@@ -60,7 +60,7 @@ public record EmptySourceData(Source Source) : ISourceData
 /// Number of connected peers at the moment when we downloaded the bitcoin block.
 /// The number of connected peers can change at any moment.
 /// </param>
-public record P2pSourceData(P2pSourceDataStatusCode StatusCode, Node? Node, uint ConnectedNodes) : ISourceData
+public record P2pSourceData(P2pSourceDataStatusCode StatusCode, TimeSpan Duration, Node? Node, uint ConnectedNodes) : ISourceData
 {
 	public Source Source => Source.P2P;
 }

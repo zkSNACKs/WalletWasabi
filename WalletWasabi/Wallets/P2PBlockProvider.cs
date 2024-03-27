@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using NBitcoin;
 using NBitcoin.Protocol;
 using System.Threading;
@@ -41,19 +42,26 @@ public class P2PBlockProvider : IP2PBlockProvider
 	/// <inheritdoc/>
 	public async Task<P2pBlockResponse> TryGetBlockWithSourceDataAsync(uint256 blockHash, P2pSourceRequest sourceRequest, CancellationToken cancellationToken)
 	{
+		var duration = Stopwatch.StartNew();
+
 		Node? node = sourceRequest.Node;
 
 		if (node is null)
 		{
-			node = await P2PNodesManager.GetNodeAsync(cancellationToken).ConfigureAwait(false);
+			node = await P2PNodesManager.GetBestNodeAsync(cancellationToken).ConfigureAwait(false);
 
 			if (node is null || !node.IsConnected)
 			{
-				return new P2pBlockResponse(Block: null, new P2pSourceData(P2pSourceDataStatusCode.NoPeerAvailable, Node: null, P2PNodesManager.ConnectedNodesCount));
+				return await NotifyNodeManagerAndCreateResponseAsync(
+					block: null,
+					statusCode: P2pSourceDataStatusCode.NoPeerAvailable,
+					duration: duration.Elapsed,
+					node: null,
+					connectedNodes: P2PNodesManager.ConnectedNodesCount).ConfigureAwait(false);
 			}
 		}
 
-		double timeout = sourceRequest.Timeout ?? P2PNodesManager.GetCurrentTimeout();
+		double timeout = sourceRequest.Timeout ?? P2PNodesManager.SuggestedTimeout;
 
 		uint connectedNodes = P2PNodesManager.ConnectedNodesCount;
 
@@ -71,33 +79,47 @@ public class P2PBlockProvider : IP2PBlockProvider
 			// Validate block
 			if (!block.Check())
 			{
-				P2PNodesManager.DisconnectNode(node, $"Disconnected node: {node.RemoteSocketAddress}, because invalid block received.");
-
-				return new P2pBlockResponse(Block: null, new P2pSourceData(P2pSourceDataStatusCode.InvalidBlockProvided, node, connectedNodes));
+				return await NotifyNodeManagerAndCreateResponseAsync(
+					block: null,
+					statusCode: P2pSourceDataStatusCode.InvalidBlockProvided,
+					duration: duration.Elapsed,
+					node: node,
+					connectedNodes: connectedNodes).ConfigureAwait(false);
 			}
 
-			P2PNodesManager.DisconnectNodeIfEnoughPeers(node, $"Disconnected node: {node.RemoteSocketAddress}. Block ({block.GetCoinbaseHeight()}) downloaded: {block.GetHash()}.");
-
-			await P2PNodesManager.UpdateTimeoutAsync(increaseDecrease: false).ConfigureAwait(false);
-
-			return new P2pBlockResponse(block, new P2pSourceData(P2pSourceDataStatusCode.Success, node, connectedNodes));
+			return await NotifyNodeManagerAndCreateResponseAsync(
+				block: block,
+				statusCode: P2pSourceDataStatusCode.InvalidBlockProvided,
+				duration: duration.Elapsed,
+				node: node,
+				connectedNodes: connectedNodes).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{
 			if (ex is OperationCanceledException or TimeoutException)
 			{
-				await P2PNodesManager.UpdateTimeoutAsync(increaseDecrease: true).ConfigureAwait(false);
-				P2PNodesManager.DisconnectNodeIfEnoughPeers(node, $"Disconnected node: {node.RemoteSocketAddress}, because block download took too long."); // it could be a slow connection and not a misbehaving node
-
-				return new P2pBlockResponse(Block: null, new P2pSourceData(P2pSourceDataStatusCode.Cancelled, node, connectedNodes));
+				return await NotifyNodeManagerAndCreateResponseAsync(
+					block: null,
+					statusCode: P2pSourceDataStatusCode.Cancelled,
+					duration: duration.Elapsed,
+					node: node,
+					connectedNodes: connectedNodes).ConfigureAwait(false);
 			}
-			else
-			{
-				Logger.LogDebug(ex);
-				P2PNodesManager.DisconnectNode(node, $"Disconnected node: {node.RemoteSocketAddress}, because block download failed: {ex.Message}.");
 
-				return new P2pBlockResponse(Block: null, new P2pSourceData(P2pSourceDataStatusCode.Failure, node, connectedNodes));
-			}
+			Logger.LogDebug(ex);
+			return await NotifyNodeManagerAndCreateResponseAsync(
+				block: null,
+				statusCode: P2pSourceDataStatusCode.Failure,
+				duration: duration.Elapsed,
+				node: node,
+				connectedNodes: connectedNodes).ConfigureAwait(false);
 		}
+	}
+
+	private async Task<P2pBlockResponse> NotifyNodeManagerAndCreateResponseAsync(Block? block, P2pSourceDataStatusCode statusCode, TimeSpan duration, Node? node, uint connectedNodes)
+	{
+		var p2pSourceData = new P2pSourceData(statusCode, duration, node, connectedNodes);
+		await P2PNodesManager.NotifyDownloadFinishedAsync(p2pSourceData).ConfigureAwait(false);
+		return new P2pBlockResponse(Block: block, p2pSourceData);
 	}
 }
