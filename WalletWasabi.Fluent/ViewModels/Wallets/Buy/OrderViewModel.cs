@@ -24,7 +24,6 @@ public partial class OrderViewModel : ViewModelBase
 	private readonly SourceList<MessageViewModel> _messagesList;
 	private readonly IWalletModel _wallet;
 	private readonly IOrderManager _orderManager;
-	private readonly BuyAnythingManager _buyAnythingManager;
 
 	[AutoNotify] private string _title;
 	[AutoNotify] private string? _sibId = "New Order";
@@ -34,11 +33,15 @@ public partial class OrderViewModel : ViewModelBase
 
 	private CancellationTokenSource _cts;
 
-	public OrderViewModel(UiContext uiContext, IWalletModel wallet, Workflow workflow, IOrderManager orderManager, int orderNumber, CancellationToken cancellationToken)
+	public OrderViewModel(UiContext uiContext, IWalletModel wallet, Conversation conversation, IOrderManager orderManager, int orderNumber)
 	{
+		UiContext = uiContext;
+		// TODO: Dispose of the workflow when the view model is disposed
+		Workflow = wallet.BuyAnything.CreateWorkflow(conversation);
+
+		_wallet = wallet;
 		_orderManager = orderManager;
-		_title = workflow.Conversation.MetaData.Title;
-		_buyAnythingManager = Services.HostedServices.Get<BuyAnythingManager>();
+		_title = Workflow.Conversation.MetaData.Title;
 
 		_messagesList = new SourceList<MessageViewModel>();
 
@@ -47,9 +50,7 @@ public partial class OrderViewModel : ViewModelBase
 			.Bind(out _messages)
 			.Subscribe();
 
-		UiContext = uiContext;
-		_wallet = wallet;
-		Workflow = workflow;
+		
 		OrderNumber = orderNumber;
 
 		HasUnreadMessagesObs = _messagesList.Connect()

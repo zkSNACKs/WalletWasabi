@@ -1,3 +1,4 @@
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -128,6 +129,7 @@ public sealed partial class ShopinBitWorkflow : Workflow
 							  CurrentStep?.Ignore();
 						  }
 					  })
-					  .Subscribe();
+					  .Subscribe()
+					  .DisposeWith(Disposables);
 	}
 }

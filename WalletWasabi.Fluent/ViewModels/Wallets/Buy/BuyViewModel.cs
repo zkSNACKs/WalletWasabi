@@ -10,6 +10,7 @@ using ReactiveUI;
 using WalletWasabi.BuyAnything;
 using WalletWasabi.Fluent.Extensions;
 using WalletWasabi.Fluent.Models.UI;
+using WalletWasabi.Fluent.Models.Wallets;
 using WalletWasabi.Fluent.ViewModels.Navigation;
 using WalletWasabi.Fluent.ViewModels.Wallets.Buy.Workflows;
 using WalletWasabi.Logging;
@@ -29,23 +30,19 @@ namespace WalletWasabi.Fluent.ViewModels.Wallets.Buy;
 	Searchable = false)]
 public partial class BuyViewModel : RoutableViewModel, IOrderManager
 {
-	private readonly BuyAnythingManager _buyAnythingManager;
 	private readonly CancellationTokenSource _cts;
 	private readonly ReadOnlyObservableCollection<OrderViewModel> _orders;
 	private readonly SourceCache<OrderViewModel, int> _ordersCache;
-	private readonly Wallet _wallet;
+	private readonly IWalletModel _wallet;
 
 	[AutoNotify] private OrderViewModel? _emptyOrder; // Used to track the "Empty" order (with empty ConversationId)
 	[AutoNotify] private OrderViewModel? _selectedOrder;
 
-	public BuyViewModel(UiContext uiContext, WalletViewModel walletVm)
+	public BuyViewModel(UiContext uiContext, IWalletModel wallet)
 	{
 		IsBusy = true;
 		UiContext = uiContext;
-		WalletVm = walletVm;
-
-		_wallet = walletVm.Wallet;
-		_buyAnythingManager = Services.HostedServices.Get<BuyAnythingManager>();
+		_wallet = wallet;
 
 		SetupCancel(enableCancel: true, enableCancelOnEscape: true, enableCancelOnPressed: true);
 
@@ -77,13 +74,11 @@ public partial class BuyViewModel : RoutableViewModel, IOrderManager
 
 	public ReadOnlyObservableCollection<OrderViewModel> Orders => _orders;
 
-	public WalletViewModel WalletVm { get; }
-
 	async Task IOrderManager.RemoveOrderAsync(int id)
 	{
 		if (Orders.FirstOrDefault(x => x.OrderNumber == id) is { } orderToRemove)
 		{
-			await _buyAnythingManager.RemoveConversationsByIdsAsync(new[] { orderToRemove.ConversationId }, _cts.Token);
+			await _wallet.BuyAnything.RemoveConversationByIdAsync(orderToRemove.ConversationId, _cts.Token);
 		}
 
 		_ordersCache.RemoveKey(id);
@@ -154,16 +149,11 @@ public partial class BuyViewModel : RoutableViewModel, IOrderManager
 	{
 		try
 		{
-			var currentConversations = await _buyAnythingManager.GetConversationsAsync(_wallet, _cts.Token);
+			var currentConversations = await _wallet.BuyAnything.GetConversationsAsync(_cts.Token);
 
 			var orders =
-				currentConversations.Select((conversation, index) =>
-				{
-					var workflow = Workflow.Create(_wallet, conversation);
-					var order = new OrderViewModel(UiContext, WalletVm.WalletModel, workflow, this, index, _cts.Token);
-					return order;
-				})
-				.ToArray();
+				currentConversations.Select((conversation, index) => new OrderViewModel(UiContext, _wallet, conversation, this, index))
+								    .ToArray();
 
 			_ordersCache.AddOrUpdate(orders);
 
@@ -187,13 +177,10 @@ public partial class BuyViewModel : RoutableViewModel, IOrderManager
 	private OrderViewModel NewEmptyOrder()
 	{
 		var nextOrderNumber = Orders.Count > 0 ? Orders.Max(x => x.OrderNumber) + 1 : 1;
-		var title = "New Order";
 
-		var conversation = new Conversation(ConversationId.Empty, Chat.Empty, OrderStatus.Open, ConversationStatus.Started, new ConversationMetaData(title));
+		var conversation = _wallet.BuyAnything.NewConversation();
 
-		var workflow = Workflow.Create(_wallet, conversation);
-
-		var order = new OrderViewModel(UiContext, WalletVm.WalletModel, workflow, this, nextOrderNumber, _cts.Token);
+		var order = new OrderViewModel(UiContext, _wallet, conversation, this, nextOrderNumber);
 
 		_ordersCache.AddOrUpdate(order);
 
