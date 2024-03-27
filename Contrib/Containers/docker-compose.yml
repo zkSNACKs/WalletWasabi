@@ -3,7 +3,7 @@ services:
 
   bitcoind:
     restart: unless-stopped
-    image: btcpayserver/bitcoinknots:23.0
+    image: btcpayserver/bitcoinknots:25.1
     environment:
       BITCOIN_NETWORK: regtest
       BITCOIN_EXTRA_ARGS: |-
