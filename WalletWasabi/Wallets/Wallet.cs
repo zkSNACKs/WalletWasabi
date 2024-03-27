@@ -40,7 +40,8 @@ public class Wallet : BackgroundService, IWallet
 		ServiceConfiguration serviceConfiguration,
 		HybridFeeProvider feeProvider,
 		TransactionProcessor transactionProcessor,
-		WalletFilterProcessor walletFilterProcessor)
+		WalletFilterProcessor walletFilterProcessor,
+		UnconfirmedTransactionChainProvider unconfirmedTransactionChainProvider)
 	{
 		Guard.NotNullOrEmptyOrWhitespace(nameof(dataDir), dataDir);
 		Network = network;
@@ -49,6 +50,7 @@ public class Wallet : BackgroundService, IWallet
 		Synchronizer = syncer;
 		ServiceConfiguration = serviceConfiguration;
 		FeeProvider = feeProvider;
+		UnconfirmedTransactionChainProvider = unconfirmedTransactionChainProvider;
 
 		RuntimeParams.SetDataDir(dataDir);
 
@@ -105,7 +107,7 @@ public class Wallet : BackgroundService, IWallet
 	public TransactionProcessor TransactionProcessor { get; }
 
 	public HybridFeeProvider FeeProvider { get; }
-
+	public UnconfirmedTransactionChainProvider UnconfirmedTransactionChainProvider { get; }
 	public WalletFilterProcessor WalletFilterProcessor { get; }
 	public FilterModel? LastProcessedFilter => WalletFilterProcessor.LastProcessedFilter;
 
@@ -393,6 +395,7 @@ public class Wallet : BackgroundService, IWallet
 		try
 		{
 			WalletRelevantTransactionProcessed?.Invoke(this, e);
+			UnconfirmedTransactionChainProvider.BeginRequestUnconfirmedChain(e.Transaction);
 		}
 		catch (Exception ex)
 		{
