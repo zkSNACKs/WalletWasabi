@@ -10,7 +10,7 @@ using WalletWasabi.Fluent.Helpers;
 
 namespace WalletWasabi.Fluent.TreeDataGrid;
 
-internal class TreeDataGridPrivacyTextCell : TreeDataGridCell
+public class TreeDataGridPrivacyTextCell : TreeDataGridCell
 {
 	private IDisposable? _subscription;
 	private bool _isContentVisible = true;

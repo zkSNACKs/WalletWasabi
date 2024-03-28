@@ -7,14 +7,8 @@
              x:DataType="vm:LoadingViewModel"
              x:CompileBindings="True"
              x:Class="WalletWasabi.Fluent.Views.Wallets.LoadingView">
-  <ContentArea ScrollViewer.VerticalScrollBarVisibility="Disabled">
-    <ContentArea.Title>
-      <StackPanel>
-        <TextBlock TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Text="{Binding WalletName, FallbackValue=My Wallet with a very long name}" />
-        <Separator DockPanel.Dock="Bottom" Margin="-200 13 -200 0" HorizontalAlignment="Stretch" />
-      </StackPanel>
-    </ContentArea.Title>
-
+  <ContentArea Title="{Binding WalletName, FallbackValue=My Wallet with a very long name}"
+               ScrollViewer.VerticalScrollBarVisibility="Disabled">
     <Panel>
       <Interaction.Behaviors>
         <AdaptiveBehavior>

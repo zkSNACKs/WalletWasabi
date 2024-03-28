@@ -3,7 +3,7 @@
                     xmlns:converters="clr-namespace:WalletWasabi.Fluent.Converters">
   <Design.PreviewWith>
     <Border Padding="10">
-      <TagControl Content="Label 1, Label 2, Label 3" />
+      <TagControl Content="Label One Two Three" />
     </Border>
   </Design.PreviewWith>
 
@@ -11,7 +11,7 @@
 
     <Setter Property="Cursor" Value="Arrow" />
     <Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
-    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Background" Value="{DynamicResource TagsBoxItemBackground}" />
     <Setter Property="BorderBrush" Value="{DynamicResource TagsBoxBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="(ToolTip.Tip)" Value="{Binding .}" />
@@ -26,13 +26,14 @@
                   Background="{TemplateBinding Background}"
                   BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}"
-                  CornerRadius="2" />
+                  CornerRadius="{StaticResource ControlCornerRadius}" />
           <DockPanel Name="PART_DummyPanel"
                      VerticalAlignment="Top" LastChildFill="True">
             <DockPanel Margin="12,6,12,6" DockPanel.Dock="Left" MaxWidth="260">
               <TextBlock DockPanel.Dock="Left" Margin="0 0 5 0"
                          Text="{TemplateBinding OrdinalIndex, Converter={x:Static converters:IntConverter.ToOrdinalString}}"
-                         IsVisible="{TemplateBinding EnableCounter}" />
+                         IsVisible="{TemplateBinding EnableCounter}"
+                         Opacity="0.6" />
               <ContentPresenter Name="PART_ContentPresenter"
                                 DockPanel.Dock="Left"
                                 Content="{TemplateBinding Content}"

@@ -17,7 +17,7 @@
                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
             <Border Name="PART_Border"
-                    BorderBrush="{DynamicResource TileBorderColor}"
+                    BorderBrush="{DynamicResource BorderColor}"
                     Background="{DynamicResource RegionColor}"
                     MaxWidth="{TemplateBinding MaxContentWidth}" MaxHeight="{TemplateBinding MaxContentHeight}">
               <Panel Name="PART_Dismiss">
@@ -54,7 +54,7 @@
       <Setter Property="(Interaction.Behaviors)">
         <BehaviorCollectionTemplate>
           <BehaviorCollection>
-            <DialogTransitionAttachedBehavior OpacityDuration="0:0:0.50" ScaleDuration="0:0:0.35" />
+            <DialogTransitionAttachedBehavior OpacityDuration="0:0:0.50" ScaleDuration="0:0:0.50" />
           </BehaviorCollection>
         </BehaviorCollectionTemplate>
       </Setter>
@@ -62,9 +62,7 @@
 
     <Style Selector="^/template/ Border#PART_Border">
       <Setter Property="Margin" Value="40" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="4" />
-      <Setter Property="BoxShadow" Value="{DynamicResource DialogBoxShadow}" />
+      <Setter Property="CornerRadius" Value="{StaticResource OverlayCornerRadius}" />
     </Style>
 
     <Style Selector="^/template/ ContentPresenter#PART_ContentPresenter">

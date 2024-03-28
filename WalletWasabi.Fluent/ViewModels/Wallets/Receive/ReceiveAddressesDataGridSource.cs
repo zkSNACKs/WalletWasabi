@@ -10,18 +10,18 @@ namespace WalletWasabi.Fluent.ViewModels.Wallets.Receive;
 public static class ReceiveAddressesDataGridSource
 {
 	// [Column]		[View]				[Header]	[Width]		[MinWidth]		[MaxWidth]	[CanUserSort]
-	// Actions		ActionsColumnView	-			90			-				-			false
-	// Address		AddressColumnView	Address		2*			-				-			true
-	// Labels		LabelsColumnView	Labels		210			-				-			false
+	// Address		AddressColumnView	Address		Auto		-				-			true
+	// Labels		LabelsColumnView	Labels		1*			-				-			false
+	// Actions		ActionsColumnView	-			Auto		-				-			false
 	public static FlatTreeDataGridSource<AddressViewModel> Create(IEnumerable<AddressViewModel> addresses)
 	{
 		return new FlatTreeDataGridSource<AddressViewModel>(addresses)
 		{
 			Columns =
 			{
-				ActionsColumn(),
 				AddressColumn(),
-				LabelsColumn()
+				LabelsColumn(),
+				ActionsColumn(),
 			}
 		};
 	}
@@ -37,7 +37,7 @@ public static class ReceiveAddressesDataGridSource
 				CanUserResizeColumn = false,
 				CanUserSortColumn = false
 			},
-			width: new GridLength(90, GridUnitType.Pixel));
+			width: new GridLength(0, GridUnitType.Auto));
 	}
 
 	private static IColumn<AddressViewModel> AddressColumn()
@@ -53,7 +53,7 @@ public static class ReceiveAddressesDataGridSource
 				CompareAscending = Sort<AddressViewModel>.Ascending(x => x.AddressText),
 				CompareDescending = Sort<AddressViewModel>.Descending(x => x.AddressText)
 			},
-			width: new GridLength(2, GridUnitType.Star));
+			width: new GridLength(0, GridUnitType.Auto));
 	}
 
 	private static IColumn<AddressViewModel> LabelsColumn()
@@ -69,6 +69,6 @@ public static class ReceiveAddressesDataGridSource
 				CompareAscending = Sort<AddressViewModel>.Ascending(x => x.Labels),
 				CompareDescending = Sort<AddressViewModel>.Descending(x => x.Labels)
 			},
-			width: new GridLength(210, GridUnitType.Pixel));
+			width: new GridLength(1, GridUnitType.Star));
 	}
 }

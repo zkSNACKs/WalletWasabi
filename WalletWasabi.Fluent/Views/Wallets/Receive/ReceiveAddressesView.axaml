@@ -3,35 +3,31 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:receive="clr-namespace:WalletWasabi.Fluent.ViewModels.Wallets.Receive"
+             xmlns:sorting="clr-namespace:WalletWasabi.Fluent.Controls.Sorting"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="receive:ReceiveAddressesViewModel"
              x:CompileBindings="True"
              x:Class="WalletWasabi.Fluent.Views.Wallets.Receive.ReceiveAddressesView">
   <ContentArea Title="{Binding Title}"
-                 EnableCancel="{Binding EnableCancel}"
-                 EnableBack="{Binding EnableBack}"
-                 ScrollViewer.VerticalScrollBarVisibility="Disabled">
+               Caption="You can choose to hide, modify, or display the addresses listed below."
+               EnableCancel="{Binding EnableCancel}"
+               EnableBack="{Binding EnableBack}"
+               ScrollViewer.VerticalScrollBarVisibility="Disabled">
+    <ContentArea.TopContent>
+      <Button DockPanel.Dock="Right" Theme="{StaticResource DialogSortButton}" ToolTip.Tip="Sorting">
+        <Button.Flyout>
+          <Flyout Placement="BottomEdgeAlignedRight">
+            <sorting:SortControl Sortables="{Binding Sortables}" />
+          </Flyout>
+        </Button.Flyout>
+      </Button>
+    </ContentArea.TopContent>
     <TreeDataGrid Source="{Binding Source}"
-                  CanUserSortColumns="True">
+                  VerticalAlignment="Stretch"
+                  Margin="0 20 0 0">
       <TreeDataGrid.Styles>
         <Style Selector="TreeDataGridRow">
           <Setter Property="Theme" Value="{StaticResource ReceiveAddressesViewTreeDataGridRow}" />
-        </Style>
-        <Style Selector="AnimatedButton.addressActionButton">
-          <Setter Property="DockPanel.Dock" Value="Right" />
-          <Setter Property="Margin" Value="5 0 0 0" />
-        </Style>
-        <Style Selector="AnimatedButton /template/ PathIcon">
-          <Setter Property="Height" Value="15" />
-          <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}" />
-        </Style>
-        <Style Selector="Button.addressActionButton">
-          <Setter Property="DockPanel.Dock" Value="Right" />
-          <Setter Property="Margin" Value="5 0 0 0" />
-        </Style>
-        <Style Selector="PathIcon.addressActionIcon">
-          <Setter Property="Height" Value="15" />
-          <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}" />
         </Style>
       </TreeDataGrid.Styles>
     </TreeDataGrid>

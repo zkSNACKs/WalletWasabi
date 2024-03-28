@@ -2,22 +2,29 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
   <Design.PreviewWith>
-    <Border Padding="20">
-      <FlyoutPresenter>
-        <StackPanel>
-          <TextBlock>Hi, I'm inside a FlyoutPresenter</TextBlock>
-          <TextBlock>Hi, I'm inside a FlyoutPresenter</TextBlock>
-          <TextBlock>Hi, I'm inside a FlyoutPresenter</TextBlock>
-          <TextBlock>Hi, I'm inside a FlyoutPresenter</TextBlock>
-        </StackPanel>
-      </FlyoutPresenter>
+    <Border Padding="20" Width="300">
+      <StackPanel>
+        <FlyoutPresenter>
+          <StackPanel>
+            <TextBlock>Hi, I'm inside a FlyoutPresenter</TextBlock>
+            <TextBlock>Hi, I'm inside a FlyoutPresenter</TextBlock>
+            <TextBlock>Hi, I'm inside a FlyoutPresenter</TextBlock>
+            <TextBlock HorizontalAlignment="Right">Hi, I'm inside a FlyoutPresenter</TextBlock>
+          </StackPanel>
+        </FlyoutPresenter>
+        <FlyoutPresenter>
+          <StackPanel Background="Red">
+            <Button HorizontalAlignment="Center">This is a button</Button>
+          </StackPanel>
+        </FlyoutPresenter>
+      </StackPanel>
     </Border>
+
   </Design.PreviewWith>
 
   <Style Selector="FlyoutPresenter">
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="VerticalContentAlignment" Value="Stretch" />
-    <Setter Property="BorderBrush" Value="{DynamicResource TileBorderColor}" />
     <Setter Property="BorderThickness" Value="1 1 1 1" />
     <Setter Property="Padding" Value="{DynamicResource FlyoutContentThemePadding}" />
     <Setter Property="MinWidth" Value="{DynamicResource FlyoutThemeMinWidth}" />
@@ -27,11 +34,12 @@
     <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
     <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
     <Setter Property="TextElement.Foreground" Value="{DynamicResource AcrylicTrimForeground}" />
-    <Setter Property="CornerRadius" Value="8 8 8 8" />
+    <Setter Property="CornerRadius" Value="{StaticResource OverlayCornerRadius}" />
     <Setter Property="Template">
       <ControlTemplate>
         <Panel x:Name="RootPanel">
-          <ContentControl Theme="{StaticResource AcrylicPanel}">
+          <ContentControl Theme="{StaticResource AcrylicPanel}"
+                          Padding="{TemplateBinding Padding}">
             <ContentPresenter Content="{TemplateBinding Content}"
                               ContentTemplate="{TemplateBinding ContentTemplate}"
                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"

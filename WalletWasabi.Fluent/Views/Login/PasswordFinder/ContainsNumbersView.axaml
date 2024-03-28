@@ -14,8 +14,9 @@
                  ScrollViewer.VerticalScrollBarVisibility="Disabled">
 
     <QuestionControl Content="Does your password contain numbers?"
-                       YesCommand="{Binding YesCommand}"
-                       NoCommand="{Binding NoCommand}">
+                     YesCommand="{Binding YesCommand}"
+                     NoCommand="{Binding NoCommand}"
+                     HighlightButton="Both">
       <QuestionControl.IconContent>
         <Viewbox Height="150">
           <StackPanel Orientation="Horizontal" Opacity="0.6">

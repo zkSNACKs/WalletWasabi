@@ -9,10 +9,11 @@
              x:CompileBindings="True"
              x:Class="WalletWasabi.Fluent.Views.CoinJoinProfiles.CoinJoinProfilesView">
   <ContentArea Title="{Binding Title}"
-                 EnableCancel="{Binding EnableCancel}"
-                 EnableBack="{Binding EnableBack}"
-                 NextContent="Done" EnableNext="True"
-                 ScrollViewer.VerticalScrollBarVisibility="Disabled" ClipToBounds="False">
+               Caption="Wasabi takes care of your financial privacy by automatically starting to coinjoin all your funds for a fixed 0.3% coordination fee + the mining fees. Select a coinjoin strategy that fits you best!"
+               EnableCancel="{Binding EnableCancel}"
+               EnableBack="{Binding EnableBack}"
+               NextContent="Done" EnableNext="True"
+               ScrollViewer.VerticalScrollBarVisibility="Disabled" ClipToBounds="False">
 
     <ContentArea.Styles>
       <Style Selector=":is(Control)">
@@ -21,8 +22,6 @@
     </ContentArea.Styles>
 
     <DockPanel>
-
-      <TextBlock DockPanel.Dock="Top" Text="Wasabi takes care of your financial privacy by automatically starting to coinjoin all your funds for a fixed 0.3% coordination fee + the mining fees. Select a coinjoin strategy that fits you best!" TextWrapping="Wrap" />
 
       <Button Classes="h8 plain activeHyperLink" Margin="0 10 0 0"
               DockPanel.Dock="Bottom"
@@ -42,29 +41,30 @@
           </Style>
           <Style Selector="ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="Transparent" />
-            </Style>
+          </Style>
 
           <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter, ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="Transparent" />
           </Style>
           <Style Selector="ListBoxItem:selected Border#PART_DecorationBorderHover, ListBoxItem:selected Border#PART_DecorationBorderUnselected">
             <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="Background" Value="{DynamicResource Layer2BackgroundBrush}" />
           </Style>
 
           <Style Selector="ListBoxItem Border#PART_MainContentBorder">
-            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="CornerRadius" Value="15" />
           </Style>
 
           <Style Selector="ListBoxItem Border#PART_DecorationBorderUnselected">
-            <Setter Property="CornerRadius" Value="4" />
-            <Setter Property="BorderBrush" Value="#14FFFFFF" />
+            <Setter Property="CornerRadius" Value="15" />
+            <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Background" Value="{DynamicResource OptimizePrivacyOptionSelectedColor}" />
             <Setter Property="BoxShadow" Value="{DynamicResource OptimizePrivacyOptionBoxShadow1}" />
           </Style>
 
           <Style Selector="ListBoxItem Border#PART_DecorationBorderHover">
-            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="CornerRadius" Value="15" />
             <Setter Property="BorderBrush" Value="#2AFFFFFF" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Background" Value="{DynamicResource OptimizePrivacyOptionSelectedColor}" />

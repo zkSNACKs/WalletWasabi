@@ -1,7 +1,0 @@
-<Styles xmlns="https://github.com/avaloniaui">
-
-  <Style Selector="MenuFlyoutPresenter MenuItem">
-    <Setter Property="Padding" Value="10" />
-  </Style>
-
-</Styles>

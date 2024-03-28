@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
   <Style Selector="Dialog:alert /template/ Border#PART_Border">
-    <Setter Property="BoxShadow" Value="{DynamicResource DialogBoxShadow}"/>
+    <Setter Property="BoxShadow" Value="{DynamicResource EmptyBoxShadow}" />
     <Style.Animations>
       <Animation Duration="0:0:0.6" PlaybackDirection="AlternateReverse" IterationCount="1">
         <KeyFrame Cue="25%">
@@ -15,7 +15,7 @@
           <Setter Property="BoxShadow" Value="{DynamicResource DialogAlertStartBoxShadow}"/>
         </KeyFrame>
         <KeyFrame Cue="100%">
-          <Setter Property="BoxShadow" Value="{DynamicResource DialogBoxShadow}"/>
+          <Setter Property="BoxShadow" Value="{DynamicResource EmptyBoxShadow}" />
         </KeyFrame>
       </Animation>
     </Style.Animations>

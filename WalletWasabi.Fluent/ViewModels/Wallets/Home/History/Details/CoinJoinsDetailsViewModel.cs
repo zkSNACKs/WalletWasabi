@@ -57,9 +57,9 @@ public partial class CoinJoinsDetailsViewModel : RoutableViewModel
 	{
 		if (_wallet.Transactions.TryGetById(_transaction.Id, _transaction.IsChild, out var transaction))
 		{
-			Date = transaction.DateString;
+			Date = transaction.DateToolTipString;
 			Status = transaction.IsConfirmed ? "Confirmed" : "Pending";
-			CoinJoinFeeAmount = _wallet.AmountProvider.Create(transaction.OutgoingAmount);
+			CoinJoinFeeAmount = _wallet.AmountProvider.Create(transaction.DisplayAmount);
 			TransactionId = transaction.Id;
 			TransactionIds = new ObservableCollection<uint256>(transaction.Children.Select(x => x.Id));
 			TxCount = TransactionIds.Count;

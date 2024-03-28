@@ -10,20 +10,16 @@
              xmlns:statusIcon="clr-namespace:WalletWasabi.Fluent.Views.StatusIcon"
              d:DesignWidth="1000" d:DesignHeight="1000"
              x:CompileBindings="True">
-
   <DockPanel IsEnabled="{Binding IsMainContentEnabled^}">
     <shell:TitleBar DockPanel.Dock="Top" />
     <DockPanel>
       <navbar:NavBar DockPanel.Dock="Left" DataContext="{Binding NavBar}" />
-      <Border x:Name="ContentPart" BorderBrush="{DynamicResource TileBorderColor}" BorderThickness="1 1 0 0"
-              CornerRadius="10 0 0 0" ClipToBounds="True">
+      <Border x:Name="ContentPart" CornerRadius="10 0 0 0" ClipToBounds="True" Background="{DynamicResource RegionColor}">
         <Panel>
-          <Border CornerRadius="10 0 0 0" Background="{DynamicResource RegionColor}" ClipToBounds="True"
-                  IsHitTestVisible="False" />
-          <Panel VerticalAlignment="Bottom"
-                 Height="100">
+          <!-- Coinjoin waves -->
+          <Panel VerticalAlignment="Bottom" Height="100">
             <SpectrumControl Opacity="0.6" IsActive="{Binding IsCoinJoinActive}"
-                                      Classes.fireEffect="{Binding CurrentWallet^.CoinJoinStateViewModel.IsInCriticalPhase, FallbackValue=False}">
+                             Classes.fireEffect="{Binding CurrentWallet^.CoinJoinStateViewModel.IsInCriticalPhase, FallbackValue=False}">
               <SpectrumControl.IsDockEffectVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                   <Binding Path="CurrentWallet^.IsMusicBoxVisible^" FallbackValue="False" />
@@ -57,10 +53,22 @@
             </DockPanel.Styles>
             <wallets:MusicControlsView DockPanel.Dock="Bottom" DataContext="{Binding CurrentWallet^}"
                                        HorizontalAlignment="Center" Height="66" />
-            <ContentControl ClipToBounds="False" Content="{Binding MainScreen.CurrentPage}" />
+
+            <!-- Main content -->
+            <ContentControl ClipToBounds="False" Content="{Binding MainScreen.CurrentPage}">
+              <ContentControl.Styles>
+                <Style Selector="ContentArea /template/ Panel#PART_ButtonArea">
+                  <Setter Property="IsVisible" Value="False" />
+                </Style>
+
+                <Style Selector="ContentArea /template/ StackPanel#PART_Header">
+                  <Setter Property="Margin" Value="31 26 31 0" />
+                </Style>
+              </ContentControl.Styles>
+            </ContentControl>
           </DockPanel>
-          <Border CornerRadius="10 0 0 0" BoxShadow="inset 0 0 5 0 #000000" ClipToBounds="True"
-                  IsHitTestVisible="False" Margin="0 0 -5 -5" />
+
+          <!-- Status Icon -->
           <statusIcon:StatusIcon Margin="10" Foreground="{DynamicResource AcrylicTrimForeground}" DataContext="{Binding StatusIcon}" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
         </Panel>
       </Border>

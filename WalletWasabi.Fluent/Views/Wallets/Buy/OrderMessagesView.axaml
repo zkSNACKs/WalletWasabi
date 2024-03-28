@@ -50,7 +50,7 @@
                           IsVisible="{Binding !IsBusy}"
                           VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                      <PathIcon Data="{StaticResource checkmark_filled}" Height="11" IsVisible="{Binding IsPaid}" VerticalAlignment="Center" Foreground="{DynamicResource ActionForegroundColor}" />
+                      <PathIcon Data="{StaticResource checkmark_filled}" Height="11" IsVisible="{Binding IsPaid}" VerticalAlignment="Center" Foreground="{DynamicResource ActionButtonForegroundColor}" />
                       <TextBlock Text="{Binding PayButtonText}" VerticalAlignment="Center" />
                     </StackPanel>
                   </Button>

@@ -14,7 +14,6 @@
         <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/Dialog.axaml" />
         <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/DualCurrencyEntryBox.axaml" />
         <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/FadeOutTextControl.axaml" />
-        <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/HistoryPlaceholderPanel.axaml" />
         <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/InfoMessage.axaml" />
         <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/LabelsItemsPresenter.axaml" />
         <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/NavBarItem.axaml" />
@@ -33,9 +32,12 @@
         <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/TileButton.axaml" />
         <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/TreeDataGrid.axaml" />
         <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/AmountControl.axaml" />
+        <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/DummyRowsControl.axaml" />
+        <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/Sorting/SortControl.axaml" />
+        <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/ToggleRadioButton.axaml" />
+        <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/ScrollBar.axaml" />
         <MergeResourceInclude Source="avares://WalletWasabi.Fluent/Controls/ContentControl.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>
 </Styles>
-

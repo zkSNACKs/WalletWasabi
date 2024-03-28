@@ -4,11 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:core="clr-namespace:WalletWasabi.Fluent.ViewModels.CoinControl.Core"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:DataType="core:CoinControlItemViewModelBase"
+             x:DataType="core:CoinListItem"
              x:CompileBindings="True"
              x:Class="WalletWasabi.Fluent.Views.CoinControl.Core.Cells.IndicatorsCellView">
 
-  <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Spacing="3">
+  <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="3" Margin="0 0 20 0">
 
     <Panel>
       <!-- Confirmed -->
@@ -42,6 +42,7 @@
     </Panel>
 
     <Border BorderThickness="1"
+            VerticalAlignment="Center"
             IsVisible="{Binding ScriptType.ShortName, Converter={x:Static StringConverters.IsNotNullOrEmpty}, FallbackValue='False'}"
             BorderBrush="{DynamicResource TextControlForeground}" Opacity="0.6" CornerRadius="4" Padding="3">
       <TextBlock Classes="h10" Text="{Binding ScriptType.ShortName, FallbackValue=''}"

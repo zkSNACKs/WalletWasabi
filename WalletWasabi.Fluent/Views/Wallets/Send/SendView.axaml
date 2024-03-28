@@ -14,7 +14,7 @@
   <UserControl.DataTemplates>
 
     <DataTemplate DataType="models:Suggestion">
-      <Button Background="Transparent" HorizontalAlignment="Center" Padding="8" DockPanel.Dock="Right" Command="{Binding AcceptCommand}" Focusable="False" Cursor="Hand">
+      <Button Classes="invisible" HorizontalAlignment="Center" DockPanel.Dock="Right" Command="{Binding AcceptCommand}" Focusable="False" Cursor="Hand">
         <DockPanel HorizontalAlignment="Center">
           <PathIcon Data="{StaticResource paste_regular}" Width="20" DockPanel.Dock="Left" />
           <TextBlock Margin="4 0 0 0" Text="{Binding Text}" VerticalAlignment="Center" />
@@ -26,7 +26,7 @@
   <UserControl.Styles>
 
     <Style Selector="FlyoutPresenter">
-      <Setter Property="Padding" Value="0" />
+      <Setter Property="Padding" Value="4" />
       <Setter Property="MinWidth" Value="0" />
     </Style>
 

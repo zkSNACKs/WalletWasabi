@@ -8,7 +8,7 @@
     <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Background" Value="{DynamicResource OptimizePrivacyOptionSelectedColor}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource TileBorderColor}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
     <Setter Property="Cursor" Value="Hand" />
 
     <Setter Property="Template">

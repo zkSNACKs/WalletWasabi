@@ -16,9 +16,8 @@
         <DockPanel Background="Transparent">
           <PathIcon Width="{TemplateBinding IconSize}" Height="{TemplateBinding IconSize}"
                     Data="{TemplateBinding Icon}"
-                    Opacity="0.5"
                     Margin="0 0 20 0"
-                    Foreground="{DynamicResource SystemAccentColor}"
+                    Foreground="{DynamicResource SystemAccentCustomColorLight}"
                     DockPanel.Dock="Left" IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}" />
           <DockPanel>
             <TextBlock Name="PART_Text" Text="{TemplateBinding Label}" DockPanel.Dock="Top" Margin="0 0 0 5"
@@ -46,6 +45,7 @@
 
     <Style Selector="^/template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="TextElement.FontSize" Value="14" />
+      <Setter Property="TextElement.FontWeight" Value="Bold" />
     </Style>
 
     <Style Selector="^/template/ TextBlock#PART_Text">

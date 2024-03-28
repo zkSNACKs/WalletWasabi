@@ -9,16 +9,16 @@
              x:CompileBindings="True">
   <!-- NOTE: We use UseOpacity=true so we do not trigger layout update in the TreeDataGrid -->
   <PrivacyContentControl PrivacyReplacementMode="Text" FontSize="15"
-                           HorizontalAlignment="Left"
-                           VerticalAlignment="Stretch"
-                           HorizontalContentAlignment="Left"
-                           Classes="monoSpacedPrivacyReplacement"
-                           UseOpacity="True"
-                           MaxPrivacyChars="11"
-                           MinWidth="100"
-                           Margin="0 0 7 0">
+                         HorizontalAlignment="Left"
+                         VerticalAlignment="Stretch"
+                         HorizontalContentAlignment="Left"
+                         Classes="monoSpacedPrivacyReplacement"
+                         UseOpacity="True"
+                         MaxPrivacyChars="11"
+                         MinWidth="100"
+                         Margin="20 0 20 0">
     <LabelsItemsPresenter ItemsSource="{Binding Transaction.Labels}"
-                            InfiniteWidthMeasure="True"
-                            Margin="0 0 0 0" />
+                          InfiniteWidthMeasure="True"
+                          Margin="0 0 0 0" />
   </PrivacyContentControl>
 </UserControl>

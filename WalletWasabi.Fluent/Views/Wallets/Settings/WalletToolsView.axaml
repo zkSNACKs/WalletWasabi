@@ -12,7 +12,7 @@
     <TextBlock Classes="h6" Text="Have you checked your wallet backup?" />
     <InfoMessage>
       <DockPanel>
-        <Button Margin="50 0" Command="{Binding VerifyRecoveryWordsCommand}" Content="Verify Recovery Words" DockPanel.Dock="Right" />
+        <Button Margin="50 0" Theme="{StaticResource AccentButton}" Command="{Binding VerifyRecoveryWordsCommand}" Content="Verify Recovery Words" DockPanel.Dock="Right" />
         <TextBlock Text="It is recommended that you verify your wallet Recovery Words from time to time." />
       </DockPanel>
     </InfoMessage>

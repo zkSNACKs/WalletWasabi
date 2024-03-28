@@ -5,6 +5,7 @@
              xmlns:history="clr-namespace:WalletWasabi.Fluent.ViewModels.Wallets.Home.History"
              xmlns:historyItems="clr-namespace:WalletWasabi.Fluent.ViewModels.Wallets.Home.History.HistoryItems"
              xmlns:treeDataGrid="clr-namespace:WalletWasabi.Fluent.TreeDataGrid"
+             xmlns:sorting="clr-namespace:WalletWasabi.Fluent.Controls.Sorting"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="history:HistoryViewModel"
              x:CompileBindings="True"
@@ -30,16 +31,8 @@
       </MenuItem>
       <MenuItem Header="Copy Amount"
                 Command="{Binding  ClipboardCopyCommand}"
-                CommandParameter="{Binding Transaction.IncomingAmount, StringFormat={}{0}}"
-                IsVisible="{Binding Transaction.IncomingAmount, Converter={x:Static ObjectConverters.IsNotNull}}">
-        <MenuItem.Icon>
-          <PathIcon Data="{StaticResource btc_logo}" />
-        </MenuItem.Icon>
-      </MenuItem>
-      <MenuItem Header="Copy Amount"
-                Command="{Binding  ClipboardCopyCommand}"
-                CommandParameter="{Binding Transaction.OutgoingAmount, StringFormat={}{0}}"
-                IsVisible="{Binding Transaction.OutgoingAmount, Converter={x:Static ObjectConverters.IsNotNull}}">
+                CommandParameter="{Binding Transaction.DisplayAmount, StringFormat={}{0}}"
+                IsVisible="{Binding Transaction.DisplayAmount, Converter={x:Static ObjectConverters.IsNotNull}}">
         <MenuItem.Icon>
           <PathIcon Data="{StaticResource btc_logo}" />
         </MenuItem.Icon>
@@ -115,89 +108,105 @@
     </ContextMenu>
   </UserControl.Resources>
 
-  <Panel>
-    <TreeDataGrid Source="{Binding Source}"
-                  CanUserResizeColumns="False"
-                  Margin="0 0 0 0"
-                  IsHitTestVisible="{Binding !IsTransactionHistoryEmpty}">
-      <Interaction.Behaviors>
-        <ScrollToSelectedItemBehavior />
-        <HistoryItemTypeClassBehavior />
-      </Interaction.Behaviors>
-      <TreeDataGrid.ElementFactory>
-        <treeDataGrid:PrivacyElementFactory />
-      </TreeDataGrid.ElementFactory>
-      <TreeDataGrid.Styles>
-        <Style Selector="TreeDataGrid /template/ TreeDataGridRowsPresenter">
-          <Setter Property="(Interaction.Behaviors)">
-            <BehaviorCollectionTemplate>
-              <BehaviorCollection>
-                <PendingHistoryItemSeparatorBehavior />
-              </BehaviorCollection>
-            </BehaviorCollectionTemplate>
-          </Setter>
-        </Style>
-        <Style Selector="treeDataGrid|TreeDataGridPrivacyTextCell">
-          <Setter Property="FontFamily" Value="{StaticResource MonospacedFont}" />
-          <Setter Property="FontSize" Value="15" />
-          <Setter Property="Margin" Value="10 0" />
-          <Setter Property="Background" Value="Transparent" />
-          <Setter Property="Foreground" Value="{DynamicResource TextForegroundColor}" />
-        </Style>
-        <Style Selector="TreeDataGridRow /template/ Rectangle#PART_Separator">
-          <Setter Property="Fill" Value="Transparent" />
-        </Style>
-        <Style Selector="TreeDataGridRow.separator /template/ Rectangle#PART_Separator">
-          <Setter Property="Fill" Value="{DynamicResource TreeDataGridGridLinesBrush}" />
-        </Style>
-        <Style Selector="PathIcon">
-          <Setter Property="Height" Value="13" />
-          <Setter Property="VerticalAlignment" Value="Center" />
-          <Setter Property="HorizontalAlignment" Value="Center" />
-        </Style>
-        <Style Selector="TextBlock, PrivacyContentControl">
-          <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-        <Style Selector="TreeDataGridRow Button.historyDetails">
-          <Setter Property="Opacity" Value="0" />
-        </Style>
-        <Style Selector="TreeDataGridRow:pointerover Button.historyDetails">
-          <Setter Property="Opacity" Value="1" />
-        </Style>
+  <DockPanel>
+    <StackPanel Margin="0 20 0 20" HorizontalAlignment="Left" DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+      <TextBlock VerticalAlignment="Center" Text="Transactions" FontSize="{StaticResource FontSizeH5}" />
+      <Button IsVisible="{Binding !IsTransactionHistoryEmpty}" Theme="{StaticResource HistorySortButton}" ToolTip.Tip="Sorting">
+        <Button.Flyout>
+          <Flyout Placement="BottomEdgeAlignedLeft">
+            <sorting:SortControl Sortables="{Binding Sortables}" />
+          </Flyout>
+        </Button.Flyout>
+      </Button>
+    </StackPanel>
+    <Panel>
+      <TreeDataGrid Source="{Binding Source}"
+                    CanUserResizeColumns="False"
+                    ShowColumnHeaders="False"
+                    Margin="0 0 0 0"
+                    IsHitTestVisible="{Binding !IsTransactionHistoryEmpty}">
+        <Interaction.Behaviors>
+          <ScrollToSelectedItemBehavior />
+          <HistoryItemTypeClassBehavior />
+          <SetLastChildBehavior />
+        </Interaction.Behaviors>
+        <TreeDataGrid.ElementFactory>
+          <treeDataGrid:PrivacyElementFactory />
+        </TreeDataGrid.ElementFactory>
+        <TreeDataGrid.Styles>
+          <Style Selector="treeDataGrid|TreeDataGridAmountPrivacyTextCell">
+            <Setter Property="FontFamily" Value="{StaticResource MonospacedFont}" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Margin" Value="20 0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextForegroundColor}" />
+          </Style>
+          <Style Selector="TreeDataGridRow.PositiveAmount treeDataGrid|TreeDataGridAmountPrivacyTextCell">
+            <Setter Property="Foreground" Value="{DynamicResource PositiveAmountColor}" />
+          </Style>
+          <Style Selector="treeDataGrid|TreeDataGridDatePrivacyTextCell" x:DataType="historyItems:HistoryItemViewModelBase">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Margin" Value="20 0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextForegroundColor}" />
+            <Setter Property="ToolTip.Tip" Value="{Binding Transaction.DateToolTipString}" />
+          </Style>
+          <Style Selector="PathIcon">
+            <Setter Property="Height" Value="13" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+          </Style>
+          <Style Selector="TextBlock, PrivacyContentControl">
+            <Setter Property="VerticalAlignment" Value="Center" />
+          </Style>
+          <Style Selector="TreeDataGridRow Button.historyDetails">
+            <Setter Property="Opacity" Value="0" />
+          </Style>
+          <Style Selector="TreeDataGridRow:pointerover Button.historyDetails">
+            <Setter Property="Opacity" Value="1" />
+          </Style>
+          <Style Selector="TreeDataGridRow" x:DataType="historyItems:HistoryItemViewModelBase">
+            <Setter Property="Theme" Value="{StaticResource HistoryTableTreeDataGridRow}" />
+            <Setter Property="IsPointerOver" Value="{Binding IsPointerOverProxy, Mode=OneWayToSource}" />
+            <Setter Property="IsSelected" Value="{Binding IsSelectedProxy, Mode=OneWayToSource}" />
+          </Style>
 
-        <Style Selector="TreeDataGridRow">
-          <Setter Property="Theme" Value="{StaticResource HistoryTableTreeDataGridRow}" />
-        </Style>
-
-        <Style Selector="TreeDataGridRow.Transaction">
-          <Setter Property="ContextMenu" Value="{StaticResource TransactionContextMenu}" />
-        </Style>
-        <Style Selector="TreeDataGridRow.CoinJoin">
-          <Setter Property="ContextMenu" Value="{StaticResource CoinJoinContextMenu}" />
-        </Style>
-        <Style Selector="TreeDataGridRow.CoinJoins">
-          <Setter Property="ContextMenu" Value="{StaticResource CoinJoinsTransactionContextMenu}" />
-        </Style>
-        <Style Selector="TreeDataGridRow.SpeedUp">
-          <Setter Property="ContextMenu" Value="{StaticResource SpeedUpContextMenu}" />
-        </Style>
-        <Style Selector="TextBlock.hidden">
-          <Setter Property="IsVisible" Value="False" />
-        </Style>
-        <Style Selector="TextBlock.visible">
-          <Setter Property="IsVisible" Value="True" />
-        </Style>
-        <Style Selector="PathIcon.hidden">
-          <Setter Property="IsVisible" Value="False" />
-        </Style>
-        <Style Selector="TreeDataGridExpanderCell">
-          <Setter Property="Theme" Value="{StaticResource HistoryTableTreeDataGridExpanderCell}" />
-        </Style>
-      </TreeDataGrid.Styles>
-    </TreeDataGrid>
-    <HistoryPlaceholderPanel Margin="{StaticResource HistoryTablePlaceholderPanelMargin}"
-                               RowHeight="{StaticResource HistoryTableRowHeight}"
-                               IsVisible="{Binding IsTransactionHistoryEmpty}"
-                               Opacity="0.1" />
-  </Panel>
+          <Style Selector="TreeDataGridRow.Transaction">
+            <Setter Property="ContextMenu" Value="{StaticResource TransactionContextMenu}" />
+          </Style>
+          <Style Selector="TreeDataGridRow.CoinJoin">
+            <Setter Property="ContextMenu" Value="{StaticResource CoinJoinContextMenu}" />
+          </Style>
+          <Style Selector="TreeDataGridRow.CoinJoins">
+            <Setter Property="ContextMenu" Value="{StaticResource CoinJoinsTransactionContextMenu}" />
+          </Style>
+          <Style Selector="TreeDataGridRow.SpeedUp">
+            <Setter Property="ContextMenu" Value="{StaticResource SpeedUpContextMenu}" />
+          </Style>
+          <Style Selector="TextBlock.hidden">
+            <Setter Property="IsVisible" Value="False" />
+          </Style>
+          <Style Selector="TextBlock.visible">
+            <Setter Property="IsVisible" Value="True" />
+          </Style>
+          <Style Selector="PathIcon.hidden">
+            <Setter Property="IsVisible" Value="False" />
+          </Style>
+          <Style Selector="TreeDataGridExpanderCell">
+            <Setter Property="Theme" Value="{StaticResource HistoryTableTreeDataGridExpanderCell}" />
+          </Style>
+        </TreeDataGrid.Styles>
+      </TreeDataGrid>
+      <DummyRowsControl Margin="{StaticResource HistoryTablePlaceholderPanelMargin}"
+                        RowHeight="{StaticResource TreeDataGridRowHeight}"
+                        IsVisible="{Binding IsTransactionHistoryEmpty}">
+        <DummyRowsControl.RowTemplate>
+          <ControlTemplate>
+            <Border CornerRadius="15" Background="{DynamicResource Layer1BackgroundBrush}" Margin="2" />
+          </ControlTemplate>
+        </DummyRowsControl.RowTemplate>
+      </DummyRowsControl>
+    </Panel>
+  </DockPanel>
 </UserControl>

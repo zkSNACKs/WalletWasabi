@@ -1,6 +1,9 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=System.Runtime">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceInclude Source="avares://WalletWasabi.Fluent/Styles/Themes/Base.axaml" />
+  </ResourceDictionary.MergedDictionaries>
 
   <Color x:Key="SystemAccentColor">#FF3870C7</Color>
   <Color x:Key="SystemAltHighColor">#FFFFFFFF</Color>
@@ -32,22 +35,37 @@
   <Color x:Key="SystemChromeAltHighColor">#FFEBEFF2</Color>
   <Color x:Key="SystemRevealListLowColor">#FFEEF8FC</Color>
   <Color x:Key="SystemRevealListMediumColor">#FFEBEFF2</Color>
-  <Color x:Key="SystemAccentColorLight1">#FF4F82D0</Color>
-  <Color x:Key="SystemAccentColorLight2">#FF6794DA</Color>
-  <Color x:Key="SystemAccentColorLight3">#FF7EA7E3</Color>
   <Color x:Key="SystemAccentColorDark1">#FF2D61B7</Color>
   <Color x:Key="SystemAccentColorDark2">#FF2252A7</Color>
   <Color x:Key="SystemAccentColorDark3">#FF164297</Color>
-  <Color x:Key="RegionColor">#FFF8F9FB</Color>
+  <Color x:Key="SystemAccentColorLight1">#FF4F82D0</Color>
+  <Color x:Key="SystemAccentColorLight2">#FF6794DA</Color>
+  <Color x:Key="SystemAccentColorLight3">#FF7EA7E3</Color>
+  <Color x:Key="SystemAccentCustomColorLight">#FF889E66</Color>
+  <Color x:Key="SystemAccentCustomColorDark">#FF556440</Color>
 
   <Color x:Key="ActionForegroundColor">White</Color>
-  <Color x:Key="ActionColor">#FF1CAF68</Color>
-  <Color x:Key="ActionColorDark1">#FF169C56</Color>
-  <Color x:Key="ActionColorDark2">#FF118945</Color>
-  <Color x:Key="ActionColorDark3">#FF0B7533</Color>
-  <Color x:Key="ActionColorLight1">#FF36BA7A</Color>
-  <Color x:Key="ActionColorLight2">#FF50C48C</Color>
-  <Color x:Key="ActionColorLight3">#FF6ACF9F</Color>
+
+  <Color x:Key="RegionColor">#FFF8F9FB</Color>
+
+  <Color x:Key="Layer1BackgroundBrush">#262626</Color>
+  <Color x:Key="Layer1BackgroundBrushLight1">#FF414141</Color>
+  <Color x:Key="Layer1BackgroundBrushLight2">#FF5D5D5D</Color>
+  <Color x:Key="Layer1BackgroundBrushLight3">#FF787878</Color>
+  <Color x:Key="Layer1BackgroundBrushDark1">#FF202020</Color>
+  <Color x:Key="Layer1BackgroundBrushDark2">#FF1B1B1B</Color>
+  <Color x:Key="Layer1BackgroundBrushDark3">#FF151515</Color>
+
+  <Color x:Key="Layer2BackgroundBrush">#333333</Color>
+  <Color x:Key="Layer2BackgroundBrushLight1">#FF4D4D4D</Color>
+  <Color x:Key="Layer2BackgroundBrushLight2">#FF676767</Color>
+  <Color x:Key="Layer2BackgroundBrushLight3">#FF808080</Color>
+  <Color x:Key="Layer2BackgroundBrushDark1">#FF2C2C2C</Color>
+  <Color x:Key="Layer2BackgroundBrushDark2">#FF242424</Color>
+  <Color x:Key="Layer2BackgroundBrushDark3">#FF1D1D1D</Color>
+
+  <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="{StaticResource BorderColor}" />
+  <SolidColorBrush x:Key="ToolTipBorderBrush" Color="{StaticResource BorderColor}" />
 
   <SolidColorBrush x:Key="TextControlBorderBrush" Color="{StaticResource  SystemBaseLowColor}" />
   <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="{StaticResource  SystemBaseMediumLowColor}" />
@@ -61,201 +79,19 @@
   <SolidColorBrush x:Key="ComboBoxItemBackgroundPressed" Color="{StaticResource SystemChromeHighColor}" />
   <SolidColorBrush x:Key="ComboBoxItemBackgroundPointerOver" Color="{StaticResource SystemChromeLowColor}" />
 
-  <SolidColorBrush x:Key="ComboBoxBackground" Color="{StaticResource SystemChromeMediumColor}" />
-  <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="{StaticResource SystemChromeHighColor}" />
-  <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="{StaticResource SystemChromeLowColor}" />
-
-  <Color x:Key="TileRegionColor">White</Color>
-  <Color x:Key="TileBorderColor">#14000000</Color>
+  <Color x:Key="TileRegionColor">#262626</Color>
+  <Color x:Key="BorderColor">#14000000</Color>
   <Color x:Key="AcrylicTrimForeground">#FCFCFC</Color>
   <Color x:Key="AcrylicTrimBackground">#90134074</Color>
 
-  <Color x:Key="WelcomeScreenButtonBackground">#DADFE7</Color>
-  <Color x:Key="WelcomeScreenButtonBackgroundPressed">#C1CBD7</Color>
-  <Color x:Key="WelcomeScreenButtonBackgroundPointerOver">#CDD5DF</Color>
-
   <SolidColorBrush x:Key="PrivacyControlWhiteListHeaderForeground" Color="#394A1B" />
-  <SolidColorBrush x:Key="PrivacyControlWhiteListBackground" Color="#F5F8EE" />
+  <SolidColorBrush x:Key="PrivacyControlWhiteListBackground" Color="#F5F8EE" Opacity="0.5" />
   <SolidColorBrush x:Key="PrivacyControlBlackListBackground" Color="Transparent" />
   <SolidColorBrush x:Key="PrivacyControlItemBackground" Color="#FFFFFF" />
-
-  <Color x:Key="LineChartAreaGradientStartStopColor">#FF5E96ED</Color>
-  <Color x:Key="LineChartAreaGradientEndStopColor">#005E96ED</Color>
-  <Color x:Key="LineChartAreaGradientCursorStrokeColor">#F05E96ED</Color>
-  <Color x:Key="LineChartLineColor">#5E96ED</Color>
-
-  <Color x:Key="BuyAnythingConversationsBackground">White</Color>
-  <SolidColorBrush x:Key="BuyAnythingChatBackground" Color="#F5F5F5" />
-  <SolidColorBrush x:Key="ChatInputBackground" Color="White" />
-  <SolidColorBrush x:Key="ConversationSelectedBackground" Color="#F5F5F5" />
-  <SolidColorBrush x:Key="ConversationPointerOverBackground" Color="#F5F5F5" Opacity="0.5" />
-  <SolidColorBrush x:Key="ConversationPressedBackground" Color="#F5F5F5" Opacity="0.8" />
-  <SolidColorBrush x:Key="AssistantMessageBackground" Color="#E0E0E0" />
-  <StaticResource x:Key="UserMessageBackground" ResourceKey="SystemAccentColor" />
-  <SolidColorBrush x:Key="ErrorMessageColor" Color="Red" />
-  <SolidColorBrush x:Key="UnreadBadgeColor" Color="#DCA63E" />
 
   <SolidColorBrush x:Key="OptimizePrivacyOptionSelectedColor">#FFFFFF</SolidColorBrush>
 
   <SolidColorBrush x:Key="DialogOverlayColor">#7F7A7A7A</SolidColorBrush>
 
-  <BoxShadows x:Key="DialogBoxShadow">4 11 30 1 #3F000000</BoxShadows>
-  <BoxShadows x:Key="DialogAlertStartBoxShadow">0 0 10 5 #FF3870C7</BoxShadows>
-  <BoxShadows x:Key="DialogAlertEndBoxShadow">0 0 10 1 #FF3870C7</BoxShadows>
-  <BoxShadows x:Key="InfoBoxShadow">0 1 1.5 #3F000000</BoxShadows>
-  <BoxShadows x:Key="BoxShadow">0 1 4 #D1D1D1</BoxShadows>
   <BoxShadows x:Key="OptionButtonShadow">0 2 2 #D1D1D1</BoxShadows>
-
-  <BoxShadows x:Key="OptimizePrivacyOptionBoxShadow1">0 6 16 0 #22000000</BoxShadows>
-  <BoxShadows x:Key="OptimizePrivacyOptionBoxShadow2">0 9 23 0 #4A000000</BoxShadows>
-
-  <!-- Base -->
-
-  <SolidColorBrush x:Key="RegionBrush" Color="{StaticResource RegionColor}" />
-  <SolidColorBrush x:Key="SystemControlTransientBackgroundBrush" Color="{StaticResource SystemChromeMediumLowColor}" />
-  <SolidColorBrush x:Key="SystemControlBackgroundChromeMediumLowBrush" Color="{StaticResource SystemBaseLowColor}" />
-
-  <Color x:Key="OrangeCoinColor">#F2994A</Color>
-  <Color x:Key="CoinjoinActiveColor">Orange</Color>
-  <SolidColorBrush x:Key="DismissColor" Color="#DD4343" />
-
-  <SolidColorBrush x:Key="InvisibleButtonBackgroundColor" Opacity="0" Color="{StaticResource SystemBaseHighColor}" />
-  <SolidColorBrush x:Key="InvisibleButtonPointerOverBackgroundColor" Opacity="0.15"
-                   Color="{StaticResource SystemBaseHighColor}" />
-  <SolidColorBrush x:Key="InvisibleButtonPressedBackgroundColor" Opacity="0.25"
-                   Color="{StaticResource SystemBaseHighColor}" />
-
-  <Color x:Key="StatusForegroundColor">White</Color>
-
-  <SolidColorBrush x:Key="PopupBackground" Color="{StaticResource SystemBaseLowColor}" />
-  <SolidColorBrush x:Key="OptionButtonBackground" Color="{StaticResource TileRegionColor}" />
-  <SolidColorBrush x:Key="OptionButtonBorderBrush" Opacity="0.5" Color="{StaticResource SystemBaseHighColor}" />
-  <SolidColorBrush x:Key="SeparatorBackgroundBrush" Opacity="0.5" Color="{StaticResource SystemBaseHighColor}" />
-  <SolidColorBrush x:Key="TagsBoxBorderBrush" Opacity="0.5" Color="{StaticResource SystemBaseHighColor}" />
-  <SolidColorBrush x:Key="HeaderRegionColor" Color="{StaticResource RegionColor}" />
-  <SolidColorBrush x:Key="DataGridRowSelectedBackgroundBrush"
-                   Opacity="0.25"
-                   Color="{DynamicResource SystemAccentColor}" />
-
-  <SolidColorBrush x:Key="ActionButtonForegroundColor" Color="{StaticResource ActionForegroundColor}" />
-  <SolidColorBrush x:Key="ActionButtonBackgroundColor" Color="{StaticResource ActionColor}" />
-  <SolidColorBrush x:Key="ActionButtonPressedBackgroundColor" Color="{StaticResource ActionColorDark1}" />
-  <SolidColorBrush x:Key="ActionButtonPointerOverBackgroundColor" Color="{StaticResource ActionColorLight1}" />
-  <SolidColorBrush x:Key="ActionButtonDisabledBackgroundColor" Color="{StaticResource SystemChromeDisabledLowColor}" />
-
-  <SolidColorBrush x:Key="NavBarAccentColor" Color="{StaticResource SystemAccentColor}" />
-  <SolidColorBrush x:Key="NavBarAccentColorPressed" Opacity="0.5" Color="{StaticResource SystemAccentColor}" />
-  <SolidColorBrush x:Key="NavBarItemPressedAccentColor">#719B2A</SolidColorBrush>
-  <SolidColorBrush x:Key="NavBarItemDisabledBrush">#66FFFFFF</SolidColorBrush>
-  <SolidColorBrush x:Key="NavBarItemPointerOverBrush">#FFFFFFFF</SolidColorBrush>
-  <SolidColorBrush x:Key="NavBarItemPointerOverBackgroundBrush">#19FFFFFF</SolidColorBrush>
-  <SolidColorBrush x:Key="NavBarItemPressedBrush">#FFFFFFFF</SolidColorBrush>
-  <SolidColorBrush x:Key="NavBarItemSelectedBrush">#FFFFFFFF</SolidColorBrush>
-  <SolidColorBrush x:Key="NavBarItemSelectedUnfocusedBrush">#FFFFFFFF</SolidColorBrush>
-  <SolidColorBrush x:Key="NavBarItemSelectedPointerOverBrush">#FFFFFFFF</SolidColorBrush>
-  <SolidColorBrush x:Key="NavBarItemSelectedPressedBrush">#FFFFFFFF</SolidColorBrush>
-  <SolidColorBrush x:Key="NavBarItemForegroundBrush">#FFFFFFFF</SolidColorBrush>
-  <SolidColorBrush x:Key="NavBarSeparatorBrush">#FFFFFFFF</SolidColorBrush>
-  <SolidColorBrush x:Key="PrivacyIndicatorWalletNotchBrush">#FF99A3B5</SolidColorBrush>
-
-  <Color x:Key="LogoFixedAccentColor">#97D234</Color>
-  <Color x:Key="LogoFixedForegroundColor">#D8DED7</Color>
-
-  <SolidColorBrush x:Key="PrivacyLevelMediumBrush" Color="#A9C35E" />
-  <SolidColorBrush x:Key="PrivacyLevelStrongBrush" Color="#3E992F" />
-  <SolidColorBrush x:Key="PrivacyLevelNoneBrush" Color="#B8B8B8" />
-
-  <SolidColorBrush x:Key="PositiveBrush" Color="#5BB626" />
-  <SolidColorBrush x:Key="UncertainBrush" Color="#C3983B" />
-
-  <SolidColorBrush x:Key="PrivacyControlItemBlackListHighlight" Color="#72BD81" />
-  <SolidColorBrush x:Key="PrivacyControlItemWhiteListHighlight" Color="#72BD81" />
-
-  <SolidColorBrush x:Key="WarningMessageForeground">#DDA73E</SolidColorBrush>
-  <SolidColorBrush x:Key="SystemControlErrorTextForegroundBrush" Color="{StaticResource SystemErrorTextColor}" />
-  <SolidColorBrush x:Key="HyperLinkForeground">#00A2E8</SolidColorBrush>
-
-  <SolidColorBrush x:Key="DataGridRowIndicatorBrush" Color="{StaticResource SystemAccentColor}" />
-  <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundBrush" Color="Transparent" />
-  <SolidColorBrush x:Key="DataGridCellFocusVisualPrimaryBrush" Color="Transparent" />
-  <SolidColorBrush x:Key="DataGridCellFocusVisualSecondaryBrush" Color="Transparent" />
-  <SolidColorBrush x:Key="DataGridRowSelectedHoveredBackgroundBrush" Color="Transparent" />
-  <SolidColorBrush x:Key="DataGridRowSelectedHoveredUnfocusedBackgroundColor" Color="Transparent" />
-
-  <SolidColorBrush x:Key="GlassEdgeColor"
-                   Color="{StaticResource SystemBaseHighColor}"
-                   Opacity="0.12" />
-
-  <x:Double x:Key="DataGridRowSelectedBackgroundOpacity">1.0</x:Double>
-  <x:Double x:Key="DataGridRowSelectedUnfocusedBackgroundOpacity">1.0</x:Double>
-
-  <x:String x:Key="LabelsWatermarkText">Person or Company i.e. Alice, Bob, Pizza Inc</x:String>
-
-  <SolidColorBrush x:Key="NotificationCardInformationBackgroundBrush" Color="{StaticResource SystemAccentColor}" />
-  <SolidColorBrush x:Key="TextControlForeground" Color="{StaticResource SystemBaseHighColor}" />
-  <SolidColorBrush x:Key="TextForegroundColor" Color="{StaticResource SystemBaseHighColor}" />
-  <!-- TODO: Fix DataGridRowSelectedUnfocusedBackgroundColor as StaticResource will not work -->
-  <SolidColorBrush x:Key="DataGridRowSelectedUnfocusedBackgroundBrush"
-                   Opacity="0.25"
-                   Color="{DynamicResource SystemAccentColor}" />
-  <SolidColorBrush x:Key="NotificationCardBackgroundBrush" Color="{StaticResource TileRegionColor}" />
-
-  <!-- TODO: TileRegionColor is in ThemeVariants file, we can remove it from here -->
-  <!-- <StaticResource x:Key="TileRegionColor" ResourceKey="SystemBaseLowColor" /> -->
-  <!-- TODO: Investigate why below line causes stack overflow exception (after lazy resource loading was added) ? -->
-  <!--<StaticResource x:Key="SystemAccentColor" ResourceKey="SystemAccentColor" />-->
-
-  <!-- TODO: Remove already included in ThemeVariants file -->
-  <!--
-  <SolidColorBrush x:Key="TextControlBorderBrush" Color="{StaticResource SystemBaseLowColor}" />
-  <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="{StaticResource SystemBaseMediumLowColor}" />
-  <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="{StaticResource SystemBaseMediumHighColor}" />
-  -->
-
-  <BoxShadows x:Key="EmptyBoxShadow">0 0 0 0 #000000</BoxShadows>
-
-  <LinearGradientBrush x:Key="LogoBaseColor" StartPoint="616.03,205.77002" EndPoint="371.41003,625.12">
-    <LinearGradientBrush.GradientStops>
-      <GradientStop Offset="0" Color="#FFFFFFFF" />
-      <GradientStop Offset="0.25" Color="#FFE1E1E1" />
-      <GradientStop Offset="0.54" Color="#FFC6C6C6" />
-      <GradientStop Offset="0.79999995" Color="#FFB5B5B5" />
-      <GradientStop Offset="0.99" Color="#FFAFAFAF" />
-    </LinearGradientBrush.GradientStops>
-  </LinearGradientBrush>
-
-  <SolidColorBrush x:Key="LogoAccentColor" Color="#FF77C600" />
-
-  <LinearGradientBrush x:Key="LogoGradientFixed" StartPoint="62%,31%" EndPoint="24%,81%">
-    <LinearGradientBrush.GradientStops>
-      <GradientStop Color="#FFFFFF" Offset="0" />
-      <GradientStop Color="#EFEFEF" Offset="0.1591" />
-      <GradientStop Color="#D4D4D4" Offset="0.4862" />
-      <GradientStop Color="#C3C3C3" Offset="0.775" />
-      <GradientStop Color="#BDBDBD" Offset="0.993" />
-    </LinearGradientBrush.GradientStops>
-  </LinearGradientBrush>
-
-  <system:Double x:Key="HistoryTableRowHeight">36.5</system:Double>
-  <system:Double x:Key="HistoryTablePlaceholderTextOpacity">0.5</system:Double>
-  <Thickness x:Key="HistoryTablePlaceholderPanelMargin">0 42 0 0</Thickness>
-
-  <!-- TreeDataGrid -->
-  <SolidColorBrush x:Key="TreeDataGridGridLinesBrush"
-                   Color="{StaticResource SystemBaseMediumLowColor}"
-                   Opacity="0.4" />
-
-  <!-- ScrollBar -->
-  <SolidColorBrush x:Key="ScrollBarThumbFillPointerOver" Color="#66000000" />
-  <SolidColorBrush x:Key="ScrollBarPanningThumbBackground" Color="#ff8ca6b7" />
-  <SolidColorBrush x:Key="ScrollBarThumbFillPressed" Color="#99000000" />
-  <SolidColorBrush x:Key="ScrollBarThumbFillDisabled" Color="Transparent" />
-
-  <!--COMMON FOR LIGHT AND DARK THEMES. -->
-  <!--TODO: MOVE TO COMMON FILE-->
-  <SolidColorBrush x:Key="LowOpacityAccentBrush" Opacity="0.8" Color="{DynamicResource SystemAccentColor}" />
-  <SolidColorBrush x:Key="HighOpacityAccentBrush" Opacity="0.9" Color="{DynamicResource SystemAccentColor}" />
-  <system:Int32 x:Key="WalletNameMaxLength">50</system:Int32>
-
 </ResourceDictionary>
-

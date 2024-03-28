@@ -15,16 +15,16 @@
       <ContentControl Content="{Binding .}">
         <ContentControl.DataTemplates>
           <DataTemplate DataType="vm:EconomicCoinJoinProfileViewModel">
-            <PathIcon Data="{StaticResource coinjoin_cost}" Foreground="{DynamicResource SystemAccentColor}" />
+            <PathIcon Data="{StaticResource coinjoin_cost}" Foreground="{DynamicResource SystemAccentCustomColorLight}" />
           </DataTemplate>
           <DataTemplate DataType="vm:SpeedyCoinJoinProfileViewModel">
-            <PathIcon Data="{StaticResource coinjoin_speed}" Foreground="{DynamicResource SystemAccentColor}" />
+            <PathIcon Data="{StaticResource coinjoin_speed}" Foreground="{DynamicResource SystemAccentCustomColorLight}" />
           </DataTemplate>
           <DataTemplate DataType="vm:PrivateCoinJoinProfileViewModel">
-            <PathIcon Data="{StaticResource coinjoin_privacy}" Foreground="{DynamicResource SystemAccentColor}" />
+            <PathIcon Data="{StaticResource coinjoin_privacy}" Foreground="{DynamicResource SystemAccentCustomColorLight}" />
           </DataTemplate>
           <DataTemplate DataType="vm:ManualCoinJoinProfileViewModel">
-            <PathIcon Data="{StaticResource coinjoin_cost}" Foreground="{DynamicResource SystemAccentColor}" />
+            <PathIcon Data="{StaticResource coinjoin_cost}" Foreground="{DynamicResource SystemAccentCustomColorLight}" />
           </DataTemplate>
         </ContentControl.DataTemplates>
       </ContentControl>

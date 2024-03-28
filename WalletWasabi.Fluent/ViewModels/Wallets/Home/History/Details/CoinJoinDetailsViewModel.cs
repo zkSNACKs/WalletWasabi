@@ -50,8 +50,8 @@ public partial class CoinJoinDetailsViewModel : RoutableViewModel
 	{
 		if (_wallet.Transactions.TryGetById(_transaction.Id, _transaction.IsChild, out var transaction))
 		{
-			Date = transaction.DateString;
-			CoinJoinFeeAmount = _wallet.AmountProvider.Create(transaction.OutgoingAmount);
+			Date = transaction.DateToolTipString;
+			CoinJoinFeeAmount = _wallet.AmountProvider.Create(transaction.DisplayAmount);
 			Confirmations = transaction.Confirmations;
 			IsConfirmed = Confirmations > 0;
 			TransactionId = transaction.Id;

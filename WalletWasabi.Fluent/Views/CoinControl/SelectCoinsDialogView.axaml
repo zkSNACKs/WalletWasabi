@@ -2,85 +2,29 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:converters="clr-namespace:WalletWasabi.Fluent.Converters"
-             xmlns:generic="clr-namespace:System.Collections.Generic;assembly=System.Collections"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="650"
              xmlns:coinControl="clr-namespace:WalletWasabi.Fluent.ViewModels.CoinControl"
-             xmlns:treeDataGrid="clr-namespace:WalletWasabi.Fluent.TreeDataGrid"
+             xmlns:coins="clr-namespace:WalletWasabi.Fluent.Views.Wallets.Coins"
+             xmlns:sorting="clr-namespace:WalletWasabi.Fluent.Controls.Sorting"
              x:DataType="coinControl:SelectCoinsDialogViewModel"
              x:Class="WalletWasabi.Fluent.Views.CoinControl.SelectCoinsDialogView"
              x:CompileBindings="True">
-
-  <ContentArea
-    Title="{Binding Title}"
-    EnableBack="{Binding EnableBack}"
-    EnableNext="True"
-    NextContent="Continue"
-    EnableCancel="{Binding EnableCancel}"
-    IsBusy="{Binding IsBusy}"
-    ScrollViewer.VerticalScrollBarVisibility="Disabled">
-
-    <ContentArea.Styles>
-
-      <Style Selector="TreeDataGridRow">
-        <Setter Property="Focusable" Value="False" />
-        <Setter Property="Height" Value="37.5" />
-        <Setter Property="Theme" Value="{StaticResource GenericTreeDataGridRow}" />
-      </Style>
-
-      <Style Selector="TreeDataGridRow /template/ Rectangle">
-        <Style.Resources>
-          <converters:IndentToBrushConverter x:Key="IndentToBrushConverter">
-            <converters:IndentToBrushConverter.Brushes>
-              <generic:List x:TypeArguments="IBrush">
-                <SolidColorBrush>Transparent</SolidColorBrush>
-                <SolidColorBrush Color="{DynamicResource SystemListLowColor}" />
-              </generic:List>
-            </converters:IndentToBrushConverter.Brushes>
-          </converters:IndentToBrushConverter>
-        </Style.Resources>
-        <Setter Property="Fill">
-          <Setter.Value>
-            <MultiBinding Converter="{StaticResource IndentToBrushConverter}">
-              <Binding Path="." />
-              <Binding Path="$parent[TreeDataGridRow].Rows" />
-            </MultiBinding>
-          </Setter.Value>
-        </Setter>
-      </Style>
-
-      <Style Selector="TreeDataGridRow ContentPresenter">
-        <Setter Property="VerticalAlignment" Value="Center" />
-      </Style>
-
-      <Style Selector="TreeDataGridTemplateCell > ContentPresenter">
-        <Setter Property="Margin" Value="5 0 10 0" />
-      </Style>
-
-      <Style Selector="TreeDataGridTextCell TextBlock">
-        <Setter Property="TextAlignment" Value="Center" />
-      </Style>
-
-      <Style Selector="treeDataGrid|TreeDataGridPlainTextCell">
-        <Setter Property="FontFamily" Value="{StaticResource MonospacedFont}" />
-        <Setter Property="FontSize" Value="15" />
-        <Setter Property="Margin" Value="10 0" />
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{DynamicResource TextForegroundColor}" />
-        <Setter Property="HorizontalAlignment" Value="Center" />
-      </Style>
-
-      <Style Selector="TreeDataGridExpanderCell">
-        <Setter Property="Theme" Value="{StaticResource SelectCoinsDialogViewTreeDataGridExpanderCell}" />
-      </Style>
-
-    </ContentArea.Styles>
-
-      <TreeDataGrid Source="{Binding CoinSelector.TreeDataGridSource}" CanUserSortColumns="True" CanUserResizeColumns="False">
-        <TreeDataGrid.ElementFactory>
-          <treeDataGrid:PlainTextElementFactory />
-        </TreeDataGrid.ElementFactory>
-      </TreeDataGrid>
-
+  <ContentArea Title="{Binding Title}"
+               EnableBack="{Binding EnableBack}"
+               EnableNext="True"
+               NextContent="Continue"
+               EnableCancel="{Binding EnableCancel}"
+               IsBusy="{Binding IsBusy}"
+               ScrollViewer.VerticalScrollBarVisibility="Disabled">
+    <ContentArea.TopContent>
+      <Button DockPanel.Dock="Right" Theme="{StaticResource DialogSortButton}" ToolTip.Tip="Sorting">
+        <Button.Flyout>
+          <Flyout Placement="BottomEdgeAlignedRight">
+            <sorting:SortControl Sortables="{Binding CoinList.Sortables}" />
+          </Flyout>
+        </Button.Flyout>
+      </Button>
+    </ContentArea.TopContent>
+    <coins:CoinListView DataContext="{Binding CoinList}" />
   </ContentArea>
 </UserControl>

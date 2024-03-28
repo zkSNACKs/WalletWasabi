@@ -1,13 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-  <Styles.Resources>
-    <!-- Original color -->
-    <!--<StaticResource x:Key="ScrollBarThumbBackgroundColor" ResourceKey="SystemBaseLowColor" />-->
-    <!-- Use color from ScrollBarPanningThumbBackgroundColor -->
-    <StaticResource x:Key="ScrollBarThumbBackgroundColor" ResourceKey="SystemChromeDisabledLowColor" />
-  </Styles.Resources>
-
   <Design.PreviewWith>
     <Grid ColumnDefinitions="*,20,*"
           Height="200"
@@ -41,7 +34,7 @@
 
   <Style Selector="ScrollViewer ScrollBar">
     <Setter Property="ShowDelay" Value="0:0:0.1" />
-    <Setter Property="HideDelay" Value="0:0:2.0" />
+    <Setter Property="HideDelay" Value="0:0:1" />
   </Style>
 
 </Styles>

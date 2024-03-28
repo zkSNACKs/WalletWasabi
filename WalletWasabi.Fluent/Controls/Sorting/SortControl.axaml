@@ -1,0 +1,103 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:behaviors="clr-namespace:WalletWasabi.Fluent.Behaviors"
+        xmlns:generic="clr-namespace:System.Collections.Generic;assembly=System.Collections"
+        xmlns:sorting="clr-namespace:WalletWasabi.Fluent.Controls.Sorting">
+  <Design.PreviewWith>
+    <sorting:SortControl Width="110">
+      <sorting:SortControl.Sortables>
+        <generic:List x:TypeArguments="sorting:ISortableItem">
+          <sorting:SortableItemDesign Name="Status" />
+          <sorting:SortableItemDesign Name="Date" />
+          <sorting:SortableItemDesign Name="Amount" />
+          <sorting:SortableItemDesign Name="Label" />
+        </generic:List>
+      </sorting:SortControl.Sortables>
+    </sorting:SortControl>
+  </Design.PreviewWith>
+
+  <ControlTheme x:Key="{x:Type sorting:SortControl}" TargetType="sorting:SortControl">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <StackPanel>
+
+            <StackPanel.Styles>
+              <Style Selector="HeaderedContentControl">
+                <Setter Property="Template">
+                  <Setter.Value>
+                    <ControlTemplate>
+                      <DockPanel>
+                        <ContentPresenter VerticalContentAlignment="Center" Content="{TemplateBinding Header}" />
+                        <ContentPresenter Margin="20 0 0 0" Content="{TemplateBinding Content}" />
+                      </DockPanel>
+                    </ControlTemplate>
+                  </Setter.Value>
+                </Setter>
+              </Style>
+
+              <Style Selector="HeaderedContentControl StackPanel">
+                <Setter Property="Orientation" Value="Horizontal" />
+                <Setter Property="HorizontalAlignment" Value="Right" />
+                <Setter Property="Spacing" Value="2" />
+              </Style>
+
+              <Style Selector="HeaderedContentControl PathIcon">
+                <Setter Property="Width" Value="8" />
+                <Setter Property="Foreground">
+                  <Setter.Value>
+                    <SolidColorBrush Color="{DynamicResource AcrylicTrimForeground}" Opacity="0.6" />
+                  </Setter.Value>
+                </Setter>
+              </Style>
+
+              <Style Selector="HeaderedContentControl RadioButton">
+                <Setter Property="Padding" Value="4" />
+                <Setter Property="CornerRadius" Value="6" />
+                <Setter Property="Height" Value="20" />
+                <Setter Property="Width" Value="19" />
+                <Setter Property="Theme" Value="{StaticResource ToggleRadioButton}" />
+                <Setter Property="Interaction.Behaviors">
+                  <BehaviorCollectionTemplate>
+                    <BehaviorCollection>
+                      <behaviors:HideFlyoutOnClickBehavior />
+                    </BehaviorCollection>
+                  </BehaviorCollectionTemplate>
+                </Setter>
+              </Style>
+
+            </StackPanel.Styles>
+
+            <ItemsControl ItemsSource="{TemplateBinding Sortables}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="sorting:ISortableItem">
+                  <HeaderedContentControl Header="{Binding Name}">
+                    <StackPanel>
+                      <RadioButton IsChecked="{Binding IsDescendingActive}"
+                                   GroupName="Sorting"
+                                   Command="{Binding SortByDescendingCommand}">
+                        <PathIcon Data="{StaticResource down_arrow}" />
+                      </RadioButton>
+                      <RadioButton IsChecked="{Binding IsAscendingActive}"
+                                   GroupName="Sorting"
+                                   Command="{Binding SortByAscendingCommand}">
+                        <PathIcon Data="{StaticResource up_arrow}" />
+                      </RadioButton>
+                    </StackPanel>
+                  </HeaderedContentControl>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Spacing="8" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+            </ItemsControl>
+
+          </StackPanel>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+
+  </ControlTheme>
+</ResourceDictionary>

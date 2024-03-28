@@ -179,6 +179,10 @@
       <Setter Property="HorizontalAlignment" Value="Right" />
     </Style>
 
+    <Style Selector="^ /template/ Border#PART_BorderElement">
+      <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+    </Style>
+
     <!-- Disabled State -->
     <Style Selector="^:disabled">
       <Setter Property="Foreground" Value="{DynamicResource TextControlForegroundDisabled}" />

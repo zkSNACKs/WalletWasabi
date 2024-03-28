@@ -5,7 +5,25 @@
              xmlns:core="clr-namespace:WalletWasabi.Fluent.ViewModels.CoinControl.Core"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WalletWasabi.Fluent.Views.CoinControl.Core.Cells.SelectionCellView"
-             x:DataType="core:CoinControlItemViewModelBase"
+             x:DataType="core:CoinListItem"
              x:CompileBindings="True">
-  <CheckBox IsChecked="{Binding IsSelected}" IsVisible="{Binding CanBeSelected}" />
+  <UserControl.Styles>
+    <Style Selector="Border">
+      <Setter Property="Background" Value="{DynamicResource Layer2BackgroundBrush}" />
+    </Style>
+    <Style Selector="Border.transparent">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+  </UserControl.Styles>
+  <Border CornerRadius="30" HorizontalAlignment="Right" Margin="0 0 2 0">
+    <Classes.transparent>
+      <MultiBinding Converter="{x:Static BoolConverters.Or}">
+        <Binding Path="IsExpanded" />
+        <Binding Path="IsChild" />
+      </MultiBinding>
+    </Classes.transparent>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="15 0">
+      <CheckBox Padding="0" IsChecked="{Binding IsSelected}" IsVisible="{Binding CanBeSelected}" />
+    </StackPanel>
+  </Border>
 </UserControl>

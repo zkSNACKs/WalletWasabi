@@ -1,0 +1,49 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewmodel="clr-namespace:WalletWasabi.Fluent.ViewModels.Wallets.Home.History.HistoryItems"
+             mc:Ignorable="d" d:DesignWidth="100" d:DesignHeight="50"
+             x:Class="WalletWasabi.Fluent.Views.Wallets.Home.History.Columns.ActionsColumnView"
+             x:CompileBindings="True"
+             x:DataType="viewmodel:HistoryItemViewModelBase">
+  <UserControl.Styles>
+    <Style Selector="Border">
+      <Setter Property="Background" Value="{DynamicResource Layer2BackgroundBrush}" />
+    </Style>
+    <Style Selector="Border.transparent">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+  </UserControl.Styles>
+  <Border CornerRadius="30" HorizontalAlignment="Right" Margin="0 0 2 0">
+    <Classes.transparent>
+      <MultiBinding Converter="{x:Static BoolConverters.Or}">
+        <Binding Path="IsExpanded" />
+        <Binding Path="Transaction.IsChild" />
+      </MultiBinding>
+    </Classes.transparent>
+    <InvalidatingStackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="15" Margin="15 0">
+
+      <!-- SpeedUp -->
+      <Button Classes="plain" ToolTip.Tip="Speed Up Transaction"
+              Command="{Binding SpeedUpTransactionCommand}"
+              IsVisible="{Binding Transaction.CanSpeedUpTransaction}">
+        <PathIcon Data="{StaticResource rocket_regular}" Height="16" />
+      </Button>
+
+      <!-- Cancel -->
+      <Button Classes="plain" ToolTip.Tip="Cancel Transaction"
+              Command="{Binding CancelTransactionCommand}"
+              IsVisible="{Binding Transaction.CanCancelTransaction}">
+        <PathIcon Data="{StaticResource dismiss_light}" Height="16" />
+      </Button>
+
+      <!-- Details -->
+      <Button Classes="plain" ToolTip.Tip="Show Details"
+              Command="{Binding ShowDetailsCommand}">
+        <PathIcon Data="{StaticResource details_regular}" Height="16" />
+      </Button>
+
+    </InvalidatingStackPanel>
+  </Border>
+</UserControl>

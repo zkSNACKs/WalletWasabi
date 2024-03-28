@@ -57,17 +57,16 @@
     </Style>
 
     <Style Selector="SuggestionItem > DockPanel > PathIcon">
-      <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}" />
+      <Setter Property="Foreground" Value="{DynamicResource SystemAccentCustomColorLight}" />
       <Setter Property="Margin" Value="0 0 10 0" />
       <Setter Property="DockPanel.Dock" Value="Left" />
       <Setter Property="Height" Value="25" />
       <Setter Property="Width" Value="25" />
-      <Setter Property="Opacity" Value="0.5" />
     </Style>
 
     <Style Selector="Border.warning">
       <Setter Property="Height" Value="38" />
-      <Setter Property="Background" Value="{DynamicResource NavBarItemPointerOverBackgroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource Layer1BackgroundBrushLight1}" />
       <Setter Property="Padding" Value="5" />
       <Setter Property="Margin" Value="5 0 5 5" />
       <Setter Property="(Interaction.Behaviors)">

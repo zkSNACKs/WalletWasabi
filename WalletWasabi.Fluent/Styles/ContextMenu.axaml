@@ -1,9 +1,5 @@
 <Styles xmlns="https://github.com/avaloniaui">
 
-  <Style Selector="ContextMenu MenuItem">
-    <Setter Property="Padding" Value="10" />
-  </Style>
-
   <Style Selector="ContextMenu MenuItem /template/ Viewbox#PART_IconPresenter">
     <Setter Property="(Interaction.Behaviors)">
       <BehaviorCollectionTemplate>

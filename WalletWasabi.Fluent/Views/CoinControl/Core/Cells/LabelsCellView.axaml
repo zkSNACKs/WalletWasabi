@@ -5,23 +5,31 @@
              xmlns:core="clr-namespace:WalletWasabi.Fluent.ViewModels.CoinControl.Core"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WalletWasabi.Fluent.Views.CoinControl.Core.Cells.LabelsCellView"
-             x:DataType="core:CoinControlItemViewModelBase"
+             x:DataType="core:CoinListItem"
              x:CompileBindings="True">
 
   <UserControl.Styles>
 
     <Style Selector="LabelsItemsPresenter.NonPrivate">
-      <Setter Property="BorderBrush" Value="{DynamicResource TextForegroundColor}" />
       <Setter Property="Foreground" Value="{DynamicResource TextForegroundColor}" />
     </Style>
+
+    <Style Selector="LabelsItemsPresenter.Private TextBlock">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <Style Selector="LabelsItemsPresenter.SemiPrivate TextBlock">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+
     <Style Selector="LabelsItemsPresenter.SemiPrivate">
-      <Setter Property="BorderBrush" Value="{DynamicResource PrivacyLevelMediumBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource PrivacyLevelMediumBrush}" />
+      <Setter Property="Background" Value="{DynamicResource PrivacyLevelMediumBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextForegroundColor}" />
       <Setter Property="MaxLabelWidth" Value="1000" />
     </Style>
     <Style Selector="LabelsItemsPresenter.Private">
-      <Setter Property="BorderBrush" Value="{DynamicResource PrivacyLevelStrongBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource PrivacyLevelStrongBrush}" />
+      <Setter Property="Background" Value="{DynamicResource PrivacyLevelStrongBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextForegroundColor}" />
       <Setter Property="MaxLabelWidth" Value="1000" />
     </Style>
   </UserControl.Styles>
@@ -31,5 +39,6 @@
     Classes.SemiPrivate="{Binding IsSemiPrivate}"
     Classes.Private="{Binding IsPrivate}"
     ItemsSource="{Binding Labels}"
-    InfiniteWidthMeasure="True" />
+    InfiniteWidthMeasure="True"
+    Margin="20 0" />
 </UserControl>

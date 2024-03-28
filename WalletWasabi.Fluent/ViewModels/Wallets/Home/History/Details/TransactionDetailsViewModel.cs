@@ -60,7 +60,7 @@ public partial class TransactionDetailsViewModel : RoutableViewModel
 
 	private void UpdateValues(TransactionModel model)
 	{
-		DateString = model.DateString;
+		DateString = model.DateToolTipString;
 		Labels = model.Labels;
 		BlockHeight = model.BlockHeight;
 		Confirmations = model.Confirmations;

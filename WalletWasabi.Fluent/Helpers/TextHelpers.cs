@@ -54,16 +54,16 @@ public static partial class TextHelpers
 		return result;
 	}
 
-	public static string ToBtcWithUnit(this Money money)
+	public static string ToBtcWithUnit(this Money money, bool fplus = false)
 	{
-		return money.ToFormattedString() + " BTC";
+		return money.ToFormattedString(fplus) + " BTC";
 	}
 
-	public static string ToFormattedString(this Money money)
+	public static string ToFormattedString(this Money money, bool fplus = false)
 	{
 		const int WholeGroupSize = 3;
 
-		var moneyString = money.ToString();
+		var moneyString = money.ToString(fplus: fplus, false);
 
 		moneyString = moneyString.Insert(moneyString.Length - 4, " ");
 

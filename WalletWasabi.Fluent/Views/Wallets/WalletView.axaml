@@ -20,6 +20,8 @@
     <ContentArea.TopContent>
       <StackPanel>
         <DockPanel>
+
+          <!-- Buttons -->
           <StackPanel HorizontalAlignment="Right" Margin="0 -5 0 0" DockPanel.Dock="Right" Orientation="Horizontal" Spacing="10" TextElement.FontSize="{DynamicResource ControlContentThemeFontSize}">
             <Button Classes="function"
                     Command="{Binding BroadcastPsbtCommand}">
@@ -29,7 +31,7 @@
                   <Binding Path="IsWalletBalanceZero" Converter="{x:Static BoolConverters.Not}" />
                 </MultiBinding>
               </Button.IsVisible>
-              <StackPanel Orientation="Horizontal" Spacing="15">
+              <StackPanel Orientation="Horizontal">
                 <PathIcon Data="{StaticResource live_regular}" />
                 <TextBlock Text="Broadcast" />
               </StackPanel>
@@ -37,14 +39,14 @@
             <Button Classes="function"
                     IsVisible="{Binding IsSendButtonVisible}"
                     Command="{Binding SendCommand}">
-              <StackPanel Orientation="Horizontal" Spacing="15">
+              <StackPanel Orientation="Horizontal">
                 <PathIcon Data="{StaticResource wallet_action_send}" />
                 <TextBlock Text="Send" />
               </StackPanel>
             </Button>
             <Button Classes="function"
                     Command="{Binding ReceiveCommand}">
-              <StackPanel Orientation="Horizontal" Spacing="15">
+              <StackPanel Orientation="Horizontal">
                 <PathIcon Data="{StaticResource wallet_action_receive}" />
                 <TextBlock Text="Receive" />
               </StackPanel>
@@ -60,7 +62,7 @@
               </Button>
               <Ellipse IsHitTestVisible="False" IsVisible="{Binding HasUnreadConversations^}" VerticalAlignment="Top" Margin="0 5 5 0" HorizontalAlignment="Right" Width="8" Height="8" Fill="{StaticResource UnreadBadgeColor}" />
             </Panel>
-            <Button Classes="function">
+            <Button Classes="transparentFunction">
               <Button.Flyout>
                 <MenuFlyout Placement="Bottom">
                   <MenuItem Header="Wallet Settings" Command="{Binding WalletSettingsCommand}">
@@ -85,15 +87,14 @@
                   </MenuItem>
                 </MenuFlyout>
               </Button.Flyout>
-              <PathIcon Data="{StaticResource more_regular}" Foreground="{DynamicResource TextForegroundColor}" />
+              <PathIcon Data="{StaticResource more_regular}" Opacity="0.6" />
             </Button>
           </StackPanel>
         </DockPanel>
-        <Separator DockPanel.Dock="Bottom" Margin="-200 13 -200 0" HorizontalAlignment="Stretch" />
       </StackPanel>
     </ContentArea.TopContent>
     <DockPanel Name="Panel" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-      <home:WalletTiles DataContext="{Binding Tiles}" Margin="0 10 0 20" DockPanel.Dock="Top" />
+      <home:WalletTiles DataContext="{Binding Tiles}" DockPanel.Dock="Top" />
       <history:HistoryTable Name="HistoryTable"
                             DataContext="{Binding History}"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />

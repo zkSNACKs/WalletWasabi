@@ -9,7 +9,8 @@ public enum HighlightedButton
 {
 	None,
 	YesButton,
-	NoButton
+	NoButton,
+	Both
 }
 
 public class QuestionControl : ContentControl
@@ -114,7 +115,7 @@ public class QuestionControl : ContentControl
 
 	private void UpdateHighlightedButton(HighlightedButton highlightedButton)
 	{
-		IsYesButton = highlightedButton == HighlightedButton.YesButton;
-		IsNoButton = highlightedButton == HighlightedButton.NoButton;
+		IsYesButton = highlightedButton is HighlightedButton.YesButton or HighlightedButton.Both;
+		IsNoButton = highlightedButton is HighlightedButton.NoButton or HighlightedButton.Both;
 	}
 }

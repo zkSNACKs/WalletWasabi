@@ -7,31 +7,46 @@
              x:DataType="receive:AddressViewModel"
              x:CompileBindings="True"
              x:Class="WalletWasabi.Fluent.Views.Wallets.Receive.Columns.ActionsColumnView">
-  <Panel>
-    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
-                Margin="-5 0 0 0" Spacing="5" Orientation="Horizontal">
-      <Button Classes="plain addressActionButton"
-              Margin="0"
+  <Border CornerRadius="30" HorizontalAlignment="Right" Margin="0 0 2 0" Background="{DynamicResource Layer2BackgroundBrush}">
+    <Border.Styles>
+      <Style Selector="AnimatedButton /template/ PathIcon">
+        <Setter Property="Height" Value="15" />
+      </Style>
+      <Style Selector="Button > PathIcon">
+        <Setter Property="Height" Value="15" />
+      </Style>
+    </Border.Styles>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="5" Margin="15 0">
+
+      <!-- Hide -->
+      <Button Classes="plain"
               Command="{Binding HideAddressCommand}"
               ToolTip.Tip="Hide address">
-        <PathIcon Data="{StaticResource dismiss_light}" Classes=" addressActionIcon" />
+        <PathIcon Data="{StaticResource dismiss_light}" Height="14" />
       </Button>
 
-      <AnimatedButton Classes="addressActionButton" DockPanel.Dock="Right"
-                        Margin="0"
-                        ToolTip.Tip="Copy"
-                        Command="{Binding CopyAddressCommand}"
-                        NormalIcon="{StaticResource copy_regular}"
-                        ClickIcon="{StaticResource copy_confirmed}"
-                        InitialOpacity="1.0" />
+      <!-- Edit -->
+      <Button Classes="plain"
+              ToolTip.Tip="Edit"
+              Command="{Binding EditLabelCommand}">
+        <PathIcon Data="{StaticResource edit_regular}" />
+      </Button>
 
-      <Button Classes="plain addressActionButton"
-              Margin="0"
+      <!-- Open -->
+      <Button Classes="plain"
               Command="{Binding NavigateCommand}"
-              DockPanel.Dock="Right"
               ToolTip.Tip="QR Code">
-        <PathIcon Data="{StaticResource qr_code_regular}" Classes=" addressActionIcon" />
+        <PathIcon Data="{StaticResource qr_code_regular}" />
       </Button>
+
+      <!-- Copy -->
+      <AnimatedButton Classes="plain"
+                      ToolTip.Tip="Copy"
+                      Command="{Binding CopyAddressCommand}"
+                      NormalIcon="{StaticResource copy_regular}"
+                      ClickIcon="{StaticResource copy_confirmed}"
+                      InitialOpacity="1.0" />
+
     </StackPanel>
-  </Panel>
+  </Border>
 </UserControl>

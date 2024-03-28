@@ -37,7 +37,7 @@
                         Command="{Binding SelectCommand}">
             <Viewbox>
               <TextBlock FontSize="50" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding ShortTitle}"
-                         Foreground="{DynamicResource SystemAccentColor}" />
+                         Foreground="{DynamicResource SystemAccentCustomColorLight}" />
             </Viewbox>
           </TileButton>
         </DataTemplate>

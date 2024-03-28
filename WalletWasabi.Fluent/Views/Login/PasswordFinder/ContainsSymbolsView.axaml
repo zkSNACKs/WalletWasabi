@@ -15,7 +15,8 @@
 
     <QuestionControl Content="Does your password contain special characters?"
                        YesCommand="{Binding YesCommand}"
-                       NoCommand="{Binding NoCommand}">
+                       NoCommand="{Binding NoCommand}"
+                       HighlightButton="Both">
       <QuestionControl.IconContent>
         <Viewbox Height="150">
           <StackPanel Orientation="Horizontal" Opacity="0.6">
