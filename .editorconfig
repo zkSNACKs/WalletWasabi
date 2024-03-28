@@ -234,6 +234,9 @@ dotnet_diagnostic.IDE0004.severity = error
 # IDE0019: Use pattern matching
 csharp_style_pattern_matching_over_as_with_null_check = true:error
 
+# IDE0028: Simplify collection initialization
+dotnet_diagnostic.IDE0028.severity = none
+
 # IDE0032: Use auto property
 dotnet_style_prefer_auto_properties = true:error
 
@@ -248,6 +251,12 @@ dotnet_style_prefer_simplified_interpolation = true:error
 
 # IDE0130: Warn and provide code fixes for when namespaces do not match the folder structure.
 dotnet_diagnostic.IDE0130.severity = warning
+
+# IDE0290: Use primary constructor
+dotnet_diagnostic.IDE0290.severity = none
+
+# IDE0305: Simplify collection initialization
+dotnet_diagnostic.IDE0305.severity = none
 
 # CA1304: Specify CultureInfo
 dotnet_diagnostic.CA1304.severity = warning
