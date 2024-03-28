@@ -22,9 +22,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Packages.props = Directory.Packages.props
 		exclusion.dic = exclusion.dic
 		global.json = global.json
+		NuGet.Config = NuGet.Config
 		README.md = README.md
 		Settings.StyleCop = Settings.StyleCop
-		NuGet.Config = NuGet.Config
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletWasabi.Packager", "WalletWasabi.Packager\WalletWasabi.Packager.csproj", "{8BE916A0-1F3F-4757-BAD9-BFBAB8EAC3C2}"
@@ -38,6 +38,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletWasabi.Fluent", "WalletWasabi.Fluent\WalletWasabi.Fluent.csproj", "{1E9A8055-DC14-4C7D-8878-887D50B55A10}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletWasabi.Daemon", "WalletWasabi.Daemon\WalletWasabi.Daemon.csproj", "{29599048-B3F1-48B9-AEBB-1A32D64BC4F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletWasabi.OSXStartsilent", "WalletWasabi.OSXStartsilent\WalletWasabi.OSXStartsilent.csproj", "{10E157FE-F8B5-4FC8-A480-75A64AE81A7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -116,6 +118,14 @@ Global
 		{29599048-B3F1-48B9-AEBB-1A32D64BC4F5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{29599048-B3F1-48B9-AEBB-1A32D64BC4F5}.Release|x64.ActiveCfg = Release|Any CPU
 		{29599048-B3F1-48B9-AEBB-1A32D64BC4F5}.Release|x64.Build.0 = Release|Any CPU
+		{10E157FE-F8B5-4FC8-A480-75A64AE81A7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10E157FE-F8B5-4FC8-A480-75A64AE81A7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10E157FE-F8B5-4FC8-A480-75A64AE81A7A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{10E157FE-F8B5-4FC8-A480-75A64AE81A7A}.Debug|x64.Build.0 = Debug|Any CPU
+		{10E157FE-F8B5-4FC8-A480-75A64AE81A7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10E157FE-F8B5-4FC8-A480-75A64AE81A7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10E157FE-F8B5-4FC8-A480-75A64AE81A7A}.Release|x64.ActiveCfg = Release|Any CPU
+		{10E157FE-F8B5-4FC8-A480-75A64AE81A7A}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

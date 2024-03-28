@@ -56,6 +56,9 @@
 		<None Update="Microservices\Binaries\osx64\Tor\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="Microservices\Binaries\osx64\Wasabi Wallet Startup.app\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="Microservices\Binaries\lin64\bitcoind">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

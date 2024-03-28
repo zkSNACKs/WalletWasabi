@@ -150,7 +150,7 @@ public class UiConfig : ConfigBase
 		set => RaiseAndSetIfChanged(ref _lastSelectedWallet, value);
 	}
 
-	// OnDeserialized changes this default on Mac and Linux.
+	// OnDeserialized changes this default on Linux.
 	[DefaultValue(true)]
 	[JsonProperty(PropertyName = "RunOnSystemStartup", DefaultValueHandling = DefaultValueHandling.Populate)]
 	public bool RunOnSystemStartup
@@ -202,8 +202,7 @@ public class UiConfig : ConfigBase
 			return;
 		}
 
-		if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || // On Linux we do not start Wasabi with OS by default - because Linux users knows better.
-			RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) // Wasabi window pops up right after startup - it is annoying UX https://github.com/zkSNACKs/WalletWasabi/pull/10190.
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) // On Linux we do not start Wasabi with OS by default - because Linux users knows better.
 		{
 			RunOnSystemStartup = false;
 		}

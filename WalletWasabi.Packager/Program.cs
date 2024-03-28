@@ -1,3 +1,4 @@
+using NBitcoin;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -28,6 +29,7 @@ public static class Program
 
 	public const string DaemonExecutableName = Constants.DaemonExecutableName;
 	public const string ExecutableName = Constants.ExecutableName;
+	public const string SilentExecutableName = Constants.SilentExecutableName;
 
 	private const string WasabiPrivateKeyFilePath = @"C:\wasabi\Wasabi.privkey";
 	private const string WasabiPublicKeyFilePath = @"C:\wasabi\Wasabi.pubkey";
@@ -50,6 +52,7 @@ public static class Program
 	public static string PackagerProjectDirectory { get; } = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
 	public static string SolutionDirectory { get; } = Path.GetFullPath(Path.Combine(PackagerProjectDirectory, ".."));
 	public static string DesktopProjectDirectory { get; } = Path.GetFullPath(Path.Combine(SolutionDirectory, "WalletWasabi.Fluent.Desktop"));
+	public static string StartsilentProjectDirectory { get; } = Path.GetFullPath(Path.Combine(SolutionDirectory, "WalletWasabi.OSXStartsilent"));
 	public static string LibraryProjectDirectory { get; } = Path.GetFullPath(Path.Combine(SolutionDirectory, "WalletWasabi"));
 	public static string WixProjectDirectory { get; } = Path.GetFullPath(Path.Combine(SolutionDirectory, "WalletWasabi.WindowsInstaller"));
 	public static string BinDistDirectory { get; } = Path.GetFullPath(Path.Combine(DesktopProjectDirectory, "bin", "dist"));
@@ -334,6 +337,12 @@ public static class Program
 			// Delete unused executables.
 			File.Delete(Path.Combine(currentBinDistDirectory, $"WalletWasabi.Fluent{executableExtension}"));
 
+			if (target.StartsWith("osx"))
+			{
+				// Deliver WalletWasabi.OSXStartsilent as well.
+				ReleaseOSXStartsilent(target);
+			}
+
 			// IF IT'S IN ONLYBINARIES MODE DON'T DO ANYTHING FANCY PACKAGING AFTER THIS!!!
 			if (OnlyBinaries)
 			{
@@ -495,7 +504,7 @@ public static class Program
 					$"{linuxWasabiWalletFolder.TrimEnd('/')}/{ExecutableName} $@\n";
 				var wasabiDaemonStarterScriptPath = Path.Combine(debUsrLocalBinFolderPath, $"{DaemonExecutableName}");
 				var wasabiDaemonStarterScriptContent = Shebang +
-				    $"{linuxWasabiWalletFolder.TrimEnd('/')}/{DaemonExecutableName} $@\n";
+					$"{linuxWasabiWalletFolder.TrimEnd('/')}/{DaemonExecutableName} $@\n";
 
 				File.WriteAllText(wasabiStarterScriptPath, wasabiStarterScriptContent, Encoding.ASCII);
 				File.WriteAllText(wasabiDaemonStarterScriptPath, wasabiDaemonStarterScriptContent, Encoding.ASCII);
@@ -523,6 +532,61 @@ public static class Program
 				Console.WriteLine($"# Deleted {publishedFolder}");
 			}
 		}
+	}
+
+	private static void ReleaseOSXStartsilent(string target)
+	{
+		Console.WriteLine($"# Run dotnet restore");
+		StartProcessAndWaitForExit("dotnet", StartsilentProjectDirectory, arguments: "restore --locked-mode");
+
+		Console.WriteLine($"# Run dotnet clean");
+		StartProcessAndWaitForExit("dotnet", StartsilentProjectDirectory, arguments: "clean --configuration Release");
+
+		string currentBinDistDirectory = Path.Combine(BinDistDirectory, target, "startsilent"); ;
+
+		if (!Directory.Exists(currentBinDistDirectory))
+		{
+			Directory.CreateDirectory(currentBinDistDirectory);
+			Console.WriteLine($"# Created {currentBinDistDirectory}");
+		}
+
+		string dotnetProcessArgs = string.Join(
+				" ",
+				$"publish",
+				$"--configuration Release",
+				$"--force",
+				$"--output \"{currentBinDistDirectory}\"",
+				$"--self-contained true",
+				$"--runtime \"{target}\"",
+				$"--disable-parallel",
+				$"--no-cache",
+				$"--no-restore",
+				$"/p:VersionPrefix={VersionPrefix}",
+				$"/p:DebugType=none",
+				$"/p:DebugSymbols=false",
+				$"/p:ErrorReport=none",
+				$"/p:DocumentationFile=\"\"",
+				$"/p:Deterministic=true");
+
+		StartProcessAndWaitForExit(
+			"dotnet",
+			StartsilentProjectDirectory,
+			arguments: dotnetProcessArgs,
+			redirectStandardOutput: true);
+
+		string oldExecutablePath = Path.Combine(currentBinDistDirectory, $"WalletWasabi.OSXStartsilent");
+		string newExecutablePath = Path.Combine(currentBinDistDirectory, "..", $"{SilentExecutableName}");
+		File.Move(oldExecutablePath, newExecutablePath);
+
+		string oldDllPath = Path.Combine(currentBinDistDirectory, $"WalletWasabi.OSXStartsilent.dll");
+		string newDllPath = Path.Combine(currentBinDistDirectory, "..", $"WalletWasabi.OSXStartsilent.dll");
+		File.Move(oldDllPath, newDllPath);
+
+		string oldDepsJsonPath = Path.Combine(currentBinDistDirectory, $"WalletWasabi.OSXStartsilent.deps.json");
+		string newDepsJsonPath = Path.Combine(currentBinDistDirectory, "..", $"WalletWasabi.OSXStartsilent.deps.json");
+		File.Move(oldDepsJsonPath, newDepsJsonPath);
+
+		Directory.Delete(currentBinDistDirectory, true);
 	}
 
 	/// <summary>Checks whether there are uncommitted changes.</summary>
