@@ -54,6 +54,7 @@ public class HwiKatas
 		HwiEnumerateEntry entry = enumerate.Single();
 		Assert.NotNull(entry.Path);
 		Assert.Equal(HardwareWalletModels.Trezor_T, entry.Model);
+		Assert.True(HwiValidationHelper.ValidatePathString(entry.Model, entry.Path));
 		Assert.NotNull(entry.Fingerprint);
 
 		string devicePath = entry.Path;
@@ -123,6 +124,7 @@ public class HwiKatas
 		HwiEnumerateEntry entry = enumerate.Single();
 		Assert.NotNull(entry.Path);
 		Assert.Equal(HardwareWalletModels.Trezor_1, entry.Model);
+		Assert.True(HwiValidationHelper.ValidatePathString(entry.Model, entry.Path));
 		Assert.True(entry.NeedsPinSent);
 		Assert.Equal(HwiErrorCode.DeviceNotReady, entry.Code);
 		Assert.Null(entry.Fingerprint);
@@ -157,6 +159,7 @@ public class HwiKatas
 		HwiEnumerateEntry entry = enumerate.Single();
 		Assert.NotNull(entry.Path);
 		Assert.Equal(HardwareWalletModels.Coldcard, entry.Model);
+		Assert.True(HwiValidationHelper.ValidatePathString(entry.Model, entry.Path));
 		Assert.NotNull(entry.Fingerprint);
 
 		string devicePath = entry.Path;
@@ -239,6 +242,7 @@ public class HwiKatas
 		HwiEnumerateEntry entry = Assert.Single(enumerate);
 		Assert.NotNull(entry.Path);
 		Assert.Equal(HardwareWalletModels.Ledger_Nano_S, entry.Model);
+		Assert.True(HwiValidationHelper.ValidatePathString(entry.Model, entry.Path));
 		Assert.NotNull(entry.Fingerprint);
 		Assert.Null(entry.Code);
 		Assert.Null(entry.Error);
@@ -407,6 +411,7 @@ public class HwiKatas
 		HwiEnumerateEntry entry = Assert.Single(enumerate);
 		Assert.NotNull(entry.Path);
 		Assert.Equal(HardwareWalletModels.Ledger_Nano_X, entry.Model);
+		Assert.True(HwiValidationHelper.ValidatePathString(entry.Model, entry.Path));
 		Assert.NotNull(entry.Fingerprint);
 		Assert.Null(entry.Code);
 		Assert.Null(entry.Error);
@@ -546,7 +551,6 @@ public class HwiKatas
 		Assert.Equal(TransactionCheckResult.Success, checkResult);
 	}
 
-
 	[Fact]
 	public async Task BitBox02BtcOnlyKataAsync()
 	{
@@ -593,7 +597,6 @@ public class HwiKatas
 
 		await Assert.ThrowsAsync<HwiException>(async () => await client.SendPinAsync(deviceType, devicePath, 1111, cts.Token));
 
-		
 		KeyPath keyPath1 = KeyManager.GetAccountKeyPath(network, ScriptPubKeyType.Segwit).Derive("0/0");
 		KeyPath keyPath2 = KeyManager.GetAccountKeyPath(network, ScriptPubKeyType.Segwit).Derive("0/1");
 		// USER: CONFIRM
