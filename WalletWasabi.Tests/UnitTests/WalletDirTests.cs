@@ -223,6 +223,7 @@ public class WalletDirTests
 		Assert.Equal("Trezor One Simulator", HardwareWalletModels.Trezor_1_Simulator.FriendlyName());
 		Assert.Equal("Trezor T", HardwareWalletModels.Trezor_T.FriendlyName());
 		Assert.Equal("Trezor T Simulator", HardwareWalletModels.Trezor_T_Simulator.FriendlyName());
+		Assert.Equal("Trezor Safe 3", HardwareWalletModels.Trezor_Safe_3.FriendlyName());
 		Assert.Equal("BitBox", HardwareWalletModels.BitBox02_BTCOnly.FriendlyName());
 		Assert.Equal("BitBox", HardwareWalletModels.BitBox02_Multi.FriendlyName());
 		Assert.Equal("Jade", HardwareWalletModels.Jade.FriendlyName());

@@ -49,6 +49,9 @@ public enum HardwareWalletModels
 	[FriendlyName("Trezor T Simulator")]
 	Trezor_T_Simulator,
 
+	[FriendlyName("Trezor Safe 3")]
+	Trezor_Safe_3,
+
 	[FriendlyName("BitBox")]
 	BitBox02_BTCOnly,
 

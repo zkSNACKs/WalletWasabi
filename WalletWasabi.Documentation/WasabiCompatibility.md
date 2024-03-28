@@ -23,6 +23,7 @@ This document lists all the officially supported software and devices by Wasabi 
 - Ledger Nano S Plus
 - Ledger Nano X
 - Trezor Model T
+- Trezor Safe 3
 
 <sup><sup>1*</sup> The device by default asks for a "Pairing code", currently, there is no such function in Wasabi. Therefore, either disable the feature or unlock the device with BitBoxApp or hwi-qt before using it with Wasabi.</sup>
 
