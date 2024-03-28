@@ -237,6 +237,8 @@ public class KeyManager
 
 	public string WalletName => string.IsNullOrWhiteSpace(FilePath) ? "" : Path.GetFileNameWithoutExtension(FilePath);
 
+	public bool InvalidateFirstReceivingHeight { get; set; } = true;
+
 	public static KeyManager CreateNew(out Mnemonic mnemonic, string password, Network network, string? filePath = null)
 	{
 		mnemonic = new Mnemonic(Wordlist.English, WordCount.Twelve);
@@ -429,13 +431,12 @@ public class KeyManager
 	/// It's unsafe because it doesn't assert that the GapLimit is respected.
 	/// GapLimit should be enforced whenever a transaction is discovered.
 	/// </summary>
-	public record ScriptPubKeySpendingInfo(byte[] CompressedScriptPubKey, Height? LatestSpendingHeight);
-
+	public record ScriptPubKeySpendingInfo(ScriptPubKeyType Type, bool IsInternal, byte[] CompressedScriptPubKey, Height? LatestSpendingHeight, Height? FirstReceivingHeight);
 	public IEnumerable<ScriptPubKeySpendingInfo> UnsafeGetSynchronizationInfos()
 	{
 		lock (CriticalStateLock)
 		{
-			return HdPubKeyCache.Select(x => new ScriptPubKeySpendingInfo(x.CompressedScriptPubKey, x.HdPubKey.LatestSpendingHeight));
+			return HdPubKeyCache.Select(x => new ScriptPubKeySpendingInfo(x.ScriptPubKeyType, x.HdPubKey.IsInternal, x.CompressedScriptPubKey, x.HdPubKey.LatestSpendingHeight, x.HdPubKey.FirstReceivingHeight));
 		}
 	}
 

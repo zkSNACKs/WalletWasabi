@@ -166,6 +166,15 @@ public class CoinsRegistry : ICoinsView
 				if (coinsOfPubKey.Count == 0)
 				{
 					CoinsByPubKeys.Remove(coin.HdPubKey);
+					coin.HdPubKey.FirstReceivingHeight = null;
+				}
+				else
+				{
+					var confirmedCoinsOnPubKey = coinsOfPubKey.Where(x => x.Confirmed);
+					if (confirmedCoinsOnPubKey.Any())
+					{
+						coin.HdPubKey.FirstReceivingHeight = confirmedCoinsOnPubKey.Min(x => x.Height);
+					}
 				}
 			}
 		}

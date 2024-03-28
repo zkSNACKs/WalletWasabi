@@ -213,6 +213,13 @@ public class TransactionProcessor
 
 				var couldBeDustAttack = CanBeConsideredDustAttack(output, foundKey, myInputs.Any());
 				KeyManager.SetKeyState(KeyState.Used, foundKey);
+
+				if (tx.Confirmed && foundKey.FirstReceivingHeight is null)
+				{
+					foundKey.FirstReceivingHeight = tx.Height;
+					KeyManager.InvalidateFirstReceivingHeight = true;
+				}
+
 				if (couldBeDustAttack)
 				{
 					result.ReceivedDusts.Add(output);
@@ -275,6 +282,10 @@ public class TransactionProcessor
 
 		BlockchainAnalyzer.Analyze(result.Transaction);
 
+		if (result.SuccessfullyDoubleSpentCoins.Count > 0 || result.ReplacedCoins.Count > 0)
+		{
+			KeyManager.InvalidateFirstReceivingHeight = true;
+		}
 		return result;
 	}
 

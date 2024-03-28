@@ -82,6 +82,7 @@ public class HdPubKey : NotifyPropertyChangedBase, IEquatable<HdPubKey>
 	/// <summary>Height of the block where all coins associated with the key were spent, or <c>null</c> if not yet spent.</summary>
 	/// <remarks>Value can be non-<c>null</c> only for <see cref="IsInternal">internal keys</see> as they should be used just once.</remarks>
 	public Height? LatestSpendingHeight { get; set; }
+	public Height? FirstReceivingHeight { get; set; }
 
 	public Script P2wpkhScript => _p2wpkhScript.Value;
 	public Script P2Taproot => _p2Taproot.Value;
