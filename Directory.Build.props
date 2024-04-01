@@ -8,5 +8,6 @@
 	<Deterministic>true</Deterministic>
 	<InvariantGlobalization>true</InvariantGlobalization>
 	 <WarningsAsErrors>false</WarningsAsErrors>
+	 <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
  </PropertyGroup>
 </Project>
