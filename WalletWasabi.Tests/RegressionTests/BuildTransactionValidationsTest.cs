@@ -42,13 +42,12 @@ public class BuildTransactionValidationsTest : IClassFixture<RegTestFixture>
 		IRPCClient rpc = setup.RpcClient;
 		Network network = setup.Network;
 		BitcoinStore bitcoinStore = setup.BitcoinStore;
-		using Backend.Global global = setup.Global;
 		string password = setup.Password;
 		ServiceConfiguration serviceConfiguration = setup.ServiceConfiguration;
 
 		// Create the services.
 		// 1. Create connection service.
-		NodesGroup nodes = new(global.Config.Network, requirements: Constants.NodeRequirements);
+		NodesGroup nodes = new(setup.Network, requirements: Constants.NodeRequirements);
 		nodes.ConnectedNodes.Add(await RegTestFixture.BackendRegTestNode.CreateNewP2pNodeAsync());
 
 		// 2. Create mempool service.

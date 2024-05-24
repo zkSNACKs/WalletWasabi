@@ -27,9 +27,9 @@ public class ReorgTest : IClassFixture<RegTestFixture>
 
 	private RegTestFixture RegTestFixture { get; }
 
-	private async Task WaitForIndexesToSyncAsync(Backend.Global global, TimeSpan timeout, BitcoinStore bitcoinStore)
+	private async Task WaitForIndexesToSyncAsync(TimeSpan timeout, BitcoinStore bitcoinStore)
 	{
-		var bestHash = await global.RpcClient.GetBestBlockHashAsync();
+		var bestHash = await RegTestFixture.BackendRegTestNode.RpcClient.GetBestBlockHashAsync();
 
 		var times = 0;
 		while (bitcoinStore.SmartHeaderChain.TipHash != bestHash)
@@ -52,7 +52,6 @@ public class ReorgTest : IClassFixture<RegTestFixture>
 		IRPCClient rpc = setup.RpcClient;
 		Network network = setup.Network;
 		BitcoinStore bitcoinStore = setup.BitcoinStore;
-		using Backend.Global global = setup.Global;
 
 		var keyManager = KeyManager.CreateNew(out _, setup.Password, network);
 
@@ -83,7 +82,7 @@ public class ReorgTest : IClassFixture<RegTestFixture>
 				2);
 
 			// Test initial synchronization.
-			await WaitForIndexesToSyncAsync(global, TimeSpan.FromSeconds(90), bitcoinStore);
+			await WaitForIndexesToSyncAsync(TimeSpan.FromSeconds(90), bitcoinStore);
 
 			var tip = await rpc.GetBestBlockHashAsync();
 			Assert.Equal(tip, bitcoinStore.SmartHeaderChain.TipHash);
@@ -97,7 +96,7 @@ public class ReorgTest : IClassFixture<RegTestFixture>
 			var tx1bumpRes = await rpc.BumpFeeAsync(tx1); // RBF it
 
 			await rpc.GenerateAsync(5);
-			await WaitForIndexesToSyncAsync(global, TimeSpan.FromSeconds(90), bitcoinStore);
+			await WaitForIndexesToSyncAsync(TimeSpan.FromSeconds(90), bitcoinStore);
 
 			var hashes = bitcoinStore.SmartHeaderChain.GetChain().Select(x => x.header.BlockHash).ToArray();
 			Assert.DoesNotContain(tip, hashes);
