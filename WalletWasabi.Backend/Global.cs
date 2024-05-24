@@ -30,7 +30,7 @@ public class Global : IDisposable
 		CoordinatorParameters = new(DataDir);
 
 		// We have to find it, because it's cloned by the node and not perfectly cloned (event handlers cannot be cloned.)
-		P2pNode = new(config.Network, config.GetBitcoinP2pEndPoint(), new(), $"/WasabiCoordinator:{Constants.BackendMajorVersion}/");
+		P2pNode = new(config.Network, config.GetBitcoinP2pEndPoint(), new());
 		HostedServices.Register<BlockNotifier>(() => new BlockNotifier(rpcClient, P2pNode), "Block Notifier");
 
 		// Initialize index building

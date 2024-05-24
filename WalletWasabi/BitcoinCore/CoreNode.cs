@@ -251,7 +251,7 @@ public class CoreNode
 			Logger.LogInfo($"Started {Constants.BuiltinBitcoinNodeName}.");
 		}
 
-		coreNode.P2pNode = new P2pNode(coreNode.Network, coreNode.P2pEndPoint, coreNode.MempoolService, coreNodeParams.UserAgent);
+		coreNode.P2pNode = new P2pNode(coreNode.Network, coreNode.P2pEndPoint, coreNode.MempoolService);
 		await coreNode.P2pNode.ConnectAsync(cancel).ConfigureAwait(false);
 
 		return coreNode;
