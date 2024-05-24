@@ -46,7 +46,7 @@ public class BobClientTests
 		var idempotencyRequestCache = new IdempotencyRequestCache(memoryCache);
 
 		using CoinJoinFeeRateStatStore coinJoinFeeRateStatStore = new(config, arena.Rpc);
-		using var mempoolMirror = new MempoolMirror(TimeSpan.Zero, null!, null!);
+		using var mempoolMirror = new MempoolMirror(null!, null!, TimeSpan.Zero);
 		var wabiSabiApi = new WabiSabiController(idempotencyRequestCache, arena, coinJoinFeeRateStatStore);
 
 		InsecureRandom insecureRandom = InsecureRandom.Instance;

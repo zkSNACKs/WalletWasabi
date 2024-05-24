@@ -29,12 +29,14 @@ public class IndexBuilderService
 
 	private long _workerCount;
 
-	public IndexBuilderService(IRPCClient rpc, BlockNotifier blockNotifier, string indexFilePath)
+	public IndexBuilderService(IRPCClient rpc, BlockNotifier blockNotifier)
 	{
 		RpcClient = Guard.NotNull(nameof(rpc), rpc);
 		BlockNotifier = Guard.NotNull(nameof(blockNotifier), blockNotifier);
-		IndexFilePath = Guard.NotNullOrEmptyOrWhitespace(nameof(indexFilePath), indexFilePath);
+		var indexBuilderServiceDir = Path.Combine(".", "IndexBuilderService");
+		var indexFilePath = Path.Combine(indexBuilderServiceDir, $"Index{rpc.Network}.dat");
 
+		IndexFilePath = Guard.NotNullOrEmptyOrWhitespace(nameof(indexFilePath), indexFilePath);
 		StartingHeight = SmartHeader.GetStartingHeader(RpcClient.Network).Height;
 
 		_serviceStatus = NotStarted;

@@ -30,8 +30,6 @@ namespace WalletWasabi.Tests.UnitTests.WabiSabi.Client;
 
 public class ArenaClientTests
 {
-	public MempoolMirror DummyMempoolMirror { get; } = new(TimeSpan.Zero, null!, null!);
-
 	[Fact]
 	public async Task FullP2wpkhCoinjoinTestAsync()
 	{

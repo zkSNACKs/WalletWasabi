@@ -273,7 +273,7 @@ public class BlockNotifierTests
 
 		rpc.OnGetBlockHeaderAsync = (blockHash) => Task.FromResult(chain.GetBlock(blockHash).Header);
 
-		var notifier = new BlockNotifier(TimeSpan.FromMilliseconds(100), rpc);
+		var notifier = new BlockNotifier(rpc, period: TimeSpan.FromMilliseconds(100));
 		return notifier;
 	}
 

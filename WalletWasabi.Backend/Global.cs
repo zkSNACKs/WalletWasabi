@@ -31,14 +31,14 @@ public class Global : IDisposable
 
 		// We have to find it, because it's cloned by the node and not perfectly cloned (event handlers cannot be cloned.)
 		P2pNode = new(config.Network, config.GetBitcoinP2pEndPoint(), new(), $"/WasabiCoordinator:{Constants.BackendMajorVersion}/");
-		HostedServices.Register<BlockNotifier>(() => new BlockNotifier(TimeSpan.FromSeconds(7), rpcClient, P2pNode), "Block Notifier");
+		HostedServices.Register<BlockNotifier>(() => new BlockNotifier(rpcClient, P2pNode), "Block Notifier");
 
 		// Initialize index building
 		var indexBuilderServiceDir = Path.Combine(DataDir, "IndexBuilderService");
 		var indexFilePath = Path.Combine(indexBuilderServiceDir, $"Index{RpcClient.Network}.dat");
-		IndexBuilderService = new(RpcClient, HostedServices.Get<BlockNotifier>(), indexFilePath);
+		IndexBuilderService = new(RpcClient, HostedServices.Get<BlockNotifier>());
 
-		MempoolMirror = new MempoolMirror(TimeSpan.FromSeconds(21), RpcClient, P2pNode);
+		MempoolMirror = new MempoolMirror(RpcClient, P2pNode);
 	}
 
 	public string DataDir { get; }

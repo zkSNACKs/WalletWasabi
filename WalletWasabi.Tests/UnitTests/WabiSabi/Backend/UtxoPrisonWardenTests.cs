@@ -4,6 +4,7 @@ using NBitcoin;
 using WalletWasabi.Helpers;
 using WalletWasabi.Tests.Helpers;
 using WalletWasabi.WabiSabi;
+using WalletWasabi.WabiSabi.Backend;
 using WalletWasabi.WabiSabi.Backend.DoSPrevention;
 using Xunit;
 
@@ -16,10 +17,7 @@ public class UtxoPrisonWardenTests
 	{
 		var workDir = Common.GetWorkDir(nameof(CanStartAndStopAsync));
 		await IoHelpers.TryDeleteDirectoryAsync(workDir);
-		CoordinatorParameters coordinatorParameters = new(workDir);
-		using var w = new Warden(
-			coordinatorParameters.PrisonFilePath,
-			coordinatorParameters.RuntimeCoordinatorConfig);
+		using var w = new Warden(new WabiSabiConfig());
 		await w.StartAsync(CancellationToken.None);
 		await w.StopAsync(CancellationToken.None);
 	}
@@ -31,10 +29,7 @@ public class UtxoPrisonWardenTests
 		await IoHelpers.TryDeleteDirectoryAsync(workDir);
 
 		// Create prison.
-		CoordinatorParameters coordinatorParameters = new(workDir);
-		using var w = new Warden(
-			coordinatorParameters.PrisonFilePath,
-			coordinatorParameters.RuntimeCoordinatorConfig);
+		using var w = new Warden(new WabiSabiConfig());
 		await w.StartAsync(CancellationToken.None);
 		var now = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 		var i1 = BitcoinFactory.CreateOutPoint();
@@ -52,11 +47,11 @@ public class UtxoPrisonWardenTests
 		await w.StopAsync(CancellationToken.None);
 
 		// See if prev UTXOs are loaded.
-		CoordinatorParameters coordinatorParameters2 = new(workDir);
-		using var w2 = new Warden(coordinatorParameters2.PrisonFilePath, coordinatorParameters2.RuntimeCoordinatorConfig);
+		var cfg = new WabiSabiConfig();
+		using var w2 = new Warden(cfg);
 		await w2.StartAsync(CancellationToken.None);
 
-		var dosConfig = coordinatorParameters2.RuntimeCoordinatorConfig.GetDoSConfiguration();
+		var dosConfig =  cfg.GetDoSConfiguration();
 		Assert.True(w2.Prison.IsBanned(i1, dosConfig, DateTimeOffset.UtcNow));
 		Assert.True(w2.Prison.IsBanned(i2, dosConfig, DateTimeOffset.UtcNow));
 		Assert.True(w2.Prison.IsBanned(i3, dosConfig, DateTimeOffset.UtcNow));
