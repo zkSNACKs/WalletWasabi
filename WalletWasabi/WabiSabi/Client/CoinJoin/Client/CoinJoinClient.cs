@@ -189,7 +189,7 @@ public class CoinJoinClient
 
 		if (coins.IsEmpty)
 		{
-			throw new CoinJoinClientException(CoinjoinError.NoCoinsEligibleToMix, $"No coin was selected from '{coinCandidates.Count()}' number of coins. Probably it was not economical, total amount of coins were: {Money.Satoshis(coinCandidates.Sum(c => c.Amount))} BTC.");
+			throw new CoinJoinClientException(CoinjoinError.NoCoinsEligibleToMix, $"No coin was selected from '{coinCandidates.Count()}' number of coins. Probably it was not economical, total amount of coins were: BTC {Money.Satoshis(coinCandidates.Sum(c => c.Amount))}.");
 		}
 
 		// Keep going to blame round until there's none, so CJs won't be DDoS-ed.

@@ -283,9 +283,9 @@ public class CoinsRegistryTests
 		SmartTransaction tx3; // The transaction has 1 input and 1 output.
 
 		Money tx0CreditingAmount = Money.Coins(1.0m);
-		Money expectedTx1Amount = Money.Coins(-0.05m); // 0.05 BTC was spent (on fees).
-		Money expectedTx2Amount = Money.Coins(-0.15m); // 0.15 BTC was spent (on fees).
-		Money expectedTx3Amount = Money.Coins(-0.10m); // 0.10 BTC was spent (on fees).
+		Money expectedTx1Amount = Money.Coins(-0.05m); // BTC 0.05 was spent (on fees).
+		Money expectedTx2Amount = Money.Coins(-0.15m); // BTC 0.15 was spent (on fees).
+		Money expectedTx3Amount = Money.Coins(-0.10m); // BTC 0.10 was spent (on fees).
 
 		// Create and process transaction tx0.
 		{

@@ -55,7 +55,7 @@ public static partial class TextHelpers
 
 	public static string ToBtcWithUnit(this Money money, bool fplus = false)
 	{
-		return money.ToFormattedString(fplus) + " BTC";
+		return "BTC " + money.ToFormattedString(fplus);
 	}
 
 	public static string ToFormattedString(this Money money, bool fplus = false)

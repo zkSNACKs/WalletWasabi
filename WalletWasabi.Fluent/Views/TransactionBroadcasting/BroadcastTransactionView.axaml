@@ -16,11 +16,11 @@
       <Separator />
       <PreviewItem Icon="{StaticResource btc_logo}"
                      Label="Input amount"
-                     Content="{Binding InputAmountString, FallbackValue=0.0001 1234 BTC}" />
+                     Content="{Binding InputAmountString, FallbackValue=BTC 0.0001 1234}" />
       <Separator />
       <PreviewItem Icon="{StaticResource btc_logo}"
                      Label="Output amount"
-                     Content="{Binding OutputAmountString, FallbackValue=0.0001 1234 BTC}" />
+                     Content="{Binding OutputAmountString, FallbackValue=BTC 0.0001 1234}" />
       <Separator />
       <PreviewItem Icon="{StaticResource arrow_down_right_circle_regular}"
                      Label="Input count"
@@ -32,7 +32,7 @@
       <Separator />
       <PreviewItem Icon="{StaticResource paper_cash_regular}"
                      Label="Fee"
-                     Content="{Binding FeeString, FallbackValue=0.0001 1234 BTC}" />
+                     Content="{Binding FeeString, FallbackValue=BTC 0.0001 1234}" />
     </StackPanel>
   </ContentArea>
 </UserControl>

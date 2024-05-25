@@ -236,7 +236,7 @@
 
           <StackPanel Grid.Column="0" Grid.Row="2">
             <TextBlock Name="PlebsTextBlock" Text="Plebs Don't Pay" Classes="title2" />
-            <TextBlock Text="You won't pay the coordination fee for coins that are less than or equal to 0.01 BTC." Classes="text" />
+            <TextBlock Text="You won't pay the coordination fee for coins that are less than or equal to BTC 0.01." Classes="text" />
           </StackPanel>
 
           <StackPanel Grid.Column="1" Grid.Row="2">

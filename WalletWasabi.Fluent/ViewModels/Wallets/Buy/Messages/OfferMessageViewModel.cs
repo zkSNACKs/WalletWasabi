@@ -25,7 +25,7 @@ public class OfferMessageViewModel : AssistantMessageViewModel
 
 		var total = Items.Sum(x => x.TotalPrice);
 
-		TotalMessage = $"For a total price of {total} USD.";
+		TotalMessage = $"For a total price of USD {total}.";
 		UiMessage = "Our offer includes:";
 	}
 

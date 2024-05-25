@@ -32,7 +32,7 @@ public class PaymentBatch
 		{
 			_payments.Add(payment);
 		}
-		Logger.LogInfo($"Payment {payment.Id} for {payment.Amount} BTC to {payment.Destination.ScriptPubKey}.");
+		Logger.LogInfo($"Payment {payment.Id} for BTC {payment.Amount} to {payment.Destination.ScriptPubKey}.");
 		return payment.Id;
 	}
 
@@ -130,7 +130,7 @@ public class PaymentBatch
 		Logger.LogInfo($"Best payment set contains {paymentSet.PaymentCount} payments.");
 		foreach (var payment in paymentSet.Payments)
 		{
-			Logger.LogInfo($"Id {payment.Id} to {payment.Destination.ScriptPubKey}  {payment.Amount.ToDecimal(MoneyUnit.BTC)} BTC.");
+			Logger.LogInfo($"Id {payment.Id} to {payment.Destination.ScriptPubKey}   BTC {payment.Amount.ToDecimal(MoneyUnit.BTC)}.");
 		}
 	}
 }

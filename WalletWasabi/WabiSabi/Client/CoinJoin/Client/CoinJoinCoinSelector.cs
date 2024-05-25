@@ -86,10 +86,10 @@ public class CoinJoinCoinSelector
 		}
 
 		Logger.LogDebug($"Coin selection started:");
-		Logger.LogDebug($"{nameof(filteredCoins)}: {filteredCoins.Length} coins, valued at {Money.Satoshis(filteredCoins.Sum(x => x.Amount)).ToString(false, true)} BTC.");
-		Logger.LogDebug($"{nameof(privateCoins)}: {privateCoins.Length} coins, valued at {Money.Satoshis(privateCoins.Sum(x => x.Amount)).ToString(false, true)} BTC.");
-		Logger.LogDebug($"{nameof(semiPrivateCoins)}: {semiPrivateCoins.Length} coins, valued at {Money.Satoshis(semiPrivateCoins.Sum(x => x.Amount)).ToString(false, true)} BTC.");
-		Logger.LogDebug($"{nameof(redCoins)}: {redCoins.Length} coins, valued at {Money.Satoshis(redCoins.Sum(x => x.Amount)).ToString(false, true)} BTC.");
+		Logger.LogDebug($"{nameof(filteredCoins)}: {filteredCoins.Length} coins, valued at BTC {Money.Satoshis(filteredCoins.Sum(x => x.Amount)).ToString(false, true)}.");
+		Logger.LogDebug($"{nameof(privateCoins)}: {privateCoins.Length} coins, valued at BTC {Money.Satoshis(privateCoins.Sum(x => x.Amount)).ToString(false, true)}.");
+		Logger.LogDebug($"{nameof(semiPrivateCoins)}: {semiPrivateCoins.Length} coins, valued at BTC {Money.Satoshis(semiPrivateCoins.Sum(x => x.Amount)).ToString(false, true)}.");
+		Logger.LogDebug($"{nameof(redCoins)}: {redCoins.Length} coins, valued at BTC {Money.Satoshis(redCoins.Sum(x => x.Amount)).ToString(false, true)}.");
 
 		// We want to isolate red coins from each other. We only let a single red coin get into our selection candidates.
 		var allowedNonPrivateCoins = semiPrivateCoins.ToList();
@@ -97,10 +97,10 @@ public class CoinJoinCoinSelector
 		if (red is not null)
 		{
 			allowedNonPrivateCoins.Add(red);
-			Logger.LogDebug($"One red coin got selected: {red.Amount.ToString(false, true)} BTC. Isolating the rest.");
+			Logger.LogDebug($"One red coin got selected: BTC {red.Amount.ToString(false, true)}. Isolating the rest.");
 		}
 
-		Logger.LogDebug($"{nameof(allowedNonPrivateCoins)}: {allowedNonPrivateCoins.Count} coins, valued at {Money.Satoshis(allowedNonPrivateCoins.Sum(x => x.Amount)).ToString(false, true)} BTC.");
+		Logger.LogDebug($"{nameof(allowedNonPrivateCoins)}: {allowedNonPrivateCoins.Count} coins, valued at BTC {Money.Satoshis(allowedNonPrivateCoins.Sum(x => x.Amount)).ToString(false, true)}.");
 
 		int inputCount = Math.Min(
 			privateCoins.Length + allowedNonPrivateCoins.Count,
@@ -119,10 +119,10 @@ public class CoinJoinCoinSelector
 
 		// Let's allow only inputCount - 1 private coins to play.
 		var allowedPrivateCoins = smallerPrivateCoins.Concat(largerPrivateCoins).Take(inputCount - 1).ToArray();
-		Logger.LogDebug($"{nameof(allowedPrivateCoins)}: {allowedPrivateCoins.Length} coins, valued at {Money.Satoshis(allowedPrivateCoins.Sum(x => x.Amount)).ToString(false, true)} BTC.");
+		Logger.LogDebug($"{nameof(allowedPrivateCoins)}: {allowedPrivateCoins.Length} coins, valued at BTC {Money.Satoshis(allowedPrivateCoins.Sum(x => x.Amount)).ToString(false, true)}.");
 
 		var allowedCoins = allowedNonPrivateCoins.Concat(allowedPrivateCoins).ToArray();
-		Logger.LogDebug($"{nameof(allowedCoins)}: {allowedCoins.Length} coins, valued at {Money.Satoshis(allowedCoins.Sum(x => x.Amount)).ToString(false, true)} BTC.");
+		Logger.LogDebug($"{nameof(allowedCoins)}: {allowedCoins.Length} coins, valued at BTC {Money.Satoshis(allowedCoins.Sum(x => x.Amount)).ToString(false, true)}.");
 
 		// Shuffle coins, while randomly biasing towards lower AS.
 		var orderedAllowedCoins = AnonScoreTxSourceBiasedShuffle(allowedCoins).ToArray();
@@ -132,7 +132,7 @@ public class CoinJoinCoinSelector
 			.OrderByDescending(x => x.Amount)
 			.Take(3)
 			.ToArray();
-		Logger.LogDebug($"Largest non-private coins: {string.Join(", ", largestNonPrivateCoins.Select(x => x.Amount.ToString(false, true)).ToArray())} BTC.");
+		Logger.LogDebug($"Largest non-private coins: BTC {string.Join(", ", largestNonPrivateCoins.Select(x => x.Amount.ToString(false, true)).ToArray())}.");
 
 		// Select a group of coins those are close to each other by anonymity score.
 		Dictionary<int, IEnumerable<TCoin>> groups = new();
@@ -181,7 +181,7 @@ public class CoinJoinCoinSelector
 		Logger.LogDebug($"Filtered combinations down to {nameof(bestRepGroups)}: {bestRepGroups.Count()}.");
 
 		var remainingLargestNonPrivateCoins = largestNonPrivateCoins.Where(x => bestRepGroups.Any(y => y.Contains(x)));
-		Logger.LogDebug($"Remaining largest non-private coins: {string.Join(", ", remainingLargestNonPrivateCoins.Select(x => x.Amount.ToString(false, true)).ToArray())} BTC.");
+		Logger.LogDebug($"Remaining largest non-private coins: BTC {string.Join(", ", remainingLargestNonPrivateCoins.Select(x => x.Amount.ToString(false, true)).ToArray())}.");
 
 		// Bias selection towards larger numbers.
 		var selectedNonPrivateCoin = remainingLargestNonPrivateCoins.RandomElement(Rnd); // Select randomly at first just to have a starting value.
@@ -208,7 +208,7 @@ public class CoinJoinCoinSelector
 			Logger.LogDebug($"Couldn't select final selection candidate, ending.");
 			return ImmutableList<TCoin>.Empty;
 		}
-		Logger.LogDebug($"Selected the final selection candidate: {finalCandidate.Count()} coins, {string.Join(", ", finalCandidate.Select(x => x.Amount.ToString(false, true)).ToArray())} BTC.");
+		Logger.LogDebug($"Selected the final selection candidate: {finalCandidate.Count()} coins, BTC {string.Join(", ", finalCandidate.Select(x => x.Amount.ToString(false, true)).ToArray())}.");
 
 		// Let's remove some coins coming from the same tx in the final candidate:
 		// The smaller our balance is the more privacy we gain and the more the user cares about the costs, so more interconnectedness allowance makes sense.
@@ -230,7 +230,7 @@ public class CoinJoinCoinSelector
 		{
 			percent = 50;
 		}
-		else if (toRegister < 100_000_000) // 1 BTC
+		else if (toRegister < 100_000_000) // BTC 1
 		{
 			percent = 60;
 		}
@@ -306,7 +306,7 @@ public class CoinJoinCoinSelector
 		{
 			Logger.LogDebug($"Optimizing selection, removing coins coming from the same tx.");
 			Logger.LogDebug($"{nameof(sameTxAllowance)}: {sameTxAllowance}.");
-			Logger.LogDebug($"{nameof(winner)}: {winner.Count} coins, {string.Join(", ", winner.Select(x => x.Amount.ToString(false, true)).ToArray())} BTC.");
+			Logger.LogDebug($"{nameof(winner)}: {winner.Count} coins, BTC {string.Join(", ", winner.Select(x => x.Amount.ToString(false, true)).ToArray())}.");
 		}
 
 		if (winner.Count < MaxInputsRegistrableByWallet)

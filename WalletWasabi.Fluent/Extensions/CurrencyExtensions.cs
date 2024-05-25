@@ -83,7 +83,7 @@ public static class CurrencyExtensions
 
 	public static string ToUsdFormatted(this decimal n)
 	{
-		return ToUsdAmountFormatted(n) + " USD";
+		return "USD " + ToUsdAmountFormatted(n);
 	}
 
 	public static string ToUsdAmountFormatted(this decimal n)
@@ -98,7 +98,7 @@ public static class CurrencyExtensions
 
 	public static string ToUsd(this decimal n)
 	{
-		return n.WithFriendlyDecimals() + " USD";
+		return "USD " + n.WithFriendlyDecimals();
 	}
 
 	public static decimal WithFriendlyDecimals(this double n)
@@ -149,7 +149,7 @@ public static class CurrencyExtensions
 			_ => fee.ToString()
 		};
 
-		var feeText = $"{feePartText} {displayUnit.FriendlyName()}";
+		var feeText = $"{displayUnit.FriendlyName()} {feePartText}";
 
 		return feeText;
 	}

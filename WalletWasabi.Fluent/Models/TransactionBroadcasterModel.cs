@@ -75,7 +75,7 @@ public partial class TransactionBroadcasterModel
 		var inputAmountString =
 			totalInputValue is null
 			? "Unknown"
-			: $"{totalInputValue.ToFormattedString()} BTC";
+			: $"BTC {totalInputValue.ToFormattedString()}";
 
 		var outputCount = outputAddressAmount.Length;
 
@@ -87,7 +87,7 @@ public partial class TransactionBroadcasterModel
 		var outputAmountString =
 			totalOutputValue is null
 			? "Unknown"
-			: $"{totalOutputValue.ToFormattedString()} BTC";
+			: $"BTC {totalOutputValue.ToFormattedString()}";
 
 		var networkFee = totalInputValue is null || totalOutputValue is null
 			? null

@@ -347,17 +347,17 @@ public class DualCurrencyEntryBox : TemplatedControl
 
 	private static string FullFormatBtc(decimal value)
 	{
-		return $"{value.FormattedBtc()} BTC";
+		return $"BTC {value.FormattedBtc()}";
 	}
 
 	private static string FullFormatFiat(decimal value, string currencyCode, bool approximate)
 	{
 		var part1 = approximate ? "≈ " : "";
-		var part2 = value.FormattedFiat();
-		var part3 =
+		var part2 =
 			!string.IsNullOrWhiteSpace(currencyCode)
-				? $" {currencyCode}"
+				? $"{currencyCode} "
 				: "";
+		var part3 = value.FormattedFiat();
 		return part1 + part2 + part3;
 	}
 

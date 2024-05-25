@@ -16,11 +16,11 @@
           <StackPanel DataContext="{Binding Path=Amount, RelativeSource={RelativeSource TemplatedParent}}" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
             <TextBlock TextAlignment="Center"
                        FontWeight="Bold"
-                       Text="{Binding Btc, Converter={x:Static converters:MoneyConverters.ToFeeWithUnit}, FallbackValue='0.0000 0232 BTC'}"
+                       Text="{Binding Btc, Converter={x:Static converters:MoneyConverters.ToFeeWithUnit}, FallbackValue='BTC 0.0000 0232'}"
                        Classes="h5" VerticalAlignment="Bottom" />
             <TextBlock
               FontWeight="Bold"
-              Text="{Binding Usd^, Converter={x:Static converters:MoneyConverters.ToUsdApprox}, FallbackValue='≈3.5 USD'}"
+              Text="{Binding Usd^, Converter={x:Static converters:MoneyConverters.ToUsdApprox}, FallbackValue='≈USD 3.5'}"
               Opacity="0.6" VerticalAlignment="Bottom" Margin="0 0 0 3" Classes="h8" />
           </StackPanel>
         </ControlTemplate>

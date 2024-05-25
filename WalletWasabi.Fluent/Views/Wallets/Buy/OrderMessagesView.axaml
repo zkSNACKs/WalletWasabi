@@ -76,7 +76,7 @@
                       <Grid ColumnDefinitions="Auto,*,Auto" Margin="0 1 0 1">
                         <TextBlock Classes="monoSpaced" Grid.Column="0" Text="{Binding Quantity, StringFormat={}{0}x}" />
                         <TextBlock Classes="monoSpaced" Grid.Column="1" Margin="15 0 15 0" Text="{Binding Description}" />
-                        <TextBlock Classes="monoSpaced" Grid.Column="2" TextWrapping="Wrap" Text="{Binding TotalPrice, StringFormat={}{0} USD}" />
+                        <TextBlock Classes="monoSpaced" Grid.Column="2" TextWrapping="Wrap" Text="{Binding TotalPrice, StringFormat=USD {}{0}}" />
                       </Grid>
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
