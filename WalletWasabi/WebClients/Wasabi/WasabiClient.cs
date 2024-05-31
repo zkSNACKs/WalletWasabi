@@ -106,27 +106,6 @@ public class WasabiClient
 		return allTxs.ToDependencyGraph().OrderByDependency();
 	}
 
-	public async Task BroadcastAsync(string hex)
-	{
-		using var content = new StringContent($"'{hex}'", Encoding.UTF8, "application/json");
-		using HttpResponseMessage response = await HttpClient.SendAsync(HttpMethod.Post, $"api/v{ApiVersion}/wallet/broadcast", content).ConfigureAwait(false);
-
-		if (response.StatusCode != HttpStatusCode.OK)
-		{
-			await response.ThrowRequestExceptionFromContentAsync(CancellationToken.None).ConfigureAwait(false);
-		}
-	}
-
-	public async Task BroadcastAsync(Transaction transaction)
-	{
-		await BroadcastAsync(transaction.ToHex()).ConfigureAwait(false);
-	}
-
-	public async Task BroadcastAsync(SmartTransaction transaction)
-	{
-		await BroadcastAsync(transaction.Transaction).ConfigureAwait(false);
-	}
-
 	public async Task<IEnumerable<uint256>> GetMempoolHashesAsync(CancellationToken cancel = default)
 	{
 		using HttpResponseMessage response = await HttpClient.SendAsync(
@@ -167,7 +146,6 @@ public class WasabiClient
 
 		return strings;
 	}
-
 
 	public async Task<ushort> GetBackendMajorVersionAsync(CancellationToken cancel)
 	{

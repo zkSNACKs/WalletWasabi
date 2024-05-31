@@ -115,7 +115,7 @@ public class SpendUnconfirmedTxTests : IClassFixture<RegTestFixture>
 			Assert.Equal(tx0Id, eventArgs.NewlyReceivedCoins.Single().TransactionId);
 			Assert.Single(wallet.Coins);
 
-			TransactionBroadcaster broadcaster = new(network, bitcoinStore, httpClientFactory, walletManager);
+			TransactionBroadcaster broadcaster = new(network, bitcoinStore, walletManager);
 			broadcaster.Initialize(nodes, rpc);
 
 			using Key key2 = new();

@@ -177,7 +177,7 @@ public class BackendTests : IClassFixture<RegTestFixture>
 		var blockCount = await rpc.GetBlockCountAsync();
 		await setup.WaitForFiltersToBeProcessedAsync(TimeSpan.FromSeconds(120), blockCount);
 
-		TransactionBroadcaster broadcaster = new(network, bitcoinStore, httpClientFactory, walletManager);
+		TransactionBroadcaster broadcaster = new(network, bitcoinStore, walletManager);
 		broadcaster.Initialize(nodes, rpc);
 
 		#endregion Initialize

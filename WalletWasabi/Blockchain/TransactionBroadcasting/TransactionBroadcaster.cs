@@ -19,16 +19,14 @@ namespace WalletWasabi.Blockchain.TransactionBroadcasting;
 
 public class TransactionBroadcaster
 {
-	public TransactionBroadcaster(Network network, BitcoinStore bitcoinStore, WasabiHttpClientFactory httpClientFactory, WalletManager walletManager)
+	public TransactionBroadcaster(Network network, BitcoinStore bitcoinStore, WalletManager walletManager)
 	{
 		Network = network;
 		BitcoinStore = bitcoinStore;
-		HttpClientFactory = httpClientFactory;
 		WalletManager = walletManager;
 	}
 
 	private BitcoinStore BitcoinStore { get; }
-	private IWasabiHttpClientFactory HttpClientFactory { get; }
 	private Network Network { get; }
 	private NodesGroup? Nodes { get; set; }
 	private IRPCClient? RpcClient { get; set; }
@@ -88,46 +86,6 @@ public class TransactionBroadcaster
 		}
 	}
 
-	private async Task BroadcastTransactionToBackendAsync(SmartTransaction transaction)
-	{
-		Logger.LogInfo("Broadcasting with backend...");
-		IHttpClient httpClient = HttpClientFactory.NewHttpClientWithCircuitPerRequest();
-
-		WasabiClient client = new(httpClient);
-
-		try
-		{
-			await client.BroadcastAsync(transaction).ConfigureAwait(false);
-		}
-		catch (HttpRequestException ex2) when (RpcErrorTools.IsSpentError(ex2.Message))
-		{
-			if (transaction.Transaction.Inputs.Count == 1) // If we tried to only spend one coin, then we can mark it as spent. If there were more coins, then we do not know.
-			{
-				OutPoint input = transaction.Transaction.Inputs.First().PrevOut;
-				foreach (var coin in WalletManager.CoinsByOutPoint(input))
-				{
-					coin.SpentAccordingToBackend = true;
-				}
-			}
-
-			// Exception message is in form: 'message:::tx1:::tx2:::etc.' where txs are encoded in HEX.
-			IEnumerable<SmartTransaction> txs = ex2.Message.Split(":::", StringSplitOptions.RemoveEmptyEntries)
-				.Skip(1) // Skip the exception message.
-				.Select(x => new SmartTransaction(Transaction.Parse(x, Network), Height.Mempool));
-
-			foreach (var tx in txs)
-			{
-				WalletManager.Process(tx);
-			}
-
-			throw;
-		}
-
-		BelieveTransaction(transaction);
-
-		Logger.LogInfo($"Transaction is successfully broadcasted to backend: {transaction.GetHash()}.");
-	}
-
 	private void BelieveTransaction(SmartTransaction transaction)
 	{
 		if (transaction.Height == Height.Unknown)
@@ -146,12 +104,7 @@ public class TransactionBroadcaster
 		{
 			// Broadcast to a random node.
 			// Wait until it arrives to at least two other nodes.
-			// If something's wrong, fall back broadcasting with rpc, then backend.
-
-			if (Network == Network.RegTest)
-			{
-				throw new InvalidOperationException($"Transaction broadcasting to nodes does not work in {Network.RegTest}.");
-			}
+			// If something's wrong, fall back broadcasting with rpc.
 
 			if (Nodes is null)
 			{
@@ -159,14 +112,14 @@ public class TransactionBroadcaster
 			}
 
 			Node? node = Nodes.ConnectedNodes.RandomElement(Random);
-			while (node is null || !node.IsConnected || Nodes.ConnectedNodes.Count < 5)
+
+			var minimumRequiredNodeCount = Network == Network.RegTest ? 1 : 5;
+
+			while (node is null || !node.IsConnected || Nodes.ConnectedNodes.Count < minimumRequiredNodeCount)
 			{
 				// As long as we are connected to at least 4 nodes, we can always try again.
 				// 3 should be enough, but make it 5 so 2 nodes could disconnect in the meantime.
-				if (Nodes.ConnectedNodes.Count < 5)
-				{
-					throw new InvalidOperationException("We are not connected to enough nodes.");
-				}
+
 				await Task.Delay(100).ConfigureAwait(false);
 				node = Nodes.ConnectedNodes.RandomElement(Random);
 			}
@@ -179,21 +132,7 @@ public class TransactionBroadcaster
 
 			if (RpcClient is { })
 			{
-				try
-				{
-					await BroadcastTransactionWithRpcAsync(transaction).ConfigureAwait(false);
-				}
-				catch (Exception ex2)
-				{
-					Logger.LogInfo($"RPC could not broadcast transaction. Reason: {ex2.Message}.");
-					Logger.LogDebug(ex2);
-
-					await BroadcastTransactionToBackendAsync(transaction).ConfigureAwait(false);
-				}
-			}
-			else
-			{
-				await BroadcastTransactionToBackendAsync(transaction).ConfigureAwait(false);
+				await BroadcastTransactionWithRpcAsync(transaction).ConfigureAwait(false);
 			}
 		}
 	}

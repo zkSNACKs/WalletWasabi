@@ -99,7 +99,7 @@ public class ReceiveSpeedupTests : IClassFixture<RegTestFixture>
 
 			wallet.Kitchen.Cook(password);
 
-			TransactionBroadcaster broadcaster = new(network, bitcoinStore, httpClientFactory, walletManager);
+			TransactionBroadcaster broadcaster = new(network, bitcoinStore, walletManager);
 			broadcaster.Initialize(nodes, rpc);
 
 			// Get some money.

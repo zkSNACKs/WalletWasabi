@@ -109,7 +109,7 @@ public class MaxFeeTests : IClassFixture<RegTestFixture>
 			await setup.WaitForFiltersToBeProcessedAsync(TimeSpan.FromSeconds(120), blockCount);
 			wallet.Kitchen.Cook(password);
 
-			TransactionBroadcaster broadcaster = new(network, bitcoinStore, httpClientFactory, walletManager);
+			TransactionBroadcaster broadcaster = new(network, bitcoinStore, walletManager);
 			broadcaster.Initialize(nodes, rpc);
 
 			var waitCount = 0;

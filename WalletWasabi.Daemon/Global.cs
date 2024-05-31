@@ -132,7 +132,7 @@ public class Global
 		HostedServices.Register<UnconfirmedTransactionChainProvider>(() => new UnconfirmedTransactionChainProvider(HttpClientFactory), friendlyName: "Unconfirmed Transaction Chain Provider");
 		WalletFactory walletFactory = new(DataDir, config.Network, BitcoinStore, wasabiSynchronizer, HttpClientFactory.SharedWasabiClient, config.ServiceConfiguration, HostedServices.Get<FeeRateEstimationUpdater>(), BlockDownloadService, HostedServices.Get<UnconfirmedTransactionChainProvider>());
 		WalletManager = new WalletManager(config.Network, DataDir, new WalletDirectories(Config.Network, DataDir), walletFactory);
-		TransactionBroadcaster = new TransactionBroadcaster(Network, BitcoinStore, HttpClientFactory, WalletManager);
+		TransactionBroadcaster = new TransactionBroadcaster(Network, BitcoinStore, WalletManager);
 
 		CoinPrison = CoinPrison.CreateOrLoadFromFile(DataDir);
 		WalletManager.WalletStateChanged += WalletManager_WalletStateChanged;

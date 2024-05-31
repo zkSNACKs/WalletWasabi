@@ -106,7 +106,7 @@ public class SelfSpendSpeedupTests : IClassFixture<RegTestFixture>
 
 			wallet.Kitchen.Cook(password);
 
-			TransactionBroadcaster broadcaster = new(network, bitcoinStore, httpClientFactory, walletManager);
+			TransactionBroadcaster broadcaster = new(network, bitcoinStore, walletManager);
 			broadcaster.Initialize(nodes, rpc);
 
 			var waitCount = 0;

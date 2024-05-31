@@ -94,8 +94,6 @@ public class WalletController : ControllerBase
 		return Ok(response);
 	}
 
-
-
 	/// <summary>
 	/// Gets mempool hashes.
 	/// </summary>
@@ -257,54 +255,6 @@ public class WalletController : ControllerBase
 				}
 			}
 		}
-	}
-
-	/// <summary>
-	/// Attempts to broadcast a transaction.
-	/// </summary>
-	/// <remarks>
-	/// Sample request:
-	///
-	///     POST /broadcast
-	///     "01000000014b6b6fced23fa0d772f83fd849ce2f4e8fa51ea49cc12710ebcdc722d74c87f5000000006a47304402206bf1118e381342d0387e47807c83d2c1e919e2e3792f2673579a9ce87a380db002207e471504f96d7830dc9cbb7442332d747a25dcfd5d1530feea92b8a302aa57f4012102a40230b345856cc18ca1d745e7ea52319a012753b050e24d7be64ca0b978fb3effffffff0235662803000000001976a9146adfacaab3dc7c51b3300c4256b184f95cc48f4288acd0dd0600000000001976a91411ff558b1790b8d57cb25b9c07094591cfd2051c88ac00000000"
-	///
-	/// </remarks>
-	/// <param name="hex">The hex string of the raw transaction.</param>
-	/// <returns>200 Ok on successful broadcast or 400 BadRequest on failure.</returns>
-	/// <response code="200">If broadcast is successful.</response>
-	/// <response code="400">If broadcast fails.</response>
-	[HttpPost("broadcast")]
-	[ProducesResponseType(200)]
-	[ProducesResponseType(400)]
-	public async Task<IActionResult> BroadcastAsync([FromBody, Required] string hex, CancellationToken cancellationToken)
-	{
-		Transaction transaction;
-		try
-		{
-			transaction = Transaction.Parse(hex, Global.Config.Network);
-		}
-		catch (Exception ex)
-		{
-			Logger.LogDebug(ex);
-			return BadRequest("Invalid hex.");
-		}
-
-		try
-		{
-			await RpcClient.SendRawTransactionAsync(transaction, cancellationToken);
-		}
-		catch (RPCException ex) when (ex.Message.Contains("already in block chain", StringComparison.InvariantCultureIgnoreCase))
-		{
-			return Ok("Transaction is already in the blockchain.");
-		}
-		catch (RPCException ex)
-		{
-			Logger.LogDebug(ex);
-			var spenders = Global.HostedServices.Get<MempoolMirror>().GetSpenderTransactions(transaction.Inputs.Select(x => x.PrevOut));
-			return BadRequest($"{ex.Message}:::{string.Join(":::", spenders.Select(x => x.ToHex()))}");
-		}
-
-		return Ok("Transaction is successfully broadcasted.");
 	}
 
 	[HttpGet("unconfirmed-transaction-chain")]
