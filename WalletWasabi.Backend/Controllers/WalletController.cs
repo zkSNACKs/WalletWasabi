@@ -11,6 +11,7 @@ using WalletWasabi.Backend.Models;
 using WalletWasabi.Backend.Models.Responses;
 using WalletWasabi.BitcoinCore.Mempool;
 using WalletWasabi.BitcoinCore.Rpc;
+using WalletWasabi.Blockchain.BlockFilters;
 using WalletWasabi.Cache;
 using WalletWasabi.Helpers;
 using WalletWasabi.JsonConverters;
@@ -36,17 +37,18 @@ public class WalletController : ControllerBase
 		CommitHash = GetCommitHash()
 	};
 
-	public WalletController(Global global, IMemoryCache memoryCache)
+	public WalletController(IRPCClient rpcClient, IndexBuilderService indexBuilderService, MempoolMirror mempoolMirror, IMemoryCache memoryCache)
 	{
-		Global = global;
 		Cache = new(memoryCache);
+		RpcClient = rpcClient;
+		IndexBuilderService = indexBuilderService;
+		Mempool = mempoolMirror;
 	}
 
-	private IRPCClient RpcClient => Global.RpcClient;
-	private MempoolMirror Mempool => Global.MempoolMirror;
-
-	public IdempotencyRequestCache Cache { get; }
-	public Global Global { get; }
+	private IRPCClient RpcClient { get; }
+	private IndexBuilderService IndexBuilderService { get; }
+	private MempoolMirror Mempool { get; }
+	private IdempotencyRequestCache Cache { get; }
 
 	/// <summary>
 	/// Gets the latest versions of the client and backend.
@@ -72,8 +74,8 @@ public class WalletController : ControllerBase
 			return BadRequest($"Invalid {nameof(bestKnownBlockHash)}.");
 		}
 
-		var numberOfFilters = Global.Config.Network == Network.Main ? 1000 : 10000;
-		(Height bestHeight, IEnumerable<FilterModel> filters) = Global.IndexBuilderService.GetFilterLinesExcluding(knownHash, numberOfFilters, out bool found);
+		var numberOfFilters = RpcClient.Network == Network.Main ? 1000 : 10000;
+		(Height bestHeight, IEnumerable<FilterModel> filters) = IndexBuilderService.GetFilterLinesExcluding(knownHash, numberOfFilters, out bool found);
 
 		var response = new SynchronizeResponse { Filters = Enumerable.Empty<FilterModel>(), BestHeight = bestHeight };
 
@@ -141,7 +143,7 @@ public class WalletController : ControllerBase
 
 	private async Task<IEnumerable<string>> GetRawMempoolStringsNoCacheAsync(CancellationToken cancellationToken = default)
 	{
-		uint256[] transactionHashes = await Global.RpcClient.GetRawMempoolAsync(cancellationToken).ConfigureAwait(false);
+		uint256[] transactionHashes = await RpcClient.GetRawMempoolAsync(cancellationToken).ConfigureAwait(false);
 		return transactionHashes.Select(x => x.ToString());
 	}
 
@@ -281,7 +283,7 @@ public class WalletController : ControllerBase
 		Transaction transaction;
 		try
 		{
-			transaction = Transaction.Parse(hex, Global.Config.Network);
+			transaction = Transaction.Parse(hex, RpcClient.Network);
 		}
 		catch (Exception ex)
 		{
@@ -300,7 +302,7 @@ public class WalletController : ControllerBase
 		catch (RPCException ex)
 		{
 			Logger.LogDebug(ex);
-			var spenders = Global.HostedServices.Get<MempoolMirror>().GetSpenderTransactions(transaction.Inputs.Select(x => x.PrevOut));
+			var spenders = Mempool.GetSpenderTransactions(transaction.Inputs.Select(x => x.PrevOut));
 			return BadRequest($"{ex.Message}:::{string.Join(":::", spenders.Select(x => x.ToHex()))}");
 		}
 

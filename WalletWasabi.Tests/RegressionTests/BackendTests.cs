@@ -125,7 +125,6 @@ public class BackendTests : IClassFixture<RegTestFixture>
 		IRPCClient rpc = setup.RpcClient;
 		Network network = setup.Network;
 		BitcoinStore bitcoinStore = setup.BitcoinStore;
-		using Backend.Global global = setup.Global;
 		ServiceConfiguration serviceConfiguration = setup.ServiceConfiguration;
 		string password = setup.Password;
 
@@ -133,7 +132,7 @@ public class BackendTests : IClassFixture<RegTestFixture>
 
 		// Create the services.
 		// 1. Create connection service.
-		using NodesGroup nodes = new(global.Config.Network, requirements: WalletWasabi.Helpers.Constants.NodeRequirements);
+		using NodesGroup nodes = new(rpc.Network, requirements: WalletWasabi.Helpers.Constants.NodeRequirements);
 		nodes.ConnectedNodes.Add(await RegTestFixture.BackendRegTestNode.CreateNewP2pNodeAsync());
 
 		// 2. Create mempool service.
@@ -243,12 +242,12 @@ public class BackendTests : IClassFixture<RegTestFixture>
 	{
 		await using RegTestSetup setup = await RegTestSetup.InitializeTestEnvironmentAsync(RegTestFixture, numberOfBlocksToGenerate: 1, nameof(GetUnconfirmedTxChainAsync));
 		IRPCClient rpc = setup.RpcClient;
-		using Backend.Global global = setup.Global;
 
-		var indexBuilderServiceDir = Common.GetWorkDir(nameof(FilterBuilderTestAsync));
-		var indexFilePath = Path.Combine(indexBuilderServiceDir, $"Index{rpc.Network}.dat");
+		//var indexBuilderServiceDir = Common.GetWorkDir(nameof(FilterBuilderTestAsync));
+		//var indexFilePath = Path.Combine(indexBuilderServiceDir, $"Index{rpc.Network}.dat");
 
-		IndexBuilderService indexBuilderService = new(rpc, global.HostedServices.Get<BlockNotifier>(), indexFilePath);
+		using var blockNotifier = new BlockNotifier(rpc);
+		IndexBuilderService indexBuilderService = new(rpc, blockNotifier);
 		try
 		{
 			indexBuilderService.Synchronize();

@@ -13,7 +13,7 @@ namespace WalletWasabi.Blockchain.Blocks;
 
 public class BlockNotifier : PeriodicRunner
 {
-	public BlockNotifier(TimeSpan period, IRPCClient rpcClient, P2pNode? p2pNode = null) : base(period)
+	public BlockNotifier(IRPCClient rpcClient, P2pNode? p2pNode = null, TimeSpan? period = null) : base(period ?? TimeSpan.FromSeconds(7))
 	{
 		RpcClient = Guard.NotNull(nameof(rpcClient), rpcClient);
 		P2pNode = p2pNode;

@@ -12,9 +12,9 @@ namespace WalletWasabi.WabiSabi.Backend.DoSPrevention;
 
 public class Warden : BackgroundService
 {
-	public Warden(string prisonFilePath, WabiSabiConfig config)
+	public Warden(WabiSabiConfig config)
 	{
-		PrisonFilePath = prisonFilePath;
+		PrisonFilePath = "Prison.txt";
 		Config = config;
 		OffendersToSaveChannel = Channel.CreateUnbounded<Offender>();
 

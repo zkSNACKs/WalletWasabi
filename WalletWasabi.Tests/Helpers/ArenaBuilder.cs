@@ -33,7 +33,7 @@ public class ArenaBuilder
 		Network network = Network ?? Network.Main;
 		RoundParameterFactory roundParameterFactory = RoundParameterFactory ?? CreateRoundParameterFactory(config, network);
 
-		Arena arena = new(period, config, rpc, prison, roundParameterFactory);
+		Arena arena = new(config, rpc, prison, roundParameterFactory, period:period);
 
 		foreach (var round in rounds)
 		{

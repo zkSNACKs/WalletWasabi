@@ -141,7 +141,7 @@ public class P2pBasedTests
 	{
 		var coreNode = await TestNodeBuilder.CreateAsync(nameof(BlockNotifierTestsAsync));
 		using HostedServices services = new();
-		services.Register<BlockNotifier>(() => new BlockNotifier(TimeSpan.FromSeconds(7), coreNode.RpcClient, coreNode.P2pNode), "Block Notifier");
+		services.Register<BlockNotifier>(() => new BlockNotifier(coreNode.RpcClient, coreNode.P2pNode,TimeSpan.FromSeconds(7) ), "Block Notifier");
 
 		await services.StartAllAsync();
 		try

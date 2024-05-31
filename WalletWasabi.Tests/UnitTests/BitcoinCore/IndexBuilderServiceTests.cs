@@ -27,8 +27,8 @@ public class IndexBuilderServiceTests
 				InitialBlockDownload = false
 			}),
 		};
-		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(rpc, blockNotifier, "filters.txt");
+		using var blockNotifier = new BlockNotifier(rpc);
+		var indexer = new IndexBuilderService(rpc, blockNotifier);
 
 		indexer.Synchronize();
 
@@ -54,8 +54,8 @@ public class IndexBuilderServiceTests
 				});
 			}
 		};
-		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(rpc, blockNotifier, "filters.txt");
+		using var blockNotifier = new BlockNotifier(rpc);
+		var indexer = new IndexBuilderService(rpc, blockNotifier);
 
 		indexer.Synchronize();
 
@@ -85,8 +85,8 @@ public class IndexBuilderServiceTests
 			OnGetBlockHashAsync = (height) => Task.FromResult(blockchain[height].Hash),
 			OnGetVerboseBlockAsync = (hash) => Task.FromResult(blockchain.Single(x => x.Hash == hash))
 		};
-		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(rpc, blockNotifier, "filters.txt");
+		using var blockNotifier = new BlockNotifier(rpc);
+		var indexer = new IndexBuilderService(rpc, blockNotifier);
 
 		indexer.Synchronize();
 
@@ -155,8 +155,8 @@ public class IndexBuilderServiceTests
 			OnGetBlockHashAsync = (height) => Task.FromResult(blockchain[height].Hash),
 			OnGetVerboseBlockAsync = (hash) => Task.FromResult(blockchain.Single(x => x.Hash == hash))
 		};
-		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(rpc, blockNotifier, "filters.txt");
+		using var blockNotifier = new BlockNotifier(rpc);
+		var indexer = new IndexBuilderService(rpc, blockNotifier);
 
 		indexer.Synchronize();
 
@@ -181,8 +181,8 @@ public class IndexBuilderServiceTests
 				InitialBlockDownload = false
 			}),
 		};
-		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(rpc, blockNotifier, "filters.txt");
+		using var blockNotifier = new BlockNotifier(rpc);
+		var indexer = new IndexBuilderService(rpc, blockNotifier);
 
 		indexer.Synchronize();
 
@@ -208,8 +208,8 @@ public class IndexBuilderServiceTests
 				});
 			}
 		};
-		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(rpc, blockNotifier, "filters.txt");
+		using var blockNotifier = new BlockNotifier(rpc);
+		var indexer = new IndexBuilderService(rpc, blockNotifier);
 
 		indexer.Synchronize();
 
@@ -239,8 +239,8 @@ public class IndexBuilderServiceTests
 			OnGetBlockHashAsync = (height) => Task.FromResult(blockchain[height].Hash),
 			OnGetVerboseBlockAsync = (hash) => Task.FromResult(blockchain.Single(x => x.Hash == hash))
 		};
-		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(rpc, blockNotifier, "filters.txt");
+		using var blockNotifier = new BlockNotifier(rpc);
+		var indexer = new IndexBuilderService(rpc, blockNotifier);
 
 		indexer.Synchronize();
 
@@ -267,8 +267,8 @@ public class IndexBuilderServiceTests
 			OnGetBlockHashAsync = (height) => Task.FromResult(blockchain[height].Hash),
 			OnGetVerboseBlockAsync = (hash) => Task.FromResult(blockchain.Single(x => x.Hash == hash))
 		};
-		using var blockNotifier = new BlockNotifier(TimeSpan.MaxValue, rpc);
-		var indexer = new IndexBuilderService(rpc, blockNotifier, "filters.txt");
+		using var blockNotifier = new BlockNotifier(rpc);
+		var indexer = new IndexBuilderService(rpc, blockNotifier);
 
 		indexer.Synchronize();
 

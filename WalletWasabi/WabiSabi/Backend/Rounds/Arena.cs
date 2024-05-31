@@ -25,12 +25,13 @@ namespace WalletWasabi.WabiSabi.Backend.Rounds;
 public partial class Arena : PeriodicRunner
 {
 	public Arena(
-		TimeSpan period,
 		WabiSabiConfig config,
 		IRPCClient rpc,
 		Prison prison,
 		RoundParameterFactory roundParameterFactory,
-		CoinJoinScriptStore? coinJoinScriptStore = null ) : base(period)
+		CoinJoinScriptStore? coinJoinScriptStore = null,
+		TimeSpan? period = null
+		) : base(period ?? TimeSpan.FromSeconds(2))
 	{
 		Config = config;
 		Rpc = rpc;

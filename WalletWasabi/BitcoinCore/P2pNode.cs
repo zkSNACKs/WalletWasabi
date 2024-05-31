@@ -16,12 +16,11 @@ public class P2pNode
 {
 	private bool _disposed = false;
 
-	public P2pNode(Network network, EndPoint endPoint, MempoolService mempoolService, string userAgent)
+	public P2pNode(Network network, EndPoint endPoint, MempoolService mempoolService)
 	{
 		Network = Guard.NotNull(nameof(network), network);
 		EndPoint = Guard.NotNull(nameof(endPoint), endPoint);
 		MempoolService = Guard.NotNull(nameof(mempoolService), mempoolService);
-		UserAgent = Guard.NotNullOrEmptyOrWhitespace(nameof(userAgent), userAgent, trim: true);
 
 		Stop = new CancellationTokenSource();
 		NodeEventsSubscribed = false;
@@ -38,7 +37,6 @@ public class P2pNode
 	private Network Network { get; }
 	private EndPoint EndPoint { get; }
 	public MempoolService MempoolService { get; }
-	private string UserAgent { get; }
 
 	private bool NodeEventsSubscribed { get; set; }
 	private object SubscriptionLock { get; }
@@ -52,7 +50,6 @@ public class P2pNode
 		handshakeTimeout.CancelAfter(TimeSpan.FromSeconds(21));
 		var parameters = new NodeConnectionParameters()
 		{
-			UserAgent = UserAgent,
 			ConnectCancellation = linked.Token,
 			IsRelay = true
 		};
