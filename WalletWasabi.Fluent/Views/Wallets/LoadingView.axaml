@@ -31,7 +31,7 @@
             TextAlignment="Center" TextWrapping="Wrap" Opacity="0.6" />
 
           <TextBlock
-            Text="This process may take some time depending on the size of your wallet."
+            Text="This process will be longer on first launch, with larger wallets, or after long gaps between synchronizations."
             TextAlignment="Center" TextWrapping="Wrap" Opacity="0.6" />
 
           <ProgressBar Value="{Binding Percent}" IsIndeterminate="{Binding !Percent}" Margin="0 20 0 0" />

@@ -42,7 +42,7 @@ public class KeyManagementTests
 		Assert.NotNull(manager3.SegwitExtPubKey);
 		Assert.NotNull(manager3.TaprootExtPubKey);
 
-		var sameManager = new KeyManager(manager.EncryptedSecret, manager.ChainCode, manager.MasterFingerprint, manager.SegwitExtPubKey, manager.TaprootExtPubKey, true, null, new BlockchainState(Network.Main));
+		var sameManager = new KeyManager(manager.EncryptedSecret, manager.ChainCode, manager.MasterFingerprint, manager.SegwitExtPubKey, manager.TaprootExtPubKey, null, new BlockchainState(Network.Main));
 		var sameManager2 = new KeyManager(manager.EncryptedSecret, manager.ChainCode, password, Network.Main);
 		Logger.TurnOff();
 		Assert.Throws<SecurityException>(() => new KeyManager(manager.EncryptedSecret, manager.ChainCode, "differentPassword", Network.Main));

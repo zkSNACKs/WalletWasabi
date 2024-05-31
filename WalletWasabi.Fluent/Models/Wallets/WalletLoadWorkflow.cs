@@ -37,7 +37,7 @@ public partial class WalletLoadWorkflow
 			Observable.FromEventPattern<WalletState>(_wallet, nameof(Wallet.StateChanged))
 					.ObserveOn(RxApp.MainThreadScheduler)
 					.Select(x => x.EventArgs)
-					.Where(x => x == WalletState.Started || (x == WalletState.Starting && wallet.KeyManager.SkipSynchronization))
+					.Where(x => x == WalletState.Started)
 					.ToSignal();
 	}
 
