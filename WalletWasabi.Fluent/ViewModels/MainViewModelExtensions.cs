@@ -1,5 +1,6 @@
 using WalletWasabi.Fluent.Models.UI;
 using WalletWasabi.Fluent.ViewModels.AddWallet;
+using WalletWasabi.Fluent.ViewModels.AI;
 using WalletWasabi.Fluent.ViewModels.HelpAndSupport;
 using WalletWasabi.Fluent.ViewModels.OpenDirectory;
 using WalletWasabi.Fluent.ViewModels.Settings;
@@ -32,6 +33,9 @@ public static class MainViewModelExtensions
 			mainViewModel.SettingsPage.SelectedTab = 2;
 			return mainViewModel.SettingsPage;
 		});
+
+		// TODO:
+		ChatsViewModel.RegisterLazy(() => new ChatsViewModel(uiContext));
 
 		AboutViewModel.RegisterLazy(() => new AboutViewModel(uiContext));
 		BroadcasterViewModel.RegisterLazy(() => new BroadcasterViewModel(uiContext));

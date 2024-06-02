@@ -24,7 +24,7 @@ internal abstract class CombinedGenerator : ISourceGenerator
 			{
 				foreach (var (fileName, source) in files)
 				{
-					ctx.AddSource(fileName, SourceText.From(source, Encoding.UTF8));
+					ctx.AddSource($"{Guid.NewGuid()}_{fileName}", SourceText.From(source, Encoding.UTF8));
 				}
 			});
 		}

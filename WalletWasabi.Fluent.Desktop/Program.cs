@@ -31,6 +31,9 @@ public class Program
 	// yet and stuff might break.
 	public static async Task<int> Main(string[] args)
 	{
+		// TDOO: For testing only
+		// await Repl.RunAsync();
+
 		// Crash reporting must be before the "single instance checking".
 		Logger.InitializeDefaults(Path.Combine(Config.DataDir, "Logs.txt"), LogLevel.Info);
 		try

@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:behaviors="clr-namespace:WalletWasabi.Fluent.Behaviors"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:vm="clr-namespace:WalletWasabi.Fluent.ViewModels.AI"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WalletWasabi.Fluent.Views.AI.UserInputView"
+             x:CompileBindings="True"
+             x:DataType="vm:ChatViewModel">
+
+    <UserControl.Resources>
+      <Thickness x:Key="TagsBoxBorderPadding">4,0,0,-2</Thickness>
+    </UserControl.Resources>
+
+  <UserControl.Styles>
+      <Style Selector="TextBox">
+        <Setter Property="Background" Value="{DynamicResource ChatInputBackground}" />
+      </Style>
+      <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource ChatInputBackground}" />
+      </Style>
+      <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource ChatInputBackground}" />
+      </Style>
+    </UserControl.Styles>
+
+    <TextBox VerticalAlignment="Center"
+             Text="{Binding CurrentUserMessage.Message}"
+             x:Name="TextBox"
+             MaxLength="5000"
+             Watermark="Enter you message">
+      <i:Interaction.Behaviors>
+        <behaviors:FocusOnAttachedBehavior />
+        <DataTriggerBehavior Binding="{Binding IsBusy}" Value="False">
+          <behaviors:FocusControlActionCustom TargetControl="TextBox" />
+        </DataTriggerBehavior>
+      </i:Interaction.Behaviors>
+      <TextBox.Styles>
+        <Style Selector="TextBox /template/ DataValidationErrors">
+          <Setter Property="IsVisible" Value="False" />
+        </Style>
+      </TextBox.Styles>
+    </TextBox>
+
+</UserControl>

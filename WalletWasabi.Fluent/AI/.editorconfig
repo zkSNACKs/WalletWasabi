@@ -1,0 +1,21 @@
+root = true
+
+[*.cs]
+
+charset = utf-8
+
+# Use hard tabs for indentation
+indent_style = tab
+indent_size = 4
+
+# Disable all .NET analyzers
+dotnet_analyzer_diagnostic.severity = none
+
+dotnet_diagnostic.CS8600.severity = none
+dotnet_diagnostic.CS8601.severity = none
+dotnet_diagnostic.CS8603.severity = none
+dotnet_diagnostic.CS8604.severity = none
+dotnet_diagnostic.CS8618.severity = none
+dotnet_diagnostic.CS8625.severity = none
+dotnet_diagnostic.CS8765.severity = none
+dotnet_diagnostic.CS8767.severity = none

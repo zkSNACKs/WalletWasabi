@@ -830,6 +830,7 @@
           "Avalonia.Skia": "[11.0.999-cibuild0044755-beta, )",
           "Avalonia.Themes.Fluent": "[11.0.999-cibuild0044755-beta, )",
           "Avalonia.Xaml.Behaviors": "[11.0.5, )",
+          "CommunityToolkit.Mvvm": "[8.1.0, )",
           "DynamicData": "[8.1.1, )",
           "QRackers": "[1.1.0, )",
           "System.Private.Uri": "[4.3.2, )",
@@ -929,6 +930,12 @@
           "Avalonia.Xaml.Interactions.Responsive": "11.0.5",
           "Avalonia.Xaml.Interactivity": "11.0.5"
         }
+      },
+      "CommunityToolkit.Mvvm": {
+        "type": "CentralTransitive",
+        "requested": "[8.1.0, )",
+        "resolved": "8.1.0",
+        "contentHash": "xxOt7lu9a5kB5Fs9RfcxzVlKnhuuPe+w7AXHtmCFtS3oldrsUhEMxHfNulluXSscUUoGxZ0jh55Om12ZP6abHA=="
       },
       "DynamicData": {
         "type": "CentralTransitive",

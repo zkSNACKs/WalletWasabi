@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,7 +47,7 @@ public class NavigationMetaDataGenerator : ISourceGenerator
 			var classSource = ProcessClass(context.Compilation, namedTypeSymbol, attributeSymbol, metadataSymbol);
 			if (classSource is not null)
 			{
-				context.AddSource($"{namedTypeSymbol.Name}_NavigationMetaData.cs", SourceText.From(classSource, Encoding.UTF8));
+				context.AddSource($"{Guid.NewGuid()}_{namedTypeSymbol.Name}_NavigationMetaData.cs", SourceText.From(classSource, Encoding.UTF8));
 			}
 		}
 	}

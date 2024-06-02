@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,7 +34,7 @@ public class StaticViewLocatorGenerator : ISourceGenerator
 	public void Initialize(GeneratorInitializationContext context)
 	{
 		// System.Diagnostics.Debugger.Launch();
-		context.RegisterForPostInitialization((i) => i.AddSource("StaticViewLocatorAttribute.cs", SourceText.From(AttributeText, Encoding.UTF8)));
+		context.RegisterForPostInitialization((i) => i.AddSource($"{Guid.NewGuid()}_StaticViewLocatorAttribute.cs", SourceText.From(AttributeText, Encoding.UTF8)));
 
 		context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
 	}
@@ -59,7 +60,7 @@ public class StaticViewLocatorGenerator : ISourceGenerator
 			var classSource = ProcessClass(context.Compilation, namedTypeSymbol, namedTypeSymbolViewModels);
 			if (classSource is not null)
 			{
-				context.AddSource($"{namedTypeSymbol.Name}_StaticViewLocator.cs", SourceText.From(classSource, Encoding.UTF8));
+				context.AddSource($"{{Guid.NewGuid()}}_{namedTypeSymbol.Name}_StaticViewLocator.cs", SourceText.From(classSource, Encoding.UTF8));
 			}
 		}
 	}
