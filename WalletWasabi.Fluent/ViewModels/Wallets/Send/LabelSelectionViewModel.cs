@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using NBitcoin;
 using ReactiveUI;
 using WalletWasabi.Blockchain.Analysis.Clustering;
 using WalletWasabi.Blockchain.Keys;
@@ -127,7 +128,10 @@ public partial class LabelSelectionViewModel : ViewModelBase
 				.ToArray();
 
 		var bestPockets = new List<Pocket>();
-		bestPockets.AddRange(privateAndSemiPrivatePockets);
+		if (Pocket.Merge(privateAndSemiPrivatePockets).Coins.TotalAmount() != Money.Zero)
+		{
+			bestPockets.AddRange(privateAndSemiPrivatePockets);
+		}
 
 		// Iterate through the ordered by privacy pockets and add them one by one until the total amount covers the payment.
 		// The first one is the best from the privacy point of view, and the last one is the worst.
@@ -330,12 +334,7 @@ public partial class LabelSelectionViewModel : ViewModelBase
 		remainingUsablePockets.Remove(_privatePocket);
 		remainingUsablePockets.Remove(_semiPrivatePocket);
 
-		if (usedPockets.Length == 1 && usedPockets.First() == _privatePocket)
-		{
-			return false;
-		}
-
-		if (usedPockets.Length == 1 && usedPockets.First() == _semiPrivatePocket)
+		if (usedPockets.Length == 1)
 		{
 			return false;
 		}
