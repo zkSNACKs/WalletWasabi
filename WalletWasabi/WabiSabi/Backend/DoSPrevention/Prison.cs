@@ -80,7 +80,8 @@ public class Prison
 
 			var maxOffense = offenderHistory.Count == 0
 				? 1
-				: offenderHistory.Max( x => x switch {
+				: offenderHistory.Max(x => x switch
+				{
 					{ Method: RoundDisruptionMethod.DidNotConfirm } => configuration.PenaltyFactorForDisruptingConfirmation,
 					{ Method: RoundDisruptionMethod.DidNotSign } => configuration.PenaltyFactorForDisruptingSigning,
 					{ Method: RoundDisruptionMethod.DoubleSpent } => configuration.PenaltyFactorForDisruptingByDoubleSpending,

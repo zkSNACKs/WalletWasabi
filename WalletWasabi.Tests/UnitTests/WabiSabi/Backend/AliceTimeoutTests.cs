@@ -38,7 +38,8 @@ public class AliceTimeoutTests
 		KeyChain keyChain = new(km, new Kitchen(ingredients: ""));
 
 		using CancellationTokenSource registrationCts = new();
-		Task<AliceClient> task = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round), arenaClient, smartCoin, keyChain, roundStateUpdater, registrationCts.Token, registrationCts.Token, confirmationCancellationToken: testDeadlineCts.Token);
+		using CancellationTokenSource coinBanCheckMode = new();
+		Task<AliceClient> task = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round), arenaClient, smartCoin, keyChain, roundStateUpdater, registrationCts.Token, registrationCts.Token, confirmationCancellationToken: testDeadlineCts.Token, coinBanCheckMode.Token);
 
 		while (round.Alices.Count == 0)
 		{

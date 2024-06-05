@@ -210,6 +210,8 @@ public class StepOutputRegistrationTests
 	{
 		using CancellationTokenSource cancellationTokenSource = new(TestTimeout);
 		var token = cancellationTokenSource.Token;
+		using CancellationTokenSource coinBanCheckMode = new();
+		var coinBanCheckModeToken = coinBanCheckMode.Token;
 
 		// Get the round.
 		await arena.TriggerAndWaitRoundAsync(token);
@@ -221,8 +223,8 @@ public class StepOutputRegistrationTests
 
 		using RoundStateUpdater roundStateUpdater = new(TimeSpan.FromSeconds(2), arena);
 		await roundStateUpdater.StartAsync(token);
-		var task1 = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round), arenaClient, coin1, keyChain, roundStateUpdater, token, token, token);
-		var task2 = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round), arenaClient, coin2, keyChain, roundStateUpdater, token, token, token);
+		var task1 = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round), arenaClient, coin1, keyChain, roundStateUpdater, token, token, token, coinBanCheckModeToken);
+		var task2 = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round), arenaClient, coin2, keyChain, roundStateUpdater, token, token, token, coinBanCheckModeToken);
 
 		while (Phase.ConnectionConfirmation != round.Phase)
 		{
@@ -252,6 +254,8 @@ public class StepOutputRegistrationTests
 	{
 		using CancellationTokenSource cancellationTokenSource = new(TestTimeout);
 		var token = cancellationTokenSource.Token;
+		using CancellationTokenSource coinBanCheckMode = new();
+		var coinBanCheckModeToken = coinBanCheckMode.Token;
 
 		WabiSabiConfig cfg = new()
 		{
@@ -282,8 +286,8 @@ public class StepOutputRegistrationTests
 
 		using RoundStateUpdater roundStateUpdater = new(TimeSpan.FromSeconds(2), arena);
 		await roundStateUpdater.StartAsync(token);
-		var task1a = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round1), arenaClient1, coin1a, keyChain1, roundStateUpdater, token, token, token);
-		var task1b = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round1), arenaClient1, coin1b, keyChain1, roundStateUpdater, token, token, token);
+		var task1a = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round1), arenaClient1, coin1a, keyChain1, roundStateUpdater, token, token, token, coinBanCheckModeToken);
+		var task1b = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round1), arenaClient1, coin1b, keyChain1, roundStateUpdater, token, token, token, coinBanCheckModeToken);
 
 		while (Phase.ConnectionConfirmation != round1.Phase)
 		{
@@ -298,8 +302,8 @@ public class StepOutputRegistrationTests
 
 		var arenaClient2 = WabiSabiFactory.CreateArenaClient(arena, round2);
 
-		var task2a = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round2), arenaClient2, coin2a, keyChain2, roundStateUpdater, token, token, token);
-		var task2b = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round2), arenaClient2, coin2b, keyChain2, roundStateUpdater, token, token, token);
+		var task2a = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round2), arenaClient2, coin2a, keyChain2, roundStateUpdater, token, token, token, coinBanCheckModeToken);
+		var task2b = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round2), arenaClient2, coin2b, keyChain2, roundStateUpdater, token, token, token, coinBanCheckModeToken);
 
 		while (Phase.ConnectionConfirmation != round2.Phase)
 		{

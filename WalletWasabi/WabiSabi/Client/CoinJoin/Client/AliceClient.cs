@@ -13,6 +13,8 @@ using WalletWasabi.Extensions;
 using System.Net.Http;
 using WabiSabi.Crypto.ZeroKnowledge;
 using WalletWasabi.WabiSabi.Models.MultipartyTransaction;
+using WalletWasabi.WabiSabi.Client.StatusChangedEvents;
+using WabiSabi.Crypto.Randomness;
 
 namespace WalletWasabi.WabiSabi.Client.CoinJoin.Client;
 
@@ -63,12 +65,13 @@ public class AliceClient
 		RoundStateUpdater roundStatusUpdater,
 		CancellationToken unregisterCancellationToken,
 		CancellationToken registrationCancellationToken,
-		CancellationToken confirmationCancellationToken)
+		CancellationToken confirmationCancellationToken,
+		CancellationToken coinBanCheckMode)
 	{
 		var aliceClient = await RegisterInputAsync(roundState, arenaClient, coin, keyChain, registrationCancellationToken).ConfigureAwait(false);
 		try
 		{
-			await aliceClient.ConfirmConnectionAsync(roundStatusUpdater, confirmationCancellationToken).ConfigureAwait(false);
+			await aliceClient.ConfirmConnectionAsync(roundState, roundStatusUpdater, confirmationCancellationToken, coinBanCheckMode).ConfigureAwait(false);
 
 			Logger.LogInfo($"Round ({aliceClient.RoundId}), Alice ({aliceClient.AliceId}): Connection was confirmed.");
 		}
@@ -119,7 +122,7 @@ public class AliceClient
 		return aliceClient;
 	}
 
-	private async Task ConfirmConnectionAsync(RoundStateUpdater roundStatusUpdater, CancellationToken cancellationToken)
+	private async Task ConfirmConnectionAsync(RoundState roundState, RoundStateUpdater roundStatusUpdater, CancellationToken cancellationToken, CancellationToken coinBanCheckMode)
 	{
 		long[] amountsToRequest = { EffectiveValue.Satoshi };
 		long[] vsizesToRequest = { MaxVsizeAllocationPerAlice - SmartCoin.ScriptPubKey.EstimateInputVsize() };
@@ -141,6 +144,15 @@ public class AliceClient
 			catch (OperationCanceledException)
 			{
 				cancellationToken.ThrowIfCancellationRequested();
+			}
+			if (coinBanCheckMode.IsCancellationRequested)
+			{
+				var aliceWouldBeRemovedByBackendTime = DateTime.UtcNow + roundState.CoinjoinState.Parameters.ConnectionConfirmationTimeout;
+				if (aliceWouldBeRemovedByBackendTime > roundState.InputRegistrationEnd - TimeSpan.FromMinutes(1) || SecureRandom.Instance.GetInt(0, 100) < 50)
+				{
+					// We "forget" to confirm the connection
+					throw new CoinJoinClientException(CoinjoinError.BannedCoinCheckFinished, "Willingly leaved the connection confirmation due to coin ban check mode.");
+				}
 			}
 		}
 		while (!await TryConfirmConnectionAsync(amountsToRequest, vsizesToRequest, cancellationToken).ConfigureAwait(false));

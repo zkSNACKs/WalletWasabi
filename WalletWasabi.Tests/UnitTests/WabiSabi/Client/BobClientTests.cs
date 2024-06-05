@@ -33,6 +33,8 @@ public class BobClientTests
 	{
 		using CancellationTokenSource cancellationTokenSource = new(TestTimeout);
 		var token = cancellationTokenSource.Token;
+		using CancellationTokenSource coinBanCheckMode = new();
+		var coinBanCheckModeToken = coinBanCheckMode.Token;
 
 		var config = new WabiSabiConfig { MaxInputCountByRound = 1 };
 		var round = WabiSabiFactory.CreateRound(config);
@@ -71,7 +73,7 @@ public class BobClientTests
 		await roundStateUpdater.StartAsync(token);
 
 		var keyChain = new KeyChain(km, new Kitchen(""));
-		var task = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round), aliceArenaClient, coin1, keyChain, roundStateUpdater, token, token, token);
+		var task = AliceClient.CreateRegisterAndConfirmInputAsync(RoundState.FromRound(round), aliceArenaClient, coin1, keyChain, roundStateUpdater, token, token, token, coinBanCheckModeToken);
 
 		do
 		{
