@@ -26,7 +26,7 @@
     <Panel IsEnabled="{Binding !IsBusy}">
       <buy:UserInputValidatorView DataContext="{Binding Workflow.CurrentStep}">
         <Interaction.Behaviors>
-          <ExecuteCommandOnKeyDownBehavior KeyGesture="Enter" Command="{Binding SendCommand}" />
+          <ExecuteCommandOnKeyDownBehavior Gesture="Enter" Command="{Binding SendCommand}" />
         </Interaction.Behaviors>
       </buy:UserInputValidatorView>
     </Panel>

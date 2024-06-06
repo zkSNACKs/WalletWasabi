@@ -159,7 +159,7 @@
                                                   EqualityComparer="{x:Static helpers:AmountStringComparer.Instance}"
                                                   PlacementMode="{Binding !ConversionReversed, Converter={StaticResource SuggestionPlacementConverter}}" />
               <KeyDownTrigger Key="Enter" EventRoutingStrategy="Tunnel" MarkAsHandled="False">
-                <FocusControlActionCustom TargetControl="LabelTagBox"/>
+                <FocusControlAction TargetControl="LabelTagBox"/>
               </KeyDownTrigger>
             </Interaction.Behaviors>
           </DualCurrencyEntryBox>

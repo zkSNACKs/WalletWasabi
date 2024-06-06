@@ -181,7 +181,7 @@
           <Interaction.Behaviors>
             <FocusOnAttachedBehavior />
             <DataTriggerBehavior Binding="{Binding IsBusy}" Value="False">
-              <FocusControlActionCustom TargetControl="TextBox" />
+              <FocusControlAction TargetControl="TextBox" />
             </DataTriggerBehavior>
           </Interaction.Behaviors>
           <ChatTextBox.Styles>
@@ -200,7 +200,7 @@
           <Interaction.Behaviors>
             <FocusOnAttachedBehavior />
             <OnSignalTriggerBehavior Trigger="{Binding Sent}">
-              <FocusControlActionCustom TargetControl="TextBox" />
+              <FocusControlAction TargetControl="TextBox" />
             </OnSignalTriggerBehavior>
           </Interaction.Behaviors>
           <ChatTextBox.Styles>
@@ -227,7 +227,7 @@
           <Interaction.Behaviors>
             <FocusOnAttachedBehavior />
             <DataTriggerBehavior Binding="{Binding IsBusy}" Value="False">
-              <FocusControlActionCustom TargetControl="TextBox" />
+              <FocusControlAction TargetControl="TextBox" />
             </DataTriggerBehavior>
           </Interaction.Behaviors>
         </TagsBox>

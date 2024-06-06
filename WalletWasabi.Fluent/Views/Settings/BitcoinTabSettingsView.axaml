@@ -62,7 +62,7 @@
         <Interaction.Behaviors>
           <TextBoxAutoSelectTextBehavior />
           <DataTriggerBehavior Binding="{Binding FocusCoordinatorUri}" Value="True">
-            <FocusControlActionCustom TargetControl="CoordinatorTextBox" />
+            <FocusControlAction TargetControl="CoordinatorTextBox" />
           </DataTriggerBehavior>
         </Interaction.Behaviors>
       </TextBox>
