@@ -7,6 +7,7 @@ using WalletWasabi.Fluent.Models.UI;
 using WalletWasabi.Fluent.Infrastructure;
 using WalletWasabi.Fluent.Models.Wallets;
 using WalletWasabi.Fluent.ViewModels.Navigation;
+using System.Reactive;
 
 namespace WalletWasabi.Fluent.ViewModels.Wallets.Settings;
 
@@ -45,6 +46,7 @@ public partial class WalletSettingsViewModel : RoutableViewModel
 		NextCommand = CancelCommand;
 
 		VerifyRecoveryWordsCommand = ReactiveCommand.Create(() => Navigate().To().WalletVerifyRecoveryWords(walletModel));
+		SignalWalletResyncCommand = ReactiveCommand.Create(OnSignalResyncAsync);
 
 		this.WhenAnyValue(x => x.PreferPsbtWorkflow)
 			.Skip(1)
@@ -68,6 +70,12 @@ public partial class WalletSettingsViewModel : RoutableViewModel
 	public WalletCoinJoinSettingsViewModel WalletCoinJoinSettings { get; private set; }
 
 	public ICommand VerifyRecoveryWordsCommand { get; }
+	public ICommand SignalWalletResyncCommand { get; }
+
+	private async Task OnSignalResyncAsync()
+	{
+		await Navigate().To().WalletResync(_wallet.Settings).GetResultAsync();
+	}
 
 	private async Task OnRenameWalletAsync()
 	{

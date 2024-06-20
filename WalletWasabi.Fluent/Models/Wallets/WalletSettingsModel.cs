@@ -99,6 +99,11 @@ public partial class WalletSettingsModel : ReactiveObject
 		return Services.WalletManager.GetWalletByName(_keyManager.WalletName).WalletId;
 	}
 
+	public void SignalResync()
+	{
+		_keyManager.SetBestHeights(0, 0);
+	}
+
 	private void SetValues()
 	{
 		_keyManager.AutoCoinJoin = AutoCoinjoin;

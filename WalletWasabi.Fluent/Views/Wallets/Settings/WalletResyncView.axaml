@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:WalletWasabi.Fluent.ViewModels.Wallets.Settings"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WalletWasabi.Fluent.Views.Wallets.Settings.WalletResyncView"
+             x:DataType="vm:WalletResyncViewModel">
+  <ContentArea Title="{Binding Title}"
+                 Caption="Signal to rescan the wallet"
+                 EnableBack="{Binding EnableBack}"
+                 EnableCancel="{Binding EnableCancel}"
+                 EnableNext="True" NextContent="Save"
+                 Height="280" Width="450">
+    <StackPanel Spacing="20">
+      <InfoMessage>
+        <DockPanel>
+          <TextBlock Text="Pressing OK will shut down Wasabi." />
+        </DockPanel>
+      </InfoMessage>
+      <InfoMessage>
+        <DockPanel>
+          <TextBlock Text="Rescanning the wallet could take several hours, based on how many transactions your wallet had." />
+        </DockPanel>
+      </InfoMessage>
+      <TextBlock Classes="h6" Text="Do you want to continue?" />
+    </StackPanel>
+  </ContentArea>
+</UserControl>

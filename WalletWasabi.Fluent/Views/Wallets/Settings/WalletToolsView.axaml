@@ -21,5 +21,11 @@
         <TextBlock Text="Your passphrase is also required to restore your wallet, do not forget it." />
       </DockPanel>
     </InfoMessage>
+    <InfoMessage>
+      <DockPanel>
+        <Button Margin="50 0" Theme="{StaticResource AccentButton}" Command="{Binding SignalWalletResyncCommand}" Content="Resync Wallet" DockPanel.Dock="Right" />
+        <TextBlock Text="If your funds are missing, you can resynchronize wallet. Once you restart Wasabi, it can take several hours to rescan and find all your funds." />
+      </DockPanel>
+    </InfoMessage>
   </StackPanel>
 </UserControl>
