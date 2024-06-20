@@ -15,18 +15,18 @@ public static class ConversationExtensions
 		ConversationStatus newStatus) =>
 		conversation with
 		{
-			ChatMessages = new(conversation.ChatMessages.Append(new ChatMessage(MessageSource.Bot, message, IsUnread: true, null, data))),
+			ChatMessages = new(conversation.ChatMessages.Append(new ChatMessage(MessageSource.Bot, message, isUnread: true, null, data))),
 			ConversationStatus = newStatus
 		};
 
 	public static Conversation AddUserMessage(this Conversation conversation, string msg, string? stepName = null) =>
-		conversation with { ChatMessages = new(conversation.ChatMessages.Append(new ChatMessage(MessageSource.User, msg, IsUnread: false, stepName))) };
+		conversation with { ChatMessages = new(conversation.ChatMessages.Append(new ChatMessage(MessageSource.User, msg, isUnread: false, stepName))) };
 
 	public static Conversation AddBotMessage(this Conversation conversation, string msg, string? stepName = null, bool isUnread = true) =>
-		conversation with { ChatMessages = new(conversation.ChatMessages.Append(new ChatMessage(MessageSource.Bot, msg, IsUnread: isUnread, stepName))) };
+		conversation with { ChatMessages = new(conversation.ChatMessages.Append(new ChatMessage(MessageSource.Bot, msg, isUnread: isUnread, stepName))) };
 
 	public static Conversation AddAgentMessage(this Conversation conversation, string msg) =>
-		conversation with { ChatMessages = new(conversation.ChatMessages.Append(new ChatMessage(MessageSource.Agent, msg, IsUnread: true, null))) };
+		conversation with { ChatMessages = new(conversation.ChatMessages.Append(new ChatMessage(MessageSource.Agent, msg, isUnread: true, null))) };
 
 	public static Conversation UpdateMetadata(this Conversation conversation, Func<ConversationMetaData, ConversationMetaData> updateMetadata)
 	{
