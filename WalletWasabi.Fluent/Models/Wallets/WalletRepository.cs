@@ -149,12 +149,26 @@ public partial class WalletRepository : ReactiveObject
 
 	private async Task<IWalletSettingsModel> RecoverWalletAsync(WalletCreationOptions.RecoverWallet options)
 	{
-		var (walletName, password, mnemonic, minGapLimit) = options;
+		var (walletName, password, mnemonic, minGapLimit, path) = options;
 
 		ArgumentException.ThrowIfNullOrEmpty(walletName);
 		ArgumentNullException.ThrowIfNull(password);
 		ArgumentNullException.ThrowIfNull(mnemonic);
 		ArgumentNullException.ThrowIfNull(minGapLimit);
+
+		var accountKeyPath = AccountKeyPath;
+
+		if (!string.IsNullOrEmpty(path))
+		{
+			if (KeyPath.TryParse(path, out var userKeyPath) && userKeyPath is not null)
+			{
+				accountKeyPath = userKeyPath;
+			}
+			else
+			{
+				throw new InvalidOperationException("Could not parse key path.");
+			}
+		}
 
 		var keyManager = await Task.Run(() =>
 		{
@@ -164,7 +178,7 @@ public partial class WalletRepository : ReactiveObject
 				mnemonic,
 				password,
 				Services.WalletManager.Network,
-				AccountKeyPath,
+				accountKeyPath,
 				null,
 				"", // Make sure it is not saved into a file yet.
 				minGapLimit.Value);

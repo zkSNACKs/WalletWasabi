@@ -3,27 +3,50 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:create="using:WalletWasabi.Fluent.ViewModels.AddWallet.Create"
-             mc:Ignorable="d" d:DesignWidth="428" d:DesignHeight="371"
+             mc:Ignorable="d" d:DesignWidth="428" d:DesignHeight="600"
              x:CompileBindings="True"
              x:DataType="create:RecoveryWordsViewModel"
              x:Class="WalletWasabi.Fluent.Views.AddWallet.Create.RecoveryWordsView">
+
+  <UserControl.Styles>
+    <Style Selector="TextBlock.RecoveryWord">
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeH6}" />
+      <Setter Property="Height" Value="42" />
+    </Style>
+    <Style Selector="TextBlock.Passphrase">
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeH6}" />
+    </Style>
+  </UserControl.Styles>
+
   <ContentArea Title="{Binding Title}"
-                 Caption="Write down the recovery words in the correct order and store them in a safe place. They are needed to recover your wallet."
-                 CancelContent="Cancel"
-                 EnableCancel="{Binding EnableCancel}"
-                 EnableBack="{Binding EnableBack}"
-                 EnableNext="True" NextContent="Continue" FocusNext="True"
-                 ScrollViewer.HorizontalScrollBarVisibility="Auto">
+               Caption="Write down the recovery words in the correct order and store them in a safe place. They are needed to recover your wallet."
+               CancelContent="Cancel"
+               EnableCancel="{Binding EnableCancel}"
+               EnableBack="{Binding EnableBack}"
+               EnableNext="True" NextContent="Continue" FocusNext="True"
+               ScrollViewer.HorizontalScrollBarVisibility="Auto">
+    <Interaction.Behaviors>
+      <ExecuteCommandOnKeyDownBehavior KeyGesture="Enter" Command="{Binding NextCommand}" />
+    </Interaction.Behaviors>
     <Grid>
       <Grid.RowDefinitions>
-        <RowDefinition MinHeight="70" Height="*" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
         <RowDefinition Height="Auto" />
         <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
-        <RowDefinition Height="20" />
+        <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
 
-      <Panel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Background="Transparent">
+      <InfoMessage HorizontalAlignment="Center"
+                   Margin="0,0,0,35"
+                   Grid.Row="2">
+        <TextBlock Text="You will not be able to see these words again once the wallet is created." />
+      </InfoMessage>
+
+      <Panel Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center" Background="Transparent">
         <Panel.ContextMenu>
           <ContextMenu>
             <MenuItem Header="Copy recovery words"
@@ -35,12 +58,6 @@
           </ContextMenu>
         </Panel.ContextMenu>
         <ItemsControl ItemsSource="{Binding MnemonicWords}">
-          <ItemsControl.Styles>
-            <Style Selector="TextBlock">
-              <Setter Property="FontSize" Value="{DynamicResource FontSizeH6}" />
-              <Setter Property="Height" Value="42" />
-            </Style>
-          </ItemsControl.Styles>
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <WrapPanel MaxHeight="200" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center" />
@@ -49,8 +66,12 @@
           <ItemsControl.ItemTemplate>
             <DataTemplate>
               <StackPanel Orientation="Horizontal" Margin="50 0 50 0" Width="80">
-                <TextBlock Text="{Binding Index, Mode=OneWay, StringFormat={}{0}.}" Opacity="0.5" />
-                <TextBlock Text="{Binding Word}" FontWeight="SemiBold" Margin="5 0 0 0" />
+                <TextBlock Text="{Binding Index, Mode=OneWay, StringFormat={}{0}.}"
+                           Opacity="0.5"
+                           Classes="RecoveryWord" />
+                <TextBlock Text="{Binding Word}" FontWeight="SemiBold"
+                           Margin="5 0 0 0"
+                           Classes="RecoveryWord" />
               </StackPanel>
             </DataTemplate>
           </ItemsControl.ItemTemplate>
@@ -62,11 +83,38 @@
         </Grid>
       </Panel>
 
-      <InfoMessage Opacity="0.5"
-                     HorizontalAlignment="Center"
-                     Grid.Row="4">
-        <TextBlock Text="You will not be able to see these words again once the wallet is created." />
-      </InfoMessage>
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Center"
+                  Grid.Row="6">
+        <TextBlock IsVisible="{Binding Passphrase, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                   Classes="Passphrase"
+                   Opacity="0.5"
+                   Text="Passphrase: " />
+        <TextBlock IsVisible="{Binding Passphrase, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                   Classes="Passphrase"
+                   FontWeight="SemiBold"
+                   Text="{Binding Passphrase}" />
+      </StackPanel>
+
+      <CheckBox x:Name="CheckBox"
+                HorizontalAlignment="Center"
+                IsChecked="{Binding IsConfirmed}"
+                Grid.Row="7">
+        <Interaction.Behaviors>
+          <FocusOnAttachedBehavior />
+          <DataTriggerBehavior Binding="{Binding #CheckBox.IsChecked}" Value="True">
+            <FocusNextControlAction />
+          </DataTriggerBehavior>
+        </Interaction.Behaviors>
+        <CheckBox.Content>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="I have written down the 12 words" />
+            <TextBlock Text=" and the passphrase"
+                       IsVisible="{Binding Passphrase, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+          </StackPanel>
+        </CheckBox.Content>
+      </CheckBox>
+
     </Grid>
   </ContentArea>
 </UserControl>

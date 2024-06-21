@@ -14,6 +14,8 @@ namespace WalletWasabi.Fluent.ViewModels.AddWallet.Create;
 [NavigationMetaData(Title = "Recovery Words")]
 public partial class RecoveryWordsViewModel : RoutableViewModel
 {
+	[AutoNotify] private bool _isConfirmed;
+
 	private RecoveryWordsViewModel(WalletCreationOptions.AddNewWallet options)
 	{
 		var (_, _, mnemonic) = options;
@@ -22,9 +24,13 @@ public partial class RecoveryWordsViewModel : RoutableViewModel
 
 		MnemonicWords = CreateList(mnemonic);
 
+		Passphrase = options.Passphrase;
+
 		EnableBack = true;
 
-		NextCommand = ReactiveCommand.Create(() => OnNext(options));
+		var canExecuteNext = this.WhenAnyValue(x => x.IsConfirmed);
+
+		NextCommand = ReactiveCommand.Create(() => OnNext(options), canExecuteNext);
 
 		CancelCommand = ReactiveCommand.Create(OnCancel);
 		CopyToClipboardCommand = ReactiveCommand.CreateFromTask(OnCopyToClipboardAsync);
@@ -33,6 +39,8 @@ public partial class RecoveryWordsViewModel : RoutableViewModel
 	public ICommand CopyToClipboardCommand { get; }
 
 	public List<RecoveryWordViewModel> MnemonicWords { get; }
+
+	public string? Passphrase { get; }
 
 	private void OnNext(WalletCreationOptions.AddNewWallet options)
 	{
@@ -74,6 +82,8 @@ public partial class RecoveryWordsViewModel : RoutableViewModel
 	{
 		var enableCancel = UiContext.WalletRepository.HasWallet;
 		SetupCancel(enableCancel: enableCancel, enableCancelOnEscape: enableCancel, enableCancelOnPressed: false);
+
+		IsConfirmed = false;
 
 		base.OnNavigatedTo(isInHistory, disposables);
 	}

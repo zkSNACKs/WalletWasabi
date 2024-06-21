@@ -1,0 +1,66 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Design.PreviewWith>
+    <Panel>
+      <Border Margin="10">
+        <RecoverWordBox />
+      </Border>
+    </Panel>
+  </Design.PreviewWith>
+
+  <Thickness x:Key="RecoverWordBoxBorderPadding">4,4,0,0</Thickness>
+
+  <ControlTheme x:Key="{x:Type RecoverWordBox}" TargetType="RecoverWordBox">
+    <Setter Property="Background" Value="{DynamicResource TextControlBackground}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource TextControlBorderThemeThickness}" />
+    <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+    <Setter Property="MinHeight" Value="{DynamicResource TextControlThemeMinHeight}" />
+    <Setter Property="MinWidth" Value="{DynamicResource TextControlThemeMinWidth}" />
+    <Setter Property="Padding" Value="{DynamicResource RecoverWordBoxBorderPadding}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+    <Setter Property="Cursor" Value="IBeam" />
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <DataValidationErrors>
+          <TagsBoxAutoCompleteBox x:Name="PART_AutoCompleteBox"
+                                  ItemsSource="{TemplateBinding Suggestions}"
+                                  Text="{TemplateBinding Text}"
+                                  FilterMode="StartsWith"
+                                  MinimumPrefixLength="0"
+                                  Width="150"
+                                  Margin="5 0 0 0"
+                                  Theme="{StaticResource TagsBoxAutoCompleteBox}"
+                                  Name="TagsBoxAutoCompleteBox"
+                                  IsVisible="{TemplateBinding IsSelected}">
+            <TagsBoxAutoCompleteBox.Styles>
+              <Style Selector="AutoCompleteBox">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Focusable" Value="True" />
+                <Setter Property="MinimumPrefixLength" Value="0" />
+              </Style>
+              <Style Selector="AutoCompleteBox /template/ TextBox#PART_TextBox">
+                <Setter Property="Focusable" Value="True" />
+                <Setter Property="IsReadOnly" Value="False" />
+              </Style>
+              <Style Selector="AutoCompleteBox /template/ TextBox#PART_TextBox /template/ Border#PART_BorderElement">
+                <Setter Property="IsVisible" Value="True" />
+              </Style>
+            </TagsBoxAutoCompleteBox.Styles>
+          </TagsBoxAutoCompleteBox>
+        </DataValidationErrors>
+      </ControlTemplate>
+    </Setter>
+
+    <Setter Property="(ScrollViewer.HorizontalScrollBarVisibility)" Value="Disabled" />
+
+    <Style Selector="^:focus-within /template/ Border#PART_Border">
+      <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrushFocused}"/>
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

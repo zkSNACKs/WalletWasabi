@@ -1,14 +1,18 @@
 using System.Reactive.Disposables;
+using System.Windows.Input;
+using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Xaml.Interactions.Custom;
 
 namespace WalletWasabi.Fluent.Behaviors;
 
-public class ExecuteCommandOnDoubleTappedBehavior : ExecuteCommandBaseBehavior
+public class ExecuteCommandOnLostFocusBehavior : ExecuteCommandBaseBehavior
 {
 	protected override void OnAttached(CompositeDisposable disposables)
 	{
-		Gestures.DoubleTappedEvent.AddClassHandler<InputElement>(
+		InputElement.LostFocusEvent.AddClassHandler<InputElement>(
 				(x, _) =>
 				{
 					if (Equals(x, AssociatedObject) && IsEnabled)
@@ -20,7 +24,7 @@ public class ExecuteCommandOnDoubleTappedBehavior : ExecuteCommandBaseBehavior
 						}
 					}
 				},
-				RoutingStrategies.Tunnel | RoutingStrategies.Bubble)
+				RoutingStrategies.Bubble)
 			.DisposeWith(disposables);
 	}
 }

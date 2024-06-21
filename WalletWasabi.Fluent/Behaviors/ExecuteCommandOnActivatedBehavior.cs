@@ -1,24 +1,12 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Windows.Input;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Xaml.Interactions.Custom;
 
 namespace WalletWasabi.Fluent.Behaviors;
 
-public class ExecuteCommandOnActivatedBehavior : DisposingBehavior<Control>
+public class ExecuteCommandOnActivatedBehavior : ExecuteCommandBaseBehavior
 {
-	public static readonly StyledProperty<ICommand?> CommandProperty =
-		AvaloniaProperty.Register<ExecuteCommandOnActivatedBehavior, ICommand?>(nameof(Command));
-
-	public ICommand? Command
-	{
-		get => GetValue(CommandProperty);
-		set => SetValue(CommandProperty, value);
-	}
-
 	protected override void OnAttached(CompositeDisposable disposables)
 	{
 		if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
@@ -29,9 +17,15 @@ public class ExecuteCommandOnActivatedBehavior : DisposingBehavior<Control>
 				.FromEventPattern(mainWindow, nameof(mainWindow.Activated))
 				.Subscribe(_ =>
 				{
-					if (Command is { } cmd && cmd.CanExecute(default))
+					if (!IsEnabled)
 					{
-						cmd.Execute(default);
+						return;
+					}
+
+					var parameter = CommandParameter;
+					if (Command is { } cmd && cmd.CanExecute(parameter))
+					{
+						cmd.Execute(parameter);
 					}
 				})
 				.DisposeWith(disposables);

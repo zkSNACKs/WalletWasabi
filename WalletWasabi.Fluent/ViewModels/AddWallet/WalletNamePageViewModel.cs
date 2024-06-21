@@ -50,15 +50,25 @@ public partial class WalletNamePageViewModel : RoutableViewModel
 		switch (options)
 		{
 			case WalletCreationOptions.AddNewWallet add:
-				Navigate().To().RecoveryWords(add);
-				break;
+				var dialogCaption = "This is needed to open and to recover your wallet.\n" +
+				                    "It will be used as the 13th seed word, it can never be changed.";
+				var password = await Navigate().To().CreatePasswordDialog("Add Passphrase", dialogCaption, enableEmpty: true).GetResultAsync();
+
+				if (password is { })
+				{
+					var addOptions = add with { Passphrase = password };
+
+					Navigate().To().RecoveryWords(addOptions);
+				}
+
+			 	break;
 
 			case WalletCreationOptions.ConnectToHardwareWallet chw:
 				Navigate().To().ConnectHardwareWallet(chw);
 				break;
 
 			case WalletCreationOptions.RecoverWallet rec:
-				Navigate().To().RecoverWallet(rec);
+				Navigate().To().RecoverWallet(new RecoverWalletState(rec));
 				break;
 
 			case WalletCreationOptions.ImportWallet imp:

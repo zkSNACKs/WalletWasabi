@@ -3,51 +3,165 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:recoverWallet="using:WalletWasabi.Fluent.ViewModels.AddWallet"
+             xmlns:converters="clr-namespace:WalletWasabi.Fluent.Converters"
              mc:Ignorable="d" d:DesignWidth="428" d:DesignHeight="371"
              x:DataType="recoverWallet:RecoverWalletViewModel"
              x:CompileBindings="True"
              x:Class="WalletWasabi.Fluent.Views.AddWallet.RecoverWalletView">
-  <ContentArea x:Name="RecoveryPageRoot"
-                 Title="{Binding Title}"
-                 CancelContent="Cancel"
-                 EnableCancel="{Binding EnableCancel}"
-                 EnableBack="{Binding EnableBack}"
-                 EnableNext="True" NextContent="Continue"
-                 IsBusy="{Binding IsBusy}">
-    <DockPanel>
-      <DockPanel DockPanel.Dock="Top">
-        <PathIcon Name="IconCheckmark"
-                  Margin="15 0 0 0"
-                  Classes="checkMark"
-                  VerticalAlignment="Center"
-                  DockPanel.Dock="Right"
-                  Opacity="{Binding IsMnemonicsValid}" />
-        <TagsBox DockPanel.Dock="Left"
-                   ItemCountLimit="24"
-                   SuggestionsAreCaseSensitive="False"
-                   RestrictInputToSuggestions="True"
-                   Items="{Binding Mnemonics}"
-                   Suggestions="{Binding Suggestions}"
-                   Watermark="Type in your recovery words in the correct order"
-                   AllowDuplication="True"
-                   EnableCounter="True"
-                   EnableDelete="False">
-          <TagsBox.Styles>
-            <Style Selector="TagsBox AutoCompleteBox">
-              <Setter Property="MinimumPrefixLength" Value="0" />
-            </Style>
-          </TagsBox.Styles>
-          <Interaction.Behaviors>
-            <FocusOnAttachedBehavior />
-          </Interaction.Behaviors>
-        </TagsBox>
-      </DockPanel>
-      <Button Classes="h8 plain activeHyperLink" Margin="0 10 0 0"
+
+  <UserControl.Styles>
+    <Style Selector="TextBlock.error">
+      <Setter Property="Foreground" Value="{DynamicResource SystemErrorTextColor}" />
+    </Style>
+  </UserControl.Styles>
+
+  <ContentArea Title="{Binding Title}"
+               Caption="Fill your 12 words in the correct order and enter the same passphrase that you used on wallet creation. If you have more words than 12 go to the advanced view."
+               CancelContent="Cancel"
+               EnableCancel="{Binding EnableCancel}"
+               EnableBack="{Binding EnableBack}"
+               EnableNext="True" NextContent="Continue"
+               IsBusy="{Binding IsBusy}">
+
+    <ContentArea.BottomContent>
+      <Button Classes="h7 plain activeHyperLink" Margin="0 0 0 0"
               DockPanel.Dock="Bottom"
               HorizontalAlignment="Center"
-              VerticalAlignment="Bottom"
+              VerticalAlignment="Center"
               Command="{Binding AdvancedRecoveryOptionsDialogCommand}"
               Content="Advanced Recovery Options" />
+    </ContentArea.BottomContent>
+
+    <DockPanel HorizontalAlignment="Stretch">
+
+      <Grid x:Name="Layout" HorizontalAlignment="Center">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*" />
+          <RowDefinition Height="16" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Panel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center"
+               MinWidth="690">
+          <ItemsControl ItemsSource="{Binding RecoveryWords}"
+                        Name="ItemsControl">
+            <Interaction.Behaviors>
+              <ExecuteCommandOnKeyDownBehavior Command="{Binding NextWordCommand}"
+                                               KeyGesture="Tab"
+                                               EventRoutingStrategy="Bubble, Tunnel" />
+              <ExecuteCommandOnKeyDownBehavior Command="{Binding NextWordCommand}"
+                                               KeyGesture="Enter"
+                                               EventRoutingStrategy="Bubble, Tunnel" />
+              <ExecuteCommandOnKeyDownBehavior Command="{Binding PreviousWordCommand}"
+                                               KeyGesture="Shift+Tab"
+                                               EventRoutingStrategy="Bubble, Tunnel"
+                                               IsEnabled="{Binding CurrentWord.IsValid}" />
+            </Interaction.Behaviors>
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel MaxHeight="200" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <DockPanel Margin="15 0 15 5"
+                           Width="200">
+                  <Interaction.Behaviors>
+                      <ExecuteCommandOnTappedBehavior Command="{Binding #ItemsControl.((recoverWallet:RecoverWalletViewModel)DataContext).SelectWordCommand, Mode=OneWay}"
+                                                      CommandParameter="{Binding .}"/>
+                  </Interaction.Behaviors>
+                  <PathIcon Name="IconCheckmark"
+                            Margin="0 0 15 0"
+                            Classes="checkMark"
+                            VerticalAlignment="Center"
+                            DockPanel.Dock="Left"
+                            Opacity="{Binding #ItemsControl.((recoverWallet:RecoverWalletViewModel)DataContext).IsMnemonicsValid}" />
+                  <Panel DockPanel.Dock="Left"
+                         Height="45"
+                         VerticalAlignment="Stretch">
+                    <TextBlock Text="{Binding Index, Mode=OneWay, StringFormat={}{0}.}"
+                               Opacity="0.5"
+                               FontSize="{DynamicResource FontSizeH6}"
+                               VerticalAlignment="Center"/>
+                  </Panel>
+
+                  <Panel>
+                    <Panel VerticalAlignment="Stretch"
+                           HorizontalAlignment="Stretch"
+                           Width="150"
+                           Height="45">
+                      <TextBlock Text="{Binding Word}"
+                                 FontWeight="SemiBold"
+                                 Margin="5 0 0 0"
+                                 FontSize="{DynamicResource FontSizeH6}"
+                                 VerticalAlignment="Center"
+                                 HorizontalAlignment="Stretch"
+                                 IsVisible="{Binding !IsSelected}" />
+                    </Panel>
+
+                    <RecoverWordBox Suggestions="{Binding Suggestions}"
+                                    Text="{Binding Word}"
+                                    Width="150"
+                                    Margin="5 0 0 0"
+                                    IsVisible="{Binding IsSelected}"
+                                    IsSelected="{Binding IsSelected}">
+                      <Interaction.Behaviors>
+                        <!-- TODO: Add IsSelected -->
+                        <FocusBehavior IsFocused="{Binding IsSelected, Mode=OneWay}" />
+                        <!--<ExecuteCommandOnLostFocusBehavior
+                          IsEnabled="{Binding IsSelected}"
+                          Command="{Binding #ItemsControl.((recoverWallet:RecoverWalletViewModel)DataContext).DeselectWordCommand, Mode=OneWay}"
+                          CommandParameter="{Binding .}"/>-->
+                        <ExecuteCommandOnKeyDownBehavior Command="{Binding #ItemsControl.((recoverWallet:RecoverWalletViewModel)DataContext).PreviousWordCommand}"
+                                                         KeyGesture="Back"
+                                                         EventRoutingStrategy="Bubble, Tunnel">
+                          <ExecuteCommandOnKeyDownBehavior.IsEnabled>
+                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                              <Binding Path="Word.Length" FallbackValue="-1" Converter="{x:Static converters:IntConverter.IsZero}" />
+                              <Binding Path="IsSelected" />
+                            </MultiBinding>
+                          </ExecuteCommandOnKeyDownBehavior.IsEnabled>
+                        </ExecuteCommandOnKeyDownBehavior>
+                      </Interaction.Behaviors>
+                    </RecoverWordBox>
+                  </Panel>
+
+                </DockPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <Grid ColumnDefinitions="*,1,*,1,*">
+            <Separator Classes="vertical" Grid.Column="1" Margin="0 5 0 15" />
+            <Separator Classes="vertical" Grid.Column="3" Margin="0 5 0 15" />
+          </Grid>
+        </Panel>
+
+        <CopyablePasswordTextBox Grid.Row="3"
+                                 Watermark="Type the passphrase (13th word)"
+                                 Text="{Binding Passphrase}"
+                                 PasswordChar=""
+                                 Classes="hasCheckMark copyablePasswordTextBox"
+                                 MaxWidth="400"
+                                 VerticalAlignment="Top"
+                                 Margin="0,30,0,0">
+          <Interaction.Behaviors>
+            <FocusBehavior IsFocused="{Binding FocusPassphrase, Mode=OneWay}" />
+          </Interaction.Behaviors>
+        </CopyablePasswordTextBox>
+
+        <TextBlock Grid.Row="4"
+                   Text="Invalid recovery words entered."
+                   IsVisible="{Binding !IsMnemonicsValid}"
+                   HorizontalAlignment="Center"
+                   Classes="error" />
+
+      </Grid>
+
     </DockPanel>
+
   </ContentArea>
 </UserControl>

@@ -1,14 +1,18 @@
 using System.Reactive.Disposables;
+using System.Windows.Input;
+using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Xaml.Interactions.Custom;
 
 namespace WalletWasabi.Fluent.Behaviors;
 
-public class ExecuteCommandOnDoubleTappedBehavior : ExecuteCommandBaseBehavior
+public class ExecuteCommandOnTappedBehavior : ExecuteCommandBaseBehavior
 {
 	protected override void OnAttached(CompositeDisposable disposables)
 	{
-		Gestures.DoubleTappedEvent.AddClassHandler<InputElement>(
+		Gestures.TappedEvent.AddClassHandler<InputElement>(
 				(x, _) =>
 				{
 					if (Equals(x, AssociatedObject) && IsEnabled)

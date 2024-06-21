@@ -1,0 +1,95 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:recoverWallet="using:WalletWasabi.Fluent.ViewModels.AddWallet"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="371"
+             x:DataType="recoverWallet:RecoverWalletSummaryViewModel"
+             x:CompileBindings="True"
+             x:Class="WalletWasabi.Fluent.Views.AddWallet.RecoverWalletSummaryView">
+
+  <UserControl.Styles>
+    <Style Selector="TextBlock.error">
+      <Setter Property="Foreground" Value="{DynamicResource SystemErrorTextColor}" />
+    </Style>
+  </UserControl.Styles>
+
+  <ContentArea x:Name="RecoveryPageRoot"
+                 Title="{Binding Title}"
+                 CancelContent="Cancel"
+                 EnableCancel="{Binding EnableCancel}"
+                 EnableBack="{Binding EnableBack}"
+                 EnableNext="True" NextContent="Continue"
+                 IsBusy="{Binding IsBusy}">
+    <DockPanel>
+
+      <!-- Mnemonics -->
+      <DockPanel DockPanel.Dock="Top">
+        <PathIcon Name="IconCheckmark"
+                  Margin="15 0 0 0"
+                  Classes="checkMark"
+                  VerticalAlignment="Center"
+                  DockPanel.Dock="Right"
+                  Opacity="{Binding IsMnemonicsValid}" />
+        <TagsBox DockPanel.Dock="Left"
+                   ItemCountLimit="24"
+                   SuggestionsAreCaseSensitive="False"
+                   RestrictInputToSuggestions="True"
+                   Items="{Binding Mnemonics}"
+                   Suggestions="{Binding Suggestions}"
+                   Watermark="Type in your recovery words in the correct order"
+                   AllowDuplication="True"
+                   EnableCounter="True"
+                   EnableDelete="False">
+          <TagsBox.Styles>
+            <Style Selector="TagsBox AutoCompleteBox">
+              <Setter Property="MinimumPrefixLength" Value="0" />
+            </Style>
+          </TagsBox.Styles>
+          <Interaction.Behaviors>
+            <FocusOnAttachedBehavior />
+          </Interaction.Behaviors>
+        </TagsBox>
+      </DockPanel>
+
+      <Grid DockPanel.Dock="Top"
+            ColumnDefinitions="*,*"
+            RowDefinitions="Auto,Auto,Auto">
+
+        <!-- Passphrase -->
+        <CopyablePasswordTextBox Watermark="Type the passphrase (13th word)"
+                                 Text="{Binding Passphrase}"
+                                 PasswordChar=""
+                                 Classes="hasCheckMark copyablePasswordTextBox"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalAlignment="Top"
+                                 Margin="0,30,0,0"
+                                 Grid.Row="0"
+                                 Grid.Column="0">
+        </CopyablePasswordTextBox>
+
+        <!-- MinGapLimit -->
+        <StackPanel HorizontalAlignment="Stretch"
+                    Grid.Row="1"
+                    Grid.Column="0">
+          <Label Content="Minimum _Gap Limit:" Target="TbGapLimit" />
+          <TextBox Name="TbGapLimit" Watermark="e.g., 63"
+                   Text="{Binding MinGapLimit}"
+                   DockPanel.Dock="Top"
+                   Classes="hasCheckMark">
+          </TextBox>
+        </StackPanel>
+
+        <TextBlock Grid.Column="0" Grid.ColumnSpan="2"
+                   Grid.Row="2"
+                   Text="Invalid recovery words entered."
+                   IsVisible="{Binding !IsMnemonicsValid}"
+                   HorizontalAlignment="Center"
+                   Classes="error" />
+
+      </Grid>
+
+    </DockPanel>
+  </ContentArea>
+
+</UserControl>

@@ -97,10 +97,13 @@ public class ExecuteCommandOnKeyDownBehavior : AttachedToVisualTreeBehavior<Cont
 
 		if (isMatch && control.IsVisible && control.IsEnabled && IsEnabled)
 		{
-			if (!e.Handled && Command?.CanExecute(CommandParameter) == true)
+			if (!e.Handled)
 			{
-				Command.Execute(CommandParameter);
 				e.Handled = true;
+				if (Command?.CanExecute(CommandParameter) == true)
+				{
+					Command.Execute(CommandParameter);
+				}
 			}
 		}
 	}

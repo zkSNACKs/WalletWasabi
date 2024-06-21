@@ -73,8 +73,8 @@ public partial class AddedWalletPageViewModel : RoutableViewModel
 		var password =
 			options switch
 			{
-				WalletCreationOptions.AddNewWallet add => add.Password,
-				WalletCreationOptions.RecoverWallet rec => rec.Password,
+				WalletCreationOptions.AddNewWallet add => add.Passphrase,
+				WalletCreationOptions.RecoverWallet rec => rec.Passphrase,
 				WalletCreationOptions.ConnectToHardwareWallet => "",
 				_ => null
 			};

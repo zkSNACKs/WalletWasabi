@@ -27,40 +27,39 @@
           <ProgressRing Name="LoadingRing" IsIndeterminate="True" IsVisible="{TemplateBinding IsBusy}" />
           <DockPanel Name="MainDockPanel" IsVisible="{Binding !#LoadingRing.IsVisible}">
 
-            <Panel DockPanel.Dock="Bottom" x:Name="PART_ButtonArea">
+            <DockPanel DockPanel.Dock="Bottom" x:Name="PART_ButtonArea">
+              <StackPanel Orientation="Horizontal" Spacing="30" DockPanel.Dock="Right">
+                <Button Name="PART_SkipButton"
+                        IsVisible="{TemplateBinding EnableSkip}"
+                        Content="{TemplateBinding SkipContent}"
+                        Command="{Binding SkipCommand}"
+                        Classes="activeHyperLink skip"
+                        VerticalAlignment="Center" />
+                <Button Name="PART_NextButton" Classes="action"
+                        IsVisible="{TemplateBinding EnableNext}"
+                        Content="{TemplateBinding NextContent}"
+                        Command="{Binding NextCommand}"
+                        IsDefault="{Binding IsActive}">
+                  <Interaction.Behaviors>
+                    <FocusOnAttachedBehavior
+                      IsEnabled="{Binding FocusNext, RelativeSource={RelativeSource TemplatedParent}}" />
+                  </Interaction.Behaviors>
+                </Button>
+              </StackPanel>
               <Button Name="PART_CancelButton"
                       Classes="invisible"
                       IsVisible="{TemplateBinding EnableCancel}"
                       Content="{TemplateBinding CancelContent}"
-                      HorizontalAlignment="Left" Command="{Binding CancelCommand}">
+                      HorizontalAlignment="Left" Command="{Binding CancelCommand}"
+                      DockPanel.Dock="Left">
                 <Interaction.Behaviors>
                   <FocusOnAttachedBehavior
                     IsEnabled="{Binding FocusCancel, RelativeSource={RelativeSource TemplatedParent}}" />
                 </Interaction.Behaviors>
               </Button>
-              <DockPanel>
-                <StackPanel Orientation="Horizontal" Spacing="30" DockPanel.Dock="Right">
-                  <Button Name="PART_SkipButton"
-                          IsVisible="{TemplateBinding EnableSkip}"
-                          Content="{TemplateBinding SkipContent}"
-                          Command="{Binding SkipCommand}"
-                          Classes="activeHyperLink skip"
-                          VerticalAlignment="Center" />
-                  <Button Name="PART_NextButton" Classes="action"
-                          IsVisible="{TemplateBinding EnableNext}"
-                          Content="{TemplateBinding NextContent}"
-                          Command="{Binding NextCommand}"
-                          IsDefault="{Binding IsActive}">
-                    <Interaction.Behaviors>
-                      <FocusOnAttachedBehavior
-                        IsEnabled="{Binding FocusNext, RelativeSource={RelativeSource TemplatedParent}}" />
-                    </Interaction.Behaviors>
-                  </Button>
-                </StackPanel>
-                <ContentPresenter Content="{TemplateBinding BottomContent}"
-                                  x:Name="PART_BottomContentPresenter" />
-              </DockPanel>
-            </Panel>
+              <ContentPresenter Content="{TemplateBinding BottomContent}"
+                                x:Name="PART_BottomContentPresenter" />
+            </DockPanel>
 
             <Panel DockPanel.Dock="Top">
               <Panel IsHitTestVisible="False" Background="{TemplateBinding HeaderBackground}" />
@@ -118,7 +117,7 @@
       <Setter Property="Margin" Value="31 11 31 21" />
     </Style>
 
-    <Style Selector="^/template/ Panel#PART_ButtonArea">
+    <Style Selector="^/template/ DockPanel#PART_ButtonArea">
       <Setter Property="Margin" Value="31,10" />
     </Style>
 

@@ -5,7 +5,7 @@ namespace WalletWasabi.Fluent.Controls;
 
 public class TagsBoxAutoCompleteBox : AutoCompleteBox
 {
-	internal TextBox? InternalTextBox;
+	internal TagsBoxTextBox? InternalTextBox;
 	internal ListBox? SuggestionListBox;
 
 	protected override Type StyleKeyOverride => typeof(AutoCompleteBox);
@@ -14,7 +14,7 @@ public class TagsBoxAutoCompleteBox : AutoCompleteBox
 	{
 		base.OnApplyTemplate(e);
 
-		InternalTextBox = e.NameScope.Find<TextBox>("PART_TextBox");
+		InternalTextBox = e.NameScope.Find<TagsBoxTextBox>("PART_TextBox");
 		SuggestionListBox = e.NameScope.Find<ListBox>("PART_SelectingItemsControl");
 	}
 }

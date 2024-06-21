@@ -22,6 +22,7 @@
         <RowDefinition MinHeight="70" Height="*" />
         <RowDefinition Height="16" />
         <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
         <RowDefinition Height="20" />
       </Grid.RowDefinitions>
@@ -92,6 +93,16 @@
           <Separator Classes="vertical" Grid.Column="3" Margin="0 0 0 20" />
         </Grid>
       </Panel>
+
+      <CopyablePasswordTextBox Grid.Row="3"
+                               Watermark="Type the passphrase (13th word)"
+                               Text="{Binding ConfirmPassphrase}"
+                               PasswordChar="•"
+                               Classes="revealPasswordButton copyablePasswordTextBox"
+                               MaxWidth="400"
+                               VerticalAlignment="Top"
+                               IsVisible="{Binding Passphrase, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
     </Grid>
   </ContentArea>
 </UserControl>
