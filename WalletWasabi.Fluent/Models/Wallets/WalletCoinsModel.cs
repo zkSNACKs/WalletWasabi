@@ -49,11 +49,6 @@ public partial class WalletCoinsModel : IDisposable
 			.DisposeWith(_disposables);
 	}
 
-	private IEnumerable<ICoinModel> GetCoins()
-	{
-		return _wallet.GetAllCoins().Select(GetCoinModel);
-	}
-
 	public IObservableCache<ICoinModel, int> List { get; }
 
 	public IObservableCache<Pocket, LabelsArray> Pockets { get; }
@@ -92,6 +87,11 @@ public partial class WalletCoinsModel : IDisposable
 	private Pocket[] GetPockets()
 	{
 		return _wallet.GetPockets().ToArray();
+	}
+
+	private ICoinModel[] GetCoins()
+	{
+		return _wallet.Coins.Select(GetCoinModel).ToArray();
 	}
 
 	public void Dispose() => _disposables.Dispose();
