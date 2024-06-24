@@ -51,7 +51,7 @@ public partial class WalletCoinsModel : IDisposable
 
 	private IEnumerable<ICoinModel> GetCoins()
 	{
-		return _wallet.Coins.Select(GetCoinModel);
+		return _wallet.GetAllCoins().Select(GetCoinModel);
 	}
 
 	public IObservableCache<ICoinModel, int> List { get; }
