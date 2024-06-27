@@ -145,10 +145,7 @@ public partial class MainViewModel : ViewModelBase
 	{
 		var announcements = new List<AnnouncementBase>();
 
-		if (UiContext.ApplicationSettings.ShowCoordinatorAnnouncement)
-		{
-			announcements.Add(new ZkSnacksCoordinatorAnnouncementViewModel(UiContext));
-		}
+		// Add Announcements here.
 
 		return announcements;
 	}
