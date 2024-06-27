@@ -11,6 +11,7 @@ namespace WalletWasabi.Fluent.Behaviors;
 
 public class CoordinatorConnectionStringBehavior : DisposingBehavior<Window>
 {
+
 	protected override void OnAttached(CompositeDisposable disposables)
 	{
 		if (AssociatedObject is null)
@@ -34,6 +35,8 @@ public class CoordinatorConnectionStringBehavior : DisposingBehavior<Window>
 				{
 					return;
 				}
+
+				// TODO: If NewCoordinatorConfirmationDialog, close the old one and ope the new one
 
 				// TODO: Check if the detected coordinator is the same
 
