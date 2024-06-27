@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dialog="using:WalletWasabi.Fluent.ViewModels.Dialogs"
+             mc:Ignorable="d" d:DesignWidth="428" d:DesignHeight="371"
+             x:DataType="dialog:NewCoordinatorConfirmationDialogViewModel"
+             x:CompileBindings="True"
+             x:Class="WalletWasabi.Fluent.Views.Dialogs.NewCoordinatorConfirmationDialogView">
+  <ContentArea Title="{Binding Title}"
+               Caption="Detected a Coordinator magic string in the clipboard. Please review the details below."
+               ScrollViewer.VerticalScrollBarVisibility="Disabled">
+    <QuestionControl Content="Do you want apply this coordinator?"
+                     YesCommand="{Binding NextCommand}"
+                     NoCommand="{Binding CancelCommand}"
+                     HighlightButton="YesButton">
+      <QuestionControl.IconContent>
+        <StackPanel Spacing="15" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+
+          <!-- Network -->
+          <PreviewItem Label="Network"
+                       Icon="{StaticResource globe}"
+                       CopyableContent="{Binding CoordinatorConfig.Network}">
+            <TextBlock Text="{Binding CoordinatorConfig.Network, FallbackValue=Main}" />
+          </PreviewItem>
+          <Separator />
+
+          <!-- Endpoint -->
+          <PreviewItem Label="Endpoint"
+                       Icon="{StaticResource coordinator}"
+                       CopyableContent="{Binding CoordinatorConfig.Endpoint}">
+            <TextBlock Text="{Binding CoordinatorConfig.Endpoint, FallbackValue=https://api.example.com/}" />
+          </PreviewItem>
+          <Separator />
+
+          <!-- CoordinatorFee -->
+          <PreviewItem Label="Coordinator fee"
+                       Icon="{StaticResource money_24_regular}"
+                       CopyableContent="{Binding CoordinatorConfig.CoordinatorFee}">
+            <TextBlock Text="{Binding CoordinatorConfig.CoordinatorFee, FallbackValue=0%, StringFormat={}{0}%}" />
+          </PreviewItem>
+          <Separator />
+
+          <!-- AbsoluteMinInputCount -->
+          <PreviewItem Label="Absolute minimum input count"
+                       Icon="{StaticResource input_count}"
+                       CopyableContent="{Binding CoordinatorConfig.AbsoluteMinInputCount}">
+            <TextBlock Text="{Binding CoordinatorConfig.AbsoluteMinInputCount, FallbackValue=100}" />
+          </PreviewItem>
+          <Separator />
+
+          <!-- ReadMore -->
+          <PreviewItem Label="Read more"
+                       Icon="{StaticResource read_more}"
+                       CopyableContent="{Binding CoordinatorConfig.ReadMore}">
+            <TextBlock Text="{Binding CoordinatorConfig.ReadMore, FallbackValue=https://www.example.com/}" />
+          </PreviewItem>
+
+        </StackPanel>
+      </QuestionControl.IconContent>
+    </QuestionControl>
+  </ContentArea>
+</UserControl>

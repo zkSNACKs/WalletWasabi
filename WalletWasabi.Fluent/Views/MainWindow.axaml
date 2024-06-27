@@ -30,6 +30,7 @@
   </Window.Styles>
   <Interaction.Behaviors>
     <ContextFlyoutWorkaroundBehavior />
+    <CoordinatorMagicStringBehavior />
   </Interaction.Behaviors>
 
   <Panel Margin="{Binding #MainWindow.OffScreenMargin}">
