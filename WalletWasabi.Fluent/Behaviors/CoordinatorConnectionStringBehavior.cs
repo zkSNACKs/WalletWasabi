@@ -9,7 +9,7 @@ using WalletWasabi.Fluent.ViewModels.SearchBar.Settings;
 
 namespace WalletWasabi.Fluent.Behaviors;
 
-public class CoordinatorMagicStringBehavior : DisposingBehavior<Window>
+public class CoordinatorConnectionStringBehavior : DisposingBehavior<Window>
 {
 	protected override void OnAttached(CompositeDisposable disposables)
 	{
@@ -23,7 +23,7 @@ public class CoordinatorMagicStringBehavior : DisposingBehavior<Window>
 			.DoAsync(async _ =>
 			{
 				var clipboardValue = await ApplicationHelper.GetTextAsync();
-				if (await CoordinatorConfigStringHelper.ParseAsync(clipboardValue) is not { } coordinatorConfigString)
+				if (CoordinatorConfigStringHelper.Parse(clipboardValue) is not { } coordinatorConfigString)
 				{
 					return;
 				}
@@ -41,7 +41,7 @@ public class CoordinatorMagicStringBehavior : DisposingBehavior<Window>
 
 				if (accepted)
 				{
-					await CoordinatorConfigStringHelper.ProcessAsync(coordinatorConfigString);
+					CoordinatorConfigStringHelper.Process(coordinatorConfigString, uiContext.ApplicationSettings);
 					NotificationHelpers.Show(new RestartViewModel("Coordinator saved and will be applied after restarting the application."));
 				}
 			})

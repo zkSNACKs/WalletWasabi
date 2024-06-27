@@ -1,8 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Threading.Tasks;
 using NBitcoin;
 using WalletWasabi.Bases;
 using WalletWasabi.Daemon;
+using WalletWasabi.Fluent.Models.UI;
 using WalletWasabi.Logging;
 
 namespace WalletWasabi.Fluent.Helpers;
@@ -14,13 +16,17 @@ public static class CoordinatorConfigStringHelper
 	private const char Separator = '|';
 	private const string Prefix = "ccs";
 
-	public static async Task ProcessAsync(CoordinatorConfigString coordinatorConfigString)
+	public static void Process(CoordinatorConfigString coordinatorConfigString, IApplicationSettings applicationSettings)
 	{
-		// TODO: Verify with GetStatus?
-
 		// TODO: SANITY CHECKS !!!
 
 		PersistentConfig config = ConfigManagerNg.LoadFile<PersistentConfig>(Services.PersistentConfigFilePath);
+
+		if (applicationSettings.Network != coordinatorConfigString.Network)
+		{
+			applicationSettings.CoordinatorUri = coordinatorConfigString.Endpoint.ToString();
+			applicationSettings.MaxCoordinationFeeRate = coordinatorConfigString.CoordinatorFee.ToString(CultureInfo.InvariantCulture);
+		}
 
 		if (coordinatorConfigString.Network == Network.Main)
 		{
@@ -45,11 +51,9 @@ public static class CoordinatorConfigStringHelper
 		// TODO: Implement AbsoluteMinInputCount and ReadMore
 
 		ConfigManagerNg.ToFile(Services.PersistentConfigFilePath, config);
-
-		await ApplicationHelper.SetTextAsync("");
 	}
 
-	public static async Task<CoordinatorConfigString?> ParseAsync(string text)
+	public static CoordinatorConfigString? Parse(string text)
 	{
 
 		if (!text.StartsWith(Prefix + Separator))
@@ -72,12 +76,9 @@ public static class CoordinatorConfigStringHelper
 				int.Parse(parts[4]),
 				new Uri(parts[5]));
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
-			Logger.LogWarning("One parameter of the magic string was incorrect.");
-
-			// Clear clipboard to avoid repetitive failed call.
-			await ApplicationHelper.SetTextAsync("");
+			Logger.LogWarning($"One parameter of the coordinator config string was incorrect: {ex}");
 			return null;
 		}
 	}
