@@ -22,7 +22,8 @@ public static class CoordinatorConfigStringHelper
 
 		PersistentConfig config = ConfigManagerNg.LoadFile<PersistentConfig>(Services.PersistentConfigFilePath);
 
-		if (applicationSettings.Network != coordinatorConfigString.Network)
+		// Only change what is displayed by the UI if Network is the current one.
+		if (applicationSettings.Network == coordinatorConfigString.Network)
 		{
 			applicationSettings.CoordinatorUri = coordinatorConfigString.Endpoint.ToString();
 			applicationSettings.MaxCoordinationFeeRate = coordinatorConfigString.CoordinatorFee.ToString(CultureInfo.InvariantCulture);

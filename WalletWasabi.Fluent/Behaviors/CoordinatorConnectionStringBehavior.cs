@@ -36,7 +36,7 @@ public class CoordinatorConnectionStringBehavior : DisposingBehavior<Window>
 					return;
 				}
 
-				// TODO: If NewCoordinatorConfirmationDialog, close the old one and ope the new one
+				// TODO: If NewCoordinatorConfirmationDialog, close the old one and open the new one
 
 				// TODO: Check if the detected coordinator is the same
 
