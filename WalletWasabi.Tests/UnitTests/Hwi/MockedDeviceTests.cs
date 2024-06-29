@@ -1,6 +1,7 @@
 using NBitcoin;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletWasabi.Blockchain.Keys;
@@ -562,7 +563,7 @@ public class MockedDeviceTests
 		IEnumerable<HwiEnumerateEntry> enumerate = await client.EnumerateAsync(cts.Token);
 		HwiEnumerateEntry entry = Assert.Single(enumerate);
 		Assert.Equal(HardwareWalletModels.Jade, entry.Model);
-		Assert.True(HwiValidationHelper.ValidatePathString(entry.Model, "COM3"));
+		Assert.True(HwiValidationHelper.ValidatePathString(entry.Model, "COM3", OSPlatform.Windows));
 		Assert.Equal("COM3", entry.Path);
 		Assert.False(entry.NeedsPassphraseSent);
 		Assert.False(entry.NeedsPinSent);
@@ -654,7 +655,7 @@ public class MockedDeviceTests
 		Assert.Single(enumerate);
 		HwiEnumerateEntry entry = enumerate.Single();
 		Assert.Equal(HardwareWalletModels.BitBox02_BTCOnly, entry.Model);
-		Assert.True(HwiValidationHelper.ValidatePathString(entry.Model, @"\\?\hid#vid_03eb&pid_2403#6&229ae20&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}"));
+		Assert.True(HwiValidationHelper.ValidatePathString(entry.Model, @"\\?\hid#vid_03eb&pid_2403#6&229ae20&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}", OSPlatform.Windows));
 		Assert.Equal(@"\\?\hid#vid_03eb&pid_2403#6&229ae20&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}", entry.Path);
 		Assert.False(entry.NeedsPassphraseSent);
 		Assert.False(entry.NeedsPinSent);
