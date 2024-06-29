@@ -18,7 +18,16 @@ public static class CoordinatorConfigStringHelper
 
 	public static void Process(CoordinatorConfigString coordinatorConfigString, IApplicationSettings applicationSettings)
 	{
-		// TODO: SANITY CHECKS !!!
+		// Sanity checks
+		if (coordinatorConfigString.CoordinatorFee > 1)
+		{
+			Logger.LogWarning($"New intended coordinator fee rate was {coordinatorConfigString.CoordinatorFee}%, but absolute max is 1%");
+			return;
+		}
+		if (coordinatorConfigString.AbsoluteMinInputCount < 2)
+		{
+			Logger.LogWarning($"New intended absolute min input count was {coordinatorConfigString.AbsoluteMinInputCount}, but absolute min is 2");
+		}
 
 		PersistentConfig config = ConfigManagerNg.LoadFile<PersistentConfig>(Services.PersistentConfigFilePath);
 
