@@ -11,8 +11,8 @@ namespace WalletWasabi.Fluent.Helpers;
 
 public static class CoordinatorConfigStringHelper
 {
-	// Format: ccs|<network>|<endpoint>|<coordinatorFee>|<absoluteMinInputCount>|<readMore>
-	private const int ExpectedParts = 6;
+	// Format: ccs|<name>|<network>|<endpoint>|<coordinatorFee>|<absoluteMinInputCount>|<readMore>
+	private const int ExpectedParts = 7;
 	private const char Separator = '|';
 	private const string Prefix = "ccs";
 
@@ -31,11 +31,10 @@ public static class CoordinatorConfigStringHelper
 
 		PersistentConfig config = ConfigManagerNg.LoadFile<PersistentConfig>(Services.PersistentConfigFilePath);
 
-		// Only change what is displayed by the UI if Network is the current one.
 		if (applicationSettings.Network == coordinatorConfigString.Network)
 		{
+			// Only change CoordinatorUri in the UI if Network is the current one.
 			applicationSettings.CoordinatorUri = coordinatorConfigString.Endpoint.ToString();
-			applicationSettings.MaxCoordinationFeeRate = coordinatorConfigString.CoordinatorFee.ToString(CultureInfo.InvariantCulture);
 		}
 
 		if (coordinatorConfigString.Network == Network.Main)
@@ -57,8 +56,12 @@ public static class CoordinatorConfigStringHelper
 		}
 
 		config = config with { MaxCoordinationFeeRate = coordinatorConfigString.CoordinatorFee };
+		applicationSettings.MaxCoordinationFeeRate = coordinatorConfigString.CoordinatorFee.ToString(CultureInfo.InvariantCulture);
 
-		// TODO: Implement AbsoluteMinInputCount and ReadMore
+		config = config with { AbsoluteMinInputCount = coordinatorConfigString.AbsoluteMinInputCount };
+		applicationSettings.AbsoluteMinInputCount = coordinatorConfigString.AbsoluteMinInputCount.ToString();
+
+		// TODO: Save Name and ReadMoreUri to display it after.
 
 		ConfigManagerNg.ToFile(Services.PersistentConfigFilePath, config);
 	}
@@ -80,11 +83,12 @@ public static class CoordinatorConfigStringHelper
 		try
 		{
 			return new CoordinatorConfigString(
-				Network.GetNetwork(parts[1])!,
-				new Uri(parts[2]),
-				decimal.Parse(parts[3]),
-				int.Parse(parts[4]),
-				new Uri(parts[5]));
+				parts[1],
+				Network.GetNetwork(parts[2])!,
+				new Uri(parts[3]),
+				decimal.Parse(parts[4]),
+				int.Parse(parts[5]),
+				new Uri(parts[6]));
 		}
 		catch (Exception ex)
 		{
@@ -94,6 +98,7 @@ public static class CoordinatorConfigStringHelper
 	}
 
 	public record CoordinatorConfigString(
+		string Name,
 		Network Network,
 		Uri Endpoint,
 		decimal CoordinatorFee,

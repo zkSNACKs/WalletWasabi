@@ -17,6 +17,14 @@
       <QuestionControl.IconContent>
         <StackPanel Spacing="15" HorizontalAlignment="Stretch" VerticalAlignment="Top">
 
+          <!-- Name -->
+          <PreviewItem Label="Name"
+                       Icon="{StaticResource person_regular}"
+                       CopyableContent="{Binding CoordinatorConfig.Name}">
+            <TextBlock Text="{Binding CoordinatorConfig.Name, FallbackValue=Name}" />
+          </PreviewItem>
+          <Separator />
+
           <!-- Network -->
           <PreviewItem Label="Network"
                        Icon="{StaticResource globe}"
