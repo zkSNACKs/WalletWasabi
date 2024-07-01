@@ -66,6 +66,29 @@ public static class CoordinatorConfigStringHelper
 		ConfigManagerNg.ToFile(Services.PersistentConfigFilePath, config);
 	}
 
+	public static bool DoesntChangeAnything(CoordinatorConfigString newCoordinator)
+	{
+		var currentConfig = ConfigManagerNg.LoadFile<PersistentConfig>(Services.PersistentConfigFilePath);
+
+		string currentCoordinatorUri;
+		if (newCoordinator.Network == Network.Main)
+		{
+			currentCoordinatorUri = currentConfig.MainNetCoordinatorUri;
+		}
+		else if (newCoordinator.Network == Network.TestNet)
+		{
+			currentCoordinatorUri = currentConfig.TestNetCoordinatorUri;
+		}
+		else
+		{
+			currentCoordinatorUri = currentConfig.RegTestCoordinatorUri;
+		}
+
+		return currentCoordinatorUri == newCoordinator.Endpoint.ToString() &&
+		       currentConfig.AbsoluteMinInputCount == newCoordinator.AbsoluteMinInputCount &&
+		       currentConfig.MaxCoordinationFeeRate == newCoordinator.CoordinatorFee;
+	}
+
 	public static CoordinatorConfigString? Parse(string text)
 	{
 

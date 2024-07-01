@@ -36,9 +36,12 @@ public class CoordinatorConnectionStringBehavior : DisposingBehavior<Window>
 					return;
 				}
 
-				// TODO: If NewCoordinatorConfirmationDialog, close the old one and open the new one
+				if (CoordinatorConfigStringHelper.DoesntChangeAnything(coordinatorConfigString))
+				{
+					return;
+				}
 
-				// TODO: Check if the detected coordinator is the same
+				// TODO: If NewCoordinatorConfirmationDialog, close the old one and open the new one
 
 				var accepted = await uiContext.Navigate().To().NewCoordinatorConfirmationDialog(coordinatorConfigString).GetResultAsync();
 
