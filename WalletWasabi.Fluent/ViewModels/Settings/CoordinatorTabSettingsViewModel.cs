@@ -1,5 +1,6 @@
 using System.Globalization;
 using ReactiveUI;
+using WalletWasabi.Fluent.Extensions;
 using WalletWasabi.Fluent.Infrastructure;
 using WalletWasabi.Fluent.Models.UI;
 using WalletWasabi.Fluent.Validation;
@@ -36,13 +37,18 @@ public partial class CoordinatorTabSettingsViewModel : RoutableViewModel
 		this.ValidateProperty(x => x.AbsoluteMinInputCount, ValidateAbsoluteMinInputCount);
 
 
-		_coordinatorUri = settings.CoordinatorUri;
+		_coordinatorUri = settings.GetCoordinatorUri();
 		_maxCoordinationFeeRate = settings.MaxCoordinationFeeRate;
 		_maxCoinJoinMiningFeeRate = settings.MaxCoinJoinMiningFeeRate;
 		_absoluteMinInputCount = settings.AbsoluteMinInputCount;
 
-		this.WhenAnyValue(x => x.Settings.CoordinatorUri)
-			.Subscribe(x => CoordinatorUri = x);
+		this.WhenAnyValue(
+				x => x.Settings.MainNetCoordinatorUri,
+				x => x.Settings.TestNetCoordinatorUri,
+				x => x.Settings.RegTestCoordinatorUri,
+				x => x.Settings.Network)
+			.ToSignal()
+			.Subscribe(x => CoordinatorUri = Settings.GetCoordinatorUri());
 	}
 
 	public bool IsReadOnly => Settings.IsOverridden;
@@ -64,7 +70,7 @@ public partial class CoordinatorTabSettingsViewModel : RoutableViewModel
 			return;
 		}
 
-		Settings.CoordinatorUri = coordinatorUri;
+		Settings.TrySetCoordinatorUri(coordinatorUri);
 	}
 
 	private void ValidateMaxCoordinationFeeRate(IValidationErrors errors)

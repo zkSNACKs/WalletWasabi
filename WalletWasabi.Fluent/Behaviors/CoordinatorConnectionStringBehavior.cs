@@ -5,7 +5,8 @@ using Avalonia.Xaml.Interactions.Custom;
 using WalletWasabi.Fluent.Extensions;
 using WalletWasabi.Fluent.Helpers;
 using WalletWasabi.Fluent.Models.UI;
-using WalletWasabi.Fluent.ViewModels.SearchBar.Settings;
+using WalletWasabi.Fluent.ViewModels.Dialogs;
+using WalletWasabi.Helpers;
 
 namespace WalletWasabi.Fluent.Behaviors;
 
@@ -19,8 +20,18 @@ public class CoordinatorConnectionStringBehavior : DisposingBehavior<Window>
 			return;
 		}
 
+		var uiContext = UiContext.Default;
+
 		Observable
 			.FromEventPattern(AssociatedObject, nameof(AssociatedObject.Activated))
+			.Where(_ => !uiContext.ApplicationSettings.Oobe)
+			.Do(_ =>
+			{
+				if (uiContext.Navigate().DialogScreen.CurrentPage is NewCoordinatorConfirmationDialogViewModel currentDialog)
+				{
+					currentDialog.CancelCommand.ExecuteIfCan();
+				}
+			})
 			.DoAsync(async _ =>
 			{
 				var clipboardValue = await ApplicationHelper.GetTextAsync();
@@ -29,26 +40,24 @@ public class CoordinatorConnectionStringBehavior : DisposingBehavior<Window>
 					return;
 				}
 
-				var uiContext = UiContext.Default;
-
-				if (uiContext.ApplicationSettings.Oobe)
-				{
-					return;
-				}
-
 				if (CoordinatorConfigStringHelper.DoesntChangeAnything(coordinatorConfigString))
 				{
 					return;
 				}
-
-				// TODO: If NewCoordinatorConfirmationDialog, close the old one and open the new one
-
 				var accepted = await uiContext.Navigate().To().NewCoordinatorConfirmationDialog(coordinatorConfigString).GetResultAsync();
-
-				if (accepted)
+				if (!accepted)
 				{
-					CoordinatorConfigStringHelper.Process(coordinatorConfigString, uiContext.ApplicationSettings);
-					NotificationHelpers.Show(new RestartViewModel("Coordinator saved and will be applied after restarting the application."));
+					return;
+				}
+
+				if (!uiContext.ApplicationSettings.TryProcessCoordinatorConfigString(coordinatorConfigString))
+				{
+					uiContext.Navigate().To().ShowErrorDialog(
+						message: "Some of the values were incorrect. See logs for more details.",
+						title: "Coordinator detected",
+						caption: "");
+
+					return;
 				}
 			})
 			.Subscribe()

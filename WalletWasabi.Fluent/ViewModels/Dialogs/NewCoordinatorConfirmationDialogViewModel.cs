@@ -2,13 +2,14 @@ using System.Reactive.Concurrency;
 using ReactiveUI;
 using WalletWasabi.Fluent.Helpers;
 using WalletWasabi.Fluent.ViewModels.Dialogs.Base;
+using WalletWasabi.Models;
 
 namespace WalletWasabi.Fluent.ViewModels.Dialogs;
 
 [NavigationMetaData(Title = "Coordinator detected")]
 public partial class NewCoordinatorConfirmationDialogViewModel : DialogViewModelBase<bool>
 {
-	public NewCoordinatorConfirmationDialogViewModel(CoordinatorConfigStringHelper.CoordinatorConfigString coordinatorConfig)
+	public NewCoordinatorConfirmationDialogViewModel(CoordinatorConfigString coordinatorConfig)
 	{
 		CoordinatorConfig = coordinatorConfig;
 		EnableBack = false;
@@ -24,5 +25,5 @@ public partial class NewCoordinatorConfirmationDialogViewModel : DialogViewModel
 		await ApplicationHelper.SetTextAsync("");
 	}
 
-	public CoordinatorConfigStringHelper.CoordinatorConfigString CoordinatorConfig { get; }
+	public CoordinatorConfigString CoordinatorConfig { get; }
 }

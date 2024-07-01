@@ -15,56 +15,58 @@
                      NoCommand="{Binding CancelCommand}"
                      HighlightButton="YesButton">
       <QuestionControl.IconContent>
-        <StackPanel Spacing="15" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+        <ScrollViewer>
+          <StackPanel Spacing="15" HorizontalAlignment="Stretch" VerticalAlignment="Top">
 
-          <!-- Name -->
-          <PreviewItem Label="Name"
-                       Icon="{StaticResource person_regular}"
-                       CopyableContent="{Binding CoordinatorConfig.Name}">
-            <TextBlock Text="{Binding CoordinatorConfig.Name, FallbackValue=Name}" />
-          </PreviewItem>
-          <Separator />
+            <!-- Name -->
+            <PreviewItem Label="Name"
+                         Icon="{StaticResource person_regular}"
+                         CopyableContent="{Binding CoordinatorConfig.Name}">
+              <TextBlock Text="{Binding CoordinatorConfig.Name, FallbackValue=Name}" />
+            </PreviewItem>
+            <Separator />
 
-          <!-- Network -->
-          <PreviewItem Label="Network"
-                       Icon="{StaticResource globe}"
-                       CopyableContent="{Binding CoordinatorConfig.Network}">
-            <TextBlock Text="{Binding CoordinatorConfig.Network, FallbackValue=Main}" />
-          </PreviewItem>
-          <Separator />
+            <!-- Network -->
+            <PreviewItem Label="Network"
+                         Icon="{StaticResource globe}"
+                         CopyableContent="{Binding CoordinatorConfig.Network}">
+              <TextBlock Text="{Binding CoordinatorConfig.Network, FallbackValue=Main}" />
+            </PreviewItem>
+            <Separator />
 
-          <!-- Endpoint -->
-          <PreviewItem Label="Endpoint"
-                       Icon="{StaticResource coordinator}"
-                       CopyableContent="{Binding CoordinatorConfig.Endpoint}">
-            <TextBlock Text="{Binding CoordinatorConfig.Endpoint, FallbackValue=https://api.example.com/}" />
-          </PreviewItem>
-          <Separator />
+            <!-- Endpoint -->
+            <PreviewItem Label="Endpoint"
+                         Icon="{StaticResource coordinator}"
+                         CopyableContent="{Binding CoordinatorConfig.Endpoint}">
+              <TextBlock Text="{Binding CoordinatorConfig.Endpoint, FallbackValue=https://api.example.com/}" />
+            </PreviewItem>
+            <Separator />
 
-          <!-- CoordinatorFee -->
-          <PreviewItem Label="Coordinator fee"
-                       Icon="{StaticResource money_24_regular}"
-                       CopyableContent="{Binding CoordinatorConfig.CoordinatorFee}">
-            <TextBlock Text="{Binding CoordinatorConfig.CoordinatorFee, FallbackValue=0%, StringFormat={}{0}%}" />
-          </PreviewItem>
-          <Separator />
+            <!-- CoordinatorFee -->
+            <PreviewItem Label="Coordinator fee"
+                         Icon="{StaticResource money_24_regular}"
+                         CopyableContent="{Binding CoordinatorConfig.CoordinatorFee}">
+              <TextBlock Text="{Binding CoordinatorConfig.CoordinatorFee, FallbackValue=0%, StringFormat={}{0}%}" />
+            </PreviewItem>
+            <Separator />
 
-          <!-- AbsoluteMinInputCount -->
-          <PreviewItem Label="Absolute minimum input count"
-                       Icon="{StaticResource input_count}"
-                       CopyableContent="{Binding CoordinatorConfig.AbsoluteMinInputCount}">
-            <TextBlock Text="{Binding CoordinatorConfig.AbsoluteMinInputCount, FallbackValue=100}" />
-          </PreviewItem>
-          <Separator />
+            <!-- AbsoluteMinInputCount -->
+            <PreviewItem Label="Absolute minimum input count"
+                         Icon="{StaticResource input_count}"
+                         CopyableContent="{Binding CoordinatorConfig.AbsoluteMinInputCount}">
+              <TextBlock Text="{Binding CoordinatorConfig.AbsoluteMinInputCount, FallbackValue=100}" />
+            </PreviewItem>
+            <Separator />
 
-          <!-- ReadMore -->
-          <PreviewItem Label="Read more"
-                       Icon="{StaticResource read_more}"
-                       CopyableContent="{Binding CoordinatorConfig.ReadMore}">
-            <TextBlock Text="{Binding CoordinatorConfig.ReadMore, FallbackValue=https://www.example.com/}" />
-          </PreviewItem>
+            <!-- ReadMore -->
+            <PreviewItem Label="Read more"
+                         Icon="{StaticResource read_more}"
+                         CopyableContent="{Binding CoordinatorConfig.ReadMore}">
+              <TextBlock Text="{Binding CoordinatorConfig.ReadMore, FallbackValue=https://www.example.com/}" />
+            </PreviewItem>
 
-        </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
       </QuestionControl.IconContent>
     </QuestionControl>
   </ContentArea>

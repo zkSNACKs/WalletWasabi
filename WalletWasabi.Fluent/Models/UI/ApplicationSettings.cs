@@ -46,7 +46,9 @@ public partial class ApplicationSettings : ReactiveObject
 	[AutoNotify] private string _dustThreshold;
 
 	// Coordinator
-	[AutoNotify] private string _coordinatorUri;
+	[AutoNotify] private string _mainNetCoordinatorUri;
+	[AutoNotify] private string _testNetCoordinatorUri;
+	[AutoNotify] private string _regTestCoordinatorUri;
 	[AutoNotify] private string _maxCoordinationFeeRate;
 	[AutoNotify] private string _maxCoinJoinMiningFeeRate;
 	[AutoNotify] private string _absoluteMinInputCount;
@@ -95,7 +97,9 @@ public partial class ApplicationSettings : ReactiveObject
 		_dustThreshold = _startupConfig.DustThreshold.ToString();
 
 		// Coordinator
-		_coordinatorUri = _startupConfig.GetCoordinatorUri();
+		_mainNetCoordinatorUri = _startupConfig.MainNetCoordinatorUri;
+		_testNetCoordinatorUri = _startupConfig.TestNetCoordinatorUri;
+		_regTestCoordinatorUri = _startupConfig.RegTestCoordinatorUri;
 		_maxCoordinationFeeRate = _startupConfig.MaxCoordinationFeeRate.ToString(CultureInfo.InvariantCulture);
 		_maxCoinJoinMiningFeeRate = _startupConfig.MaxCoinJoinMiningFeeRate.ToString(CultureInfo.InvariantCulture);
 		_absoluteMinInputCount = _startupConfig.AbsoluteMinInputCount.ToString(CultureInfo.InvariantCulture);
@@ -123,58 +127,58 @@ public partial class ApplicationSettings : ReactiveObject
 		_windowState = (WindowState)Enum.Parse(typeof(WindowState), _uiConfig.WindowState);
 
 		// Save on change
+		var configSaveTrigger1 =
+			this.WhenAnyValue(
+					x => x.EnableGpu,
+					x => x.Network,
+					x => x.StartLocalBitcoinCoreOnStartup,
+					x => x.LocalBitcoinCoreDataDir,
+					x => x.StopLocalBitcoinCoreOnShutdown,
+					x => x.BitcoinP2PEndPoint,
+					x => x.DustThreshold,
+					x => x.UseTor,
+					x => x.TerminateTorOnExit,
+					x => x.DownloadNewVersion,
+					(_, _, _, _, _, _, _, _, _, _) => Unit.Default)
+				.Skip(1);
+		var configSaveTrigger2 =
+			this.WhenAnyValue(
+					x => x.MaxCoordinationFeeRate,
+					x => x.MaxCoinJoinMiningFeeRate,
+					x => x.AbsoluteMinInputCount,
+					x => x.MainNetCoordinatorUri,
+					x => x.TestNetCoordinatorUri,
+					x => x.RegTestCoordinatorUri,
+					(_, _, _, _, _, _) => Unit.Default)
+				.Skip(1);
 
-		var configChangeTrigger1 = this.WhenAnyValue(
-			x => x.EnableGpu,
-			x => x.Network,
-			x => x.StartLocalBitcoinCoreOnStartup,
-			x => x.LocalBitcoinCoreDataDir,
-			x => x.StopLocalBitcoinCoreOnShutdown,
-			x => x.BitcoinP2PEndPoint,
-			x => x.CoordinatorUri,
-			x => x.DustThreshold,
-			x => x.UseTor,
-			x => x.TerminateTorOnExit,
-			x => x.DownloadNewVersion,
-			(_, _, _, _, _, _, _, _, _, _, _) => Unit.Default)
-			.Skip(1)
+		Observable
+			.Merge(configSaveTrigger1, configSaveTrigger2)
 			.ObserveOn(RxApp.MainThreadScheduler)
 			.Throttle(TimeSpan.FromMilliseconds(ThrottleTime))
 			.Do(_ => Save())
 			.Subscribe();
 
-		// Save on change - continuation. WhenAnyValue cannot have more than 12 arguments.
-		this.WhenAnyValue(
-				x => x.MaxCoordinationFeeRate,
-				x => x.MaxCoinJoinMiningFeeRate,
-				x => x.AbsoluteMinInputCount,
-				(_, _, _) => Unit.Default)
-			.Skip(1)
-			.ObserveOn(RxApp.MainThreadScheduler)
-			.Throttle(TimeSpan.FromMilliseconds(ThrottleTime))
-			.Do(_ => Save())
-			.Subscribe();
 
 		// Save UiConfig on change
 		this.WhenAnyValue(
-			x => x.DarkModeEnabled,
-			x => x.AutoCopy,
-			x => x.AutoPaste,
-			x => x.CustomChangeAddress,
-			x => x.SelectedFeeDisplayUnit,
-			x => x.RunOnSystemStartup,
-			x => x.HideOnClose,
-			x => x.Oobe,
-			x => x.ShowCoordinatorAnnouncement,
-			x => x.WindowState)
+				x => x.DarkModeEnabled,
+				x => x.AutoCopy,
+				x => x.AutoPaste,
+				x => x.CustomChangeAddress,
+				x => x.SelectedFeeDisplayUnit,
+				x => x.RunOnSystemStartup,
+				x => x.HideOnClose,
+				x => x.Oobe,
+				x => x.ShowCoordinatorAnnouncement,
+				x => x.WindowState)
 			.Skip(1)
 			.Throttle(TimeSpan.FromMilliseconds(ThrottleTime))
 			.Do(_ => ApplyUiConfigChanges())
 			.Subscribe();
 
 		// Save UiConfig on change without throttling
-		this.WhenAnyValue(
-				x => x.PrivacyMode)
+		this.WhenAnyValue(x => x.PrivacyMode)
 			.Skip(1)
 			.Do(_ => ApplyUiConfigPrivacyModeChange())
 			.Subscribe();
@@ -255,19 +259,20 @@ public partial class ApplicationSettings : ReactiveObject
 				}
 			}
 
+			result = result with { MainNetCoordinatorUri = MainNetCoordinatorUri };
+			result = result with { TestNetCoordinatorUri = TestNetCoordinatorUri };
+			result = result with { RegTestCoordinatorUri = RegTestCoordinatorUri };
+
 			if (Network == Network.Main)
 			{
-				result = result with { MainNetCoordinatorUri = CoordinatorUri };
 				result = result with { MainNetBackendUri = BackendUri };
 			}
 			else if (Network == Network.TestNet)
 			{
-				result = result with { TestNetCoordinatorUri = CoordinatorUri };
 				result = result with { TestNetBackendUri = BackendUri };
 			}
 			else if (Network == Network.RegTest)
 			{
-				result = result with { RegTestCoordinatorUri = CoordinatorUri };
 				result = result with { RegTestBackendUri = BackendUri };
 			}
 			else
@@ -280,18 +285,10 @@ public partial class ApplicationSettings : ReactiveObject
 				StartLocalBitcoinCoreOnStartup = StartLocalBitcoinCoreOnStartup,
 				StopLocalBitcoinCoreOnShutdown = StopLocalBitcoinCoreOnShutdown,
 				LocalBitcoinCoreDataDir = Guard.Correct(LocalBitcoinCoreDataDir),
-				DustThreshold = decimal.TryParse(DustThreshold, out var threshold) ?
-					Money.Coins(threshold) :
-					PersistentConfig.DefaultDustThreshold,
-				MaxCoordinationFeeRate = decimal.TryParse(MaxCoordinationFeeRate, out var maxCoordinationFeeRate) ?
-					maxCoordinationFeeRate :
-					Constants.DefaultMaxCoordinationFeeRate,
-				MaxCoinJoinMiningFeeRate = decimal.TryParse(MaxCoinJoinMiningFeeRate, out var maxCoinjoinMiningFeeRate) ?
-					maxCoinjoinMiningFeeRate :
-					Constants.DefaultMaxCoinJoinMiningFeeRate,
-				AbsoluteMinInputCount = int.TryParse(AbsoluteMinInputCount, out var absoluteMinInputCount) ?
-					absoluteMinInputCount :
-					Constants.DefaultAbsoluteMinInputCount
+				DustThreshold = decimal.TryParse(DustThreshold, out var threshold) ? Money.Coins(threshold) : PersistentConfig.DefaultDustThreshold,
+				MaxCoordinationFeeRate = decimal.TryParse(MaxCoordinationFeeRate, out var maxCoordinationFeeRate) ? maxCoordinationFeeRate : Constants.DefaultMaxCoordinationFeeRate,
+				MaxCoinJoinMiningFeeRate = decimal.TryParse(MaxCoinJoinMiningFeeRate, out var maxCoinjoinMiningFeeRate) ? maxCoinjoinMiningFeeRate : Constants.DefaultMaxCoinJoinMiningFeeRate,
+				AbsoluteMinInputCount = int.TryParse(AbsoluteMinInputCount, out var absoluteMinInputCount) ? absoluteMinInputCount : Constants.DefaultAbsoluteMinInputCount
 			};
 		}
 		else
@@ -302,7 +299,6 @@ public partial class ApplicationSettings : ReactiveObject
 			};
 
 			BitcoinP2PEndPoint = result.GetBitcoinP2pEndPoint().ToString(defaultPort: -1);
-			CoordinatorUri = result.GetCoordinatorUri();
 			BackendUri = result.GetBackendUri();
 		}
 
@@ -315,6 +311,80 @@ public partial class ApplicationSettings : ReactiveObject
 		};
 
 		return result;
+	}
+
+	public bool TryProcessCoordinatorConfigString(CoordinatorConfigString coordinatorConfigString)
+	{
+		// Sanity checks
+		if (coordinatorConfigString.CoordinatorFee > 1)
+		{
+			Logger.LogWarning($"New intended coordinator fee rate was {coordinatorConfigString.CoordinatorFee}%, but absolute max is 1%");
+			return false;
+		}
+
+		if (coordinatorConfigString.AbsoluteMinInputCount < 2)
+		{
+			Logger.LogWarning($"New intended absolute min input count was {coordinatorConfigString.AbsoluteMinInputCount}, but absolute min is 2");
+			return false;
+		}
+
+		if (!TrySetCoordinatorUri(coordinatorConfigString.Endpoint.ToString(), coordinatorConfigString.Network))
+		{
+			return false;
+		}
+
+		MaxCoordinationFeeRate = coordinatorConfigString.CoordinatorFee.ToString(CultureInfo.InvariantCulture);
+		AbsoluteMinInputCount = coordinatorConfigString.AbsoluteMinInputCount.ToString();
+
+		// TODO: Save Name and ReadMoreUri to display it after.
+
+		return true;
+	}
+
+	public bool TrySetCoordinatorUri(string uri, Network? network = null)
+	{
+		network ??= Network;
+
+		if (network == Network.Main)
+		{
+			MainNetCoordinatorUri = uri;
+			return true;
+		}
+
+		if (network == Network.TestNet)
+		{
+			TestNetCoordinatorUri = uri;
+			return true;
+		}
+
+		if (network == Network.RegTest)
+		{
+			RegTestCoordinatorUri = uri;
+			return true;
+		}
+
+		Logger.LogWarning($"Coordinator URI didn't change due to unknown network: {network}");
+		return false;
+	}
+
+	public string GetCoordinatorUri()
+	{
+		if (Network == Network.Main)
+		{
+			return MainNetCoordinatorUri;
+		}
+
+		if (Network == Network.TestNet)
+		{
+			return TestNetCoordinatorUri;
+		}
+
+		if (Network == Network.RegTest)
+		{
+			return RegTestCoordinatorUri;
+		}
+
+		throw new NotSupportedNetworkException(Network);
 	}
 
 	private void ApplyUiConfigChanges()

@@ -18,12 +18,15 @@ public class NullApplicationSettings : IApplicationSettings
 	public string LocalBitcoinCoreDataDir { get; set; } = "";
 	public bool StopLocalBitcoinCoreOnShutdown { get; set; }
 	public string BitcoinP2PEndPoint { get; set; } = "";
+	public string RegTestCoordinatorUri { get; set; } = "";
 	public string MaxCoordinationFeeRate { get; set; } = "";
 	public string MaxCoinJoinMiningFeeRate { get; set; } = "";
 	public string AbsoluteMinInputCount { get; set; } = "";
 	public string CoordinatorUri { get; set; } = "";
 	public string BackendUri { get; set; } = "";
 	public string DustThreshold { get; set; } = "";
+	public string MainNetCoordinatorUri { get; set; } = "";
+	public string TestNetCoordinatorUri { get; set; } = "";
 	public bool DarkModeEnabled { get; set; }
 	public bool AutoCopy { get; set; }
 	public bool AutoPaste { get; set; }
@@ -43,5 +46,20 @@ public class NullApplicationSettings : IApplicationSettings
 	public bool CheckIfRestartIsNeeded(PersistentConfig config)
 	{
 		return false;
+	}
+
+	public bool TryProcessCoordinatorConfigString(CoordinatorConfigString coordinatorConfigString)
+	{
+		return false;
+	}
+
+	public bool TrySetCoordinatorUri(string uri, Network? network = null)
+	{
+		return false;
+	}
+
+	public string GetCoordinatorUri()
+	{
+		return "";
 	}
 }
