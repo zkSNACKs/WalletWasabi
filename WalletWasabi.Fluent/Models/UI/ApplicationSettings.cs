@@ -68,7 +68,6 @@ public partial class ApplicationSettings : ReactiveObject
 	[AutoNotify] private bool _privacyMode;
 
 	[AutoNotify] private bool _oobe;
-	[AutoNotify] private bool _showCoordinatorAnnouncement;
 	[AutoNotify] private WindowState _windowState;
 
 	// Non-persistent
@@ -118,7 +117,6 @@ public partial class ApplicationSettings : ReactiveObject
 		_privacyMode = _uiConfig.PrivacyMode;
 
 		_oobe = _uiConfig.Oobe;
-		_showCoordinatorAnnouncement = _uiConfig.ShowCoordinatorAnnouncement;
 
 		_windowState = (WindowState)Enum.Parse(typeof(WindowState), _uiConfig.WindowState);
 
@@ -165,7 +163,6 @@ public partial class ApplicationSettings : ReactiveObject
 			x => x.RunOnSystemStartup,
 			x => x.HideOnClose,
 			x => x.Oobe,
-			x => x.ShowCoordinatorAnnouncement,
 			x => x.WindowState)
 			.Skip(1)
 			.Throttle(TimeSpan.FromMilliseconds(ThrottleTime))
@@ -327,7 +324,6 @@ public partial class ApplicationSettings : ReactiveObject
 		_uiConfig.RunOnSystemStartup = RunOnSystemStartup;
 		_uiConfig.HideOnClose = HideOnClose;
 		_uiConfig.Oobe = Oobe;
-		_uiConfig.ShowCoordinatorAnnouncement = ShowCoordinatorAnnouncement;
 		_uiConfig.WindowState = WindowState.ToString();
 	}
 

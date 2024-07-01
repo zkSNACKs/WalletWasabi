@@ -22,7 +22,6 @@ public class UiConfig : ConfigBase
 	private string _windowState = "Normal";
 	private bool _runOnSystemStartup;
 	private bool _oobe;
-	private bool _showCoordinatorAnnouncement;
 	private bool _hideOnClose;
 	private bool _autoPaste;
 	private int _feeTarget;
@@ -68,12 +67,6 @@ public class UiConfig : ConfigBase
 			.Skip(1) // Won't save on UiConfig creation.
 			.ObserveOn(RxApp.TaskpoolScheduler)
 			.Subscribe(_ => ToFile());
-
-		this.WhenAnyValue(x => x.ShowCoordinatorAnnouncement)
-			.Throttle(TimeSpan.FromMilliseconds(500))
-			.Skip(1) // Won't save on UiConfig creation.
-			.ObserveOn(RxApp.MainThreadScheduler)
-			.Subscribe(_ => ToFile());
 	}
 
 	[JsonProperty(PropertyName = "Oobe", DefaultValueHandling = DefaultValueHandling.Populate)]
@@ -82,14 +75,6 @@ public class UiConfig : ConfigBase
 	{
 		get => _oobe;
 		set => RaiseAndSetIfChanged(ref _oobe, value);
-	}
-
-	[JsonProperty(PropertyName = "ShowCoordinatorAnnouncement", DefaultValueHandling = DefaultValueHandling.Populate)]
-	[DefaultValue(true)]
-	public bool ShowCoordinatorAnnouncement
-	{
-		get => _showCoordinatorAnnouncement;
-		set => RaiseAndSetIfChanged(ref _showCoordinatorAnnouncement, value);
 	}
 
 	[JsonProperty(PropertyName = "WindowState")]
