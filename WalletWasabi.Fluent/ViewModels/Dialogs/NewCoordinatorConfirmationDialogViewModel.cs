@@ -9,9 +9,9 @@ namespace WalletWasabi.Fluent.ViewModels.Dialogs;
 [NavigationMetaData(Title = "Coordinator detected")]
 public partial class NewCoordinatorConfirmationDialogViewModel : DialogViewModelBase<bool>
 {
-	public NewCoordinatorConfirmationDialogViewModel(CoordinatorConfigString coordinatorConfig)
+	public NewCoordinatorConfirmationDialogViewModel(CoordinatorConnectionString coordinatorConnection)
 	{
-		CoordinatorConfig = coordinatorConfig;
+		CoordinatorConnection = coordinatorConnection;
 		EnableBack = false;
 		SetupCancel(enableCancel: false, enableCancelOnEscape: true, enableCancelOnPressed: true);
 
@@ -25,5 +25,5 @@ public partial class NewCoordinatorConfirmationDialogViewModel : DialogViewModel
 		await ApplicationHelper.SetTextAsync("");
 	}
 
-	public CoordinatorConfigString CoordinatorConfig { get; }
+	public CoordinatorConnectionString CoordinatorConnection { get; }
 }

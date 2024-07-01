@@ -48,7 +48,7 @@ public class NullApplicationSettings : IApplicationSettings
 		return false;
 	}
 
-	public bool TryProcessCoordinatorConfigString(CoordinatorConfigString coordinatorConfigString)
+	public bool TryProcessCoordinatorConnectionString(CoordinatorConnectionString coordinatorConnectionString)
 	{
 		return false;
 	}

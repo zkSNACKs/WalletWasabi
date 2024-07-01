@@ -7,6 +7,7 @@ using WalletWasabi.Fluent.Helpers;
 using WalletWasabi.Fluent.Models.UI;
 using WalletWasabi.Fluent.ViewModels.Dialogs;
 using WalletWasabi.Helpers;
+using WalletWasabi.Models;
 
 namespace WalletWasabi.Fluent.Behaviors;
 
@@ -25,39 +26,43 @@ public class CoordinatorConnectionStringBehavior : DisposingBehavior<Window>
 		Observable
 			.FromEventPattern(AssociatedObject, nameof(AssociatedObject.Activated))
 			.Where(_ => !uiContext.ApplicationSettings.Oobe)
-			.Do(_ =>
-			{
-				if (uiContext.Navigate().DialogScreen.CurrentPage is NewCoordinatorConfirmationDialogViewModel currentDialog)
-				{
-					currentDialog.CancelCommand.ExecuteIfCan();
-				}
-			})
-			.DoAsync(async _ =>
+			.SelectMany(async _ =>
 			{
 				var clipboardValue = await ApplicationHelper.GetTextAsync();
-				if (CoordinatorConfigStringHelper.Parse(clipboardValue) is not { } coordinatorConfigString)
+
+				if (uiContext.Navigate().DialogScreen.CurrentPage is not NewCoordinatorConfirmationDialogViewModel currentDialog)
+				{
+					return (clipboardValue, null);
+				}
+
+				if (!CoordinatorConnectionString.TryParse(clipboardValue, out var coordinatorConnectionString))
+				{
+					return (clipboardValue, null);
+				}
+
+				currentDialog.CancelCommand.ExecuteIfCan();
+				return (clipboardValue, coordinatorConnectionString);
+
+			})
+			.DoAsync(async result =>
+			{
+				if (result.coordinatorConnectionString is null && !CoordinatorConnectionString.TryParse(result.clipboardValue, out result.coordinatorConnectionString))
 				{
 					return;
 				}
 
-				if (CoordinatorConfigStringHelper.DoesntChangeAnything(coordinatorConfigString))
-				{
-					return;
-				}
-				var accepted = await uiContext.Navigate().To().NewCoordinatorConfirmationDialog(coordinatorConfigString).GetResultAsync();
+				var accepted = await uiContext.Navigate().To().NewCoordinatorConfirmationDialog(result.coordinatorConnectionString).GetResultAsync();
 				if (!accepted)
 				{
 					return;
 				}
 
-				if (!uiContext.ApplicationSettings.TryProcessCoordinatorConfigString(coordinatorConfigString))
+				if (!uiContext.ApplicationSettings.TryProcessCoordinatorConnectionString(result.coordinatorConnectionString))
 				{
 					uiContext.Navigate().To().ShowErrorDialog(
 						message: "Some of the values were incorrect. See logs for more details.",
 						title: "Coordinator detected",
 						caption: "");
-
-					return;
 				}
 			})
 			.Subscribe()

@@ -8,7 +8,7 @@
              x:CompileBindings="True"
              x:Class="WalletWasabi.Fluent.Views.Dialogs.NewCoordinatorConfirmationDialogView">
   <ContentArea Title="{Binding Title}"
-               Caption="Detected a Coordinator magic string in the clipboard. Please review the details below."
+               Caption="Detected a Coordinator connection string in the clipboard. Please review the details below."
                ScrollViewer.VerticalScrollBarVisibility="Disabled">
     <QuestionControl Content="Do you want apply this coordinator?"
                      YesCommand="{Binding NextCommand}"
@@ -21,48 +21,48 @@
             <!-- Name -->
             <PreviewItem Label="Name"
                          Icon="{StaticResource person_regular}"
-                         CopyableContent="{Binding CoordinatorConfig.Name}">
-              <TextBlock Text="{Binding CoordinatorConfig.Name, FallbackValue=Name}" />
+                         CopyableContent="{Binding CoordinatorConnection.Name}">
+              <TextBlock Text="{Binding CoordinatorConnection.Name, FallbackValue=Name}" />
             </PreviewItem>
             <Separator />
 
             <!-- Network -->
             <PreviewItem Label="Network"
                          Icon="{StaticResource globe}"
-                         CopyableContent="{Binding CoordinatorConfig.Network}">
-              <TextBlock Text="{Binding CoordinatorConfig.Network, FallbackValue=Main}" />
+                         CopyableContent="{Binding CoordinatorConnection.Network}">
+              <TextBlock Text="{Binding CoordinatorConnection.Network, FallbackValue=Main}" />
             </PreviewItem>
             <Separator />
 
             <!-- Endpoint -->
             <PreviewItem Label="Endpoint"
                          Icon="{StaticResource coordinator}"
-                         CopyableContent="{Binding CoordinatorConfig.Endpoint}">
-              <TextBlock Text="{Binding CoordinatorConfig.Endpoint, FallbackValue=https://api.example.com/}" />
+                         CopyableContent="{Binding CoordinatorConnection.Endpoint}">
+              <TextBlock Text="{Binding CoordinatorConnection.Endpoint, FallbackValue=https://api.example.com/}" />
             </PreviewItem>
             <Separator />
 
             <!-- CoordinatorFee -->
             <PreviewItem Label="Coordinator fee"
                          Icon="{StaticResource money_24_regular}"
-                         CopyableContent="{Binding CoordinatorConfig.CoordinatorFee}">
-              <TextBlock Text="{Binding CoordinatorConfig.CoordinatorFee, FallbackValue=0%, StringFormat={}{0}%}" />
+                         CopyableContent="{Binding CoordinatorConnection.CoordinatorFeePercent}">
+              <TextBlock Text="{Binding CoordinatorConnection.CoordinatorFeePercent, FallbackValue=0%, StringFormat={}{0}%}" />
             </PreviewItem>
             <Separator />
 
             <!-- AbsoluteMinInputCount -->
             <PreviewItem Label="Absolute minimum input count"
                          Icon="{StaticResource input_count}"
-                         CopyableContent="{Binding CoordinatorConfig.AbsoluteMinInputCount}">
-              <TextBlock Text="{Binding CoordinatorConfig.AbsoluteMinInputCount, FallbackValue=100}" />
+                         CopyableContent="{Binding CoordinatorConnection.AbsoluteMinInputCount}">
+              <TextBlock Text="{Binding CoordinatorConnection.AbsoluteMinInputCount, FallbackValue=100}" />
             </PreviewItem>
             <Separator />
 
             <!-- ReadMore -->
             <PreviewItem Label="Read more"
                          Icon="{StaticResource read_more}"
-                         CopyableContent="{Binding CoordinatorConfig.ReadMore}">
-              <TextBlock Text="{Binding CoordinatorConfig.ReadMore, FallbackValue=https://www.example.com/}" />
+                         CopyableContent="{Binding CoordinatorConnection.ReadMore}">
+              <TextBlock Text="{Binding CoordinatorConnection.ReadMore, FallbackValue=https://www.example.com/}" />
             </PreviewItem>
 
           </StackPanel>

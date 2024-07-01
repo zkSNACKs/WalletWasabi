@@ -313,28 +313,28 @@ public partial class ApplicationSettings : ReactiveObject
 		return result;
 	}
 
-	public bool TryProcessCoordinatorConfigString(CoordinatorConfigString coordinatorConfigString)
+	public bool TryProcessCoordinatorConnectionString(CoordinatorConnectionString coordinatorConnectionString)
 	{
 		// Sanity checks
-		if (coordinatorConfigString.CoordinatorFee > 1)
+		if (coordinatorConnectionString.CoordinatorFeePercent > 1)
 		{
-			Logger.LogWarning($"New intended coordinator fee rate was {coordinatorConfigString.CoordinatorFee}%, but absolute max is 1%");
+			Logger.LogWarning($"New intended coordinator fee rate was {coordinatorConnectionString.CoordinatorFeePercent}%, but absolute max is 1%");
 			return false;
 		}
 
-		if (coordinatorConfigString.AbsoluteMinInputCount < 2)
+		if (coordinatorConnectionString.AbsoluteMinInputCount < 2)
 		{
-			Logger.LogWarning($"New intended absolute min input count was {coordinatorConfigString.AbsoluteMinInputCount}, but absolute min is 2");
+			Logger.LogWarning($"New intended absolute min input count was {coordinatorConnectionString.AbsoluteMinInputCount}, but absolute min is 2");
 			return false;
 		}
 
-		if (!TrySetCoordinatorUri(coordinatorConfigString.Endpoint.ToString(), coordinatorConfigString.Network))
+		if (!TrySetCoordinatorUri(coordinatorConnectionString.Endpoint.ToString(), coordinatorConnectionString.Network))
 		{
 			return false;
 		}
 
-		MaxCoordinationFeeRate = coordinatorConfigString.CoordinatorFee.ToString(CultureInfo.InvariantCulture);
-		AbsoluteMinInputCount = coordinatorConfigString.AbsoluteMinInputCount.ToString();
+		MaxCoordinationFeeRate = coordinatorConnectionString.CoordinatorFeePercent.ToString(CultureInfo.InvariantCulture);
+		AbsoluteMinInputCount = coordinatorConnectionString.AbsoluteMinInputCount.ToString();
 
 		// TODO: Save Name and ReadMoreUri to display it after.
 
