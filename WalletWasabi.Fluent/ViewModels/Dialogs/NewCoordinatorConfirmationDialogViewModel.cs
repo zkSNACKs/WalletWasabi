@@ -1,5 +1,6 @@
 using System.Windows.Input;
 using ReactiveUI;
+using WalletWasabi.Discoverability;
 using WalletWasabi.Fluent.ViewModels.Dialogs.Base;
 using WalletWasabi.Models;
 

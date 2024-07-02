@@ -2,6 +2,7 @@ using System.Reactive.Linq;
 using Avalonia.Controls;
 using NBitcoin;
 using WalletWasabi.Daemon;
+using WalletWasabi.Discoverability;
 using WalletWasabi.Fluent.Models;
 using WalletWasabi.Fluent.Models.UI;
 using WalletWasabi.Models;
