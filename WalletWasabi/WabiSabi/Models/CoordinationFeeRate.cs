@@ -9,7 +9,7 @@ public readonly struct CoordinationFeeRate
 
 	public CoordinationFeeRate(decimal rate, Money plebsDontPayThreshold)
 	{
-		Rate = Guard.InRangeAndNotNull(nameof(rate), rate, 0m, 0.01m);
+		Rate = Guard.InRangeAndNotNull(nameof(rate), rate, 0m, Constants.AbsoluteMaxCoordinationFeeRate);
 		PlebsDontPayThreshold = plebsDontPayThreshold ?? Money.Zero;
 	}
 

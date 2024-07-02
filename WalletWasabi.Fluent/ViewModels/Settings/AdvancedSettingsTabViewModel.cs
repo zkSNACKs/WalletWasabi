@@ -25,7 +25,7 @@ public partial class AdvancedSettingsTabViewModel : RoutableViewModel
 	public AdvancedSettingsTabViewModel(IApplicationSettings settings)
 	{
 		Settings = settings;
-		_backendUri = settings.CoordinatorUri;
+		_backendUri = settings.BackendUri;
 
 		this.ValidateProperty(x => x.BackendUri, ValidateBackendUri);
 

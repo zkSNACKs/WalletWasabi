@@ -1,0 +1,76 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dialog="using:WalletWasabi.Fluent.ViewModels.Dialogs"
+             mc:Ignorable="d" d:DesignWidth="428" d:DesignHeight="371"
+             x:DataType="dialog:NewCoordinatorConfirmationDialogViewModel"
+             x:CompileBindings="True"
+             x:Class="WalletWasabi.Fluent.Views.Dialogs.NewCoordinatorConfirmationDialogView">
+  <ContentArea Title="{Binding Title}"
+               Caption="Detected a Coordinator connection string in the clipboard. Please review the details below."
+               ScrollViewer.VerticalScrollBarVisibility="Disabled">
+    <QuestionControl Content="Do you want apply this coordinator?"
+                     YesCommand="{Binding NextCommand}"
+                     NoCommand="{Binding CancelCommand}"
+                     HighlightButton="YesButton">
+      <QuestionControl.IconContent>
+        <ScrollViewer>
+          <StackPanel Spacing="15" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+
+            <!-- Name -->
+            <PreviewItem Label="Name"
+                         Icon="{StaticResource person_regular}"
+                         CopyableContent="{Binding CoordinatorConnection.Name}">
+              <TextBlock Text="{Binding CoordinatorConnection.Name, FallbackValue=Name}" />
+            </PreviewItem>
+            <Separator />
+
+            <!-- Network -->
+            <PreviewItem Label="Network"
+                         Icon="{StaticResource globe}"
+                         CopyableContent="{Binding CoordinatorConnection.Network}">
+              <TextBlock Text="{Binding CoordinatorConnection.Network, FallbackValue=Main}" />
+            </PreviewItem>
+            <Separator />
+
+            <!-- Endpoint -->
+            <PreviewItem Label="Endpoint"
+                         Icon="{StaticResource coordinator}"
+                         CopyableContent="{Binding CoordinatorConnection.Endpoint}">
+              <TextBlock Text="{Binding CoordinatorConnection.Endpoint, FallbackValue=https://api.example.com/}" />
+            </PreviewItem>
+            <Separator />
+
+            <!-- CoordinationFee -->
+            <PreviewItem Label="Coordination fee rate"
+                         Icon="{StaticResource money_24_regular}"
+                         CopyableContent="{Binding CoordinatorConnection.CoordinationFeeRate}">
+              <TextBlock Text="{Binding CoordinatorConnection.CoordinationFeeRate, FallbackValue=0, StringFormat={}{0}}" />
+            </PreviewItem>
+            <Separator />
+
+            <!-- AbsoluteMinInputCount -->
+            <PreviewItem Label="Absolute minimum input count"
+                         Icon="{StaticResource input_count}"
+                         CopyableContent="{Binding CoordinatorConnection.AbsoluteMinInputCount}">
+              <TextBlock Text="{Binding CoordinatorConnection.AbsoluteMinInputCount, FallbackValue=100}" />
+            </PreviewItem>
+            <Separator />
+
+            <!-- ReadMore -->
+            <PreviewItem Label="Read more"
+                         Icon="{StaticResource read_more}"
+                         CopyableContent="{Binding CoordinatorConnection.ReadMore}">
+              <Button Classes="activeHyperLink"
+                      ToolTip.Tip="Open the link in the default browser"
+                      Content="{Binding CoordinatorConnection.ReadMore, FallbackValue=https://www.example.com/}"
+                      Command="{Binding OpenReadMoreCommand}" />
+            </PreviewItem>
+
+          </StackPanel>
+        </ScrollViewer>
+      </QuestionControl.IconContent>
+    </QuestionControl>
+  </ContentArea>
+</UserControl>
