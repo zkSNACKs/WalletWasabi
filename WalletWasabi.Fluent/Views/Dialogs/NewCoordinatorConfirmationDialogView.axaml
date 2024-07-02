@@ -42,7 +42,7 @@
             </PreviewItem>
             <Separator />
 
-            <!-- CoordinatorFee -->
+            <!-- CoordinationFee -->
             <PreviewItem Label="Coordination fee rate"
                          Icon="{StaticResource money_24_regular}"
                          CopyableContent="{Binding CoordinatorConnection.CoordinationFeeRate}">

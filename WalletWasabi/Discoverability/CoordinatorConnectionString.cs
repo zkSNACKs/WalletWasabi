@@ -24,7 +24,7 @@ public record CoordinatorConnectionString(
 				["name"] = Uri.EscapeDataString(Name),
 				["network"] = Network.Name,
 				["endpoint"] = Uri.EscapeDataString(Endpoint.ToString()),
-				["coordinatorFeeRate"] = CoordinationFeeRate.ToString(CultureInfo.InvariantCulture),
+				["coordinationFeeRate"] = CoordinationFeeRate.ToString(CultureInfo.InvariantCulture),
 				["absoluteMinInputCount"] = AbsoluteMinInputCount.ToString(),
 				["readMore"] = Uri.EscapeDataString(ReadMore.ToString())
 			}.ToString()
