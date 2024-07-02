@@ -45,8 +45,8 @@
             <!-- CoordinatorFee -->
             <PreviewItem Label="Coordinator fee"
                          Icon="{StaticResource money_24_regular}"
-                         CopyableContent="{Binding CoordinatorConnection.CoordinatorFeePercent}">
-              <TextBlock Text="{Binding CoordinatorConnection.CoordinatorFeePercent, FallbackValue=0%, StringFormat={}{0}%}" />
+                         CopyableContent="{Binding CoordinatorConnection.CoordinationFeeRate}">
+              <TextBlock Text="{Binding CoordinatorConnection.CoordinationFeeRate, FallbackValue=0, StringFormat={}{0}}" />
             </PreviewItem>
             <Separator />
 

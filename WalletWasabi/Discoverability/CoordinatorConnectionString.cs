@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -10,18 +11,25 @@ public record CoordinatorConnectionString(
     string Name,
     Network Network,
     Uri Endpoint,
-    decimal CoordinatorFeePercent,
+    decimal CoordinationFeeRate,
     int AbsoluteMinInputCount,
     Uri ReadMore)
 {
     public override string ToString()
     {
-        return $"name={Uri.EscapeDataString(Name)}" +
-               $"&network={Network.Name}" +
-               $"&endpoint={Uri.EscapeDataString(Endpoint.ToString())}" +
-               $"&coordinatorFeePercent={CoordinatorFeePercent.ToString(CultureInfo.InvariantCulture)}" +
-               $"&absoluteMinInputCount={AbsoluteMinInputCount}" +
-               $"&readMore={Uri.EscapeDataString(ReadMore.ToString())}";
+	    var builder = new UriBuilder
+	    {
+		    Query = new NameValueCollection
+		    {
+			    ["name"] = Uri.EscapeDataString(Name),
+			    ["network"] = Network.Name,
+			    ["endpoint"] = Uri.EscapeDataString(Endpoint.ToString()),
+			    ["coordinatorFeeRate"] = CoordinationFeeRate.ToString(CultureInfo.InvariantCulture),
+			    ["absoluteMinInputCount"] = AbsoluteMinInputCount.ToString(),
+			    ["readMore"] = Uri.EscapeDataString(ReadMore.ToString())
+		    }.ToString()
+	    };
+	    return builder.ToString();
     }
 
     public static bool TryParse(string s, [NotNullWhen(true)] out CoordinatorConnectionString? coordinatorConnectionString)
@@ -29,7 +37,7 @@ public record CoordinatorConnectionString(
         coordinatorConnectionString = null;
 
         var queryString = HttpUtility.ParseQueryString(s);
-        string[] requiredParams = ["name", "network", "endpoint", "coordinatorFeePercent", "absoluteMinInputCount", "readMore"];
+        string[] requiredParams = ["name", "network", "endpoint", "coordinationFeeRate", "absoluteMinInputCount", "readMore"];
 
         if (requiredParams.Any(param => string.IsNullOrEmpty(queryString[param])))
         {
@@ -49,7 +57,7 @@ public record CoordinatorConnectionString(
             return false;
         }
 
-        if (!decimal.TryParse(queryString["coordinatorFeePercent"], NumberStyles.Any, CultureInfo.InvariantCulture, out var coordinatorFeePercent))
+        if (!decimal.TryParse(queryString["coordinationFeeRate"], NumberStyles.Any, CultureInfo.InvariantCulture, out var coordinationFeeRate))
         {
             return false;
         }
@@ -68,7 +76,7 @@ public record CoordinatorConnectionString(
             name,
             network,
             endpoint,
-            coordinatorFeePercent,
+            coordinationFeeRate,
             absoluteMinInputCount,
             readMore);
 

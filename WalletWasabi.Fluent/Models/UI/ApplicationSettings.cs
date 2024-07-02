@@ -316,9 +316,9 @@ public partial class ApplicationSettings : ReactiveObject
 	public bool TryProcessCoordinatorConnectionString(CoordinatorConnectionString coordinatorConnectionString)
 	{
 		// Sanity checks
-		if (coordinatorConnectionString.CoordinatorFeePercent > 1)
+		if (coordinatorConnectionString.CoordinationFeeRate > 0.01m)
 		{
-			Logger.LogWarning($"New intended coordinator fee rate was {coordinatorConnectionString.CoordinatorFeePercent}%, but absolute max is 1%");
+			Logger.LogWarning($"New intended coordinator fee rate was {coordinatorConnectionString.CoordinationFeeRate}, but absolute max is 0.01.");
 			return false;
 		}
 
@@ -333,7 +333,7 @@ public partial class ApplicationSettings : ReactiveObject
 			return false;
 		}
 
-		MaxCoordinationFeeRate = coordinatorConnectionString.CoordinatorFeePercent.ToString(CultureInfo.InvariantCulture);
+		MaxCoordinationFeeRate = coordinatorConnectionString.CoordinationFeeRate.ToString(CultureInfo.InvariantCulture);
 		AbsoluteMinInputCount = coordinatorConnectionString.AbsoluteMinInputCount.ToString();
 
 		// TODO: Save Name and ReadMoreUri to display it after.
