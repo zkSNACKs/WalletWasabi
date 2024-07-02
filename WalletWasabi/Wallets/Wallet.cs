@@ -175,8 +175,8 @@ public class Wallet : BackgroundService, IWallet
 			}
 			else
 			{
-				var unconfTransactionChainOfCoin = UnconfirmedTransactionChainProvider.GetUnconfirmedTransactionChain(coin.TransactionId) ?? [];
-				var effectiveFeeRate = FeeHelpers.CalculateEffectiveFeeRateOfUnconfirmedChain(unconfTransactionChainOfCoin);
+				var unconfTransactionChainOfCoin = UnconfirmedTransactionChainProvider.GetUnconfirmedTransactionChain(coin.TransactionId);
+				var effectiveFeeRate = unconfTransactionChainOfCoin is not null ? new FeeRate((decimal)unconfTransactionChainOfCoin.effectiveFeePerVsize) : null;
 
 				mapByTxid.Add(coin.TransactionId, new TransactionSummary(coin.Transaction, coin.Amount, effectiveFeeRate));
 			}
@@ -191,8 +191,8 @@ public class Wallet : BackgroundService, IWallet
 				}
 				else
 				{
-					var unconfTransactionChainOfCoin = UnconfirmedTransactionChainProvider.GetUnconfirmedTransactionChain(coin.TransactionId) ?? [];
-					var effectiveFeeRate = FeeHelpers.CalculateEffectiveFeeRateOfUnconfirmedChain(unconfTransactionChainOfCoin);
+					var unconfTransactionChainOfCoin = UnconfirmedTransactionChainProvider.GetUnconfirmedTransactionChain(coin.TransactionId);
+					var effectiveFeeRate = unconfTransactionChainOfCoin is not null ? new FeeRate((decimal)unconfTransactionChainOfCoin.effectiveFeePerVsize) : null;
 
 					mapByTxid.Add(spenderTxId, new TransactionSummary(spenderTransaction, Money.Zero - coin.Amount, effectiveFeeRate));
 				}

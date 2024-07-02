@@ -192,7 +192,7 @@ public class BackendTests : IClassFixture<RegTestFixture>
 
 		Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-		var unconfirmedChain = await response.Content.ReadAsJsonAsync<UnconfirmedTransactionChainItem[]>();
+		var unconfirmedChain = await response.Content.ReadAsJsonAsync<UnconfirmedTransactionChainItemLegacy[]>();
 
 		Assert.Equal(txId, unconfirmedChain.First().TxId);
 		Assert.Empty(unconfirmedChain.First().Parents);
@@ -221,7 +221,7 @@ public class BackendTests : IClassFixture<RegTestFixture>
 
 		Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
-		unconfirmedChain = await response2.Content.ReadAsJsonAsync<UnconfirmedTransactionChainItem[]>();
+		unconfirmedChain = await response2.Content.ReadAsJsonAsync<UnconfirmedTransactionChainItemLegacy[]>();
 
 		Assert.Equal(2, unconfirmedChain.Length);
 		Assert.Contains(txId2, unconfirmedChain.Select(x => x.TxId));

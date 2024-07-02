@@ -61,12 +61,12 @@ public static class TransactionFeeHelper
 		{
 			var unconfirmedChain = unconfirmedTxChainProvider.GetUnconfirmedTransactionChain(tx.GetHash());
 
-			if (unconfirmedChain is null || unconfirmedChain.Count == 0)
+			if (unconfirmedChain is null)
 			{
 				return false;
 			}
 
-			var feeRate = FeeHelpers.CalculateEffectiveFeeRateOfUnconfirmedChain(unconfirmedChain);
+			var feeRate = new FeeRate((decimal)unconfirmedChain.effectiveFeePerVsize);
 
 			estimate = feeEstimates.EstimateConfirmationTime(feeRate);
 			return true;

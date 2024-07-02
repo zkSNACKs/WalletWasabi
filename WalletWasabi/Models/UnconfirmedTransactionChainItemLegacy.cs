@@ -6,7 +6,9 @@ using WalletWasabi.JsonConverters.Bitcoin;
 using WalletWasabi.JsonConverters.Collections;
 
 namespace WalletWasabi.Models;
-public record UnconfirmedTransactionChainItem(
+
+// This class is here for backward compatibility and should be removed on removal of unconfirmed-transaction-chain endpoint.
+public record UnconfirmedTransactionChainItemLegacy(
 	[JsonProperty]
 	[JsonConverter(typeof(Uint256JsonConverter))]
 	uint256 TxId,

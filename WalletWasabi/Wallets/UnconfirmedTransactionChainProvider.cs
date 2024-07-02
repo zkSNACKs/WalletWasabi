@@ -24,12 +24,12 @@ public class UnconfirmedTransactionChainProvider : BackgroundService
 
 	public UnconfirmedTransactionChainProvider(WasabiHttpClientFactory httpClientFactory)
 	{
-		HttpClient = httpClientFactory.NewHttpClient(httpClientFactory.BackendUriGetter, Tor.Socks5.Pool.Circuits.Mode.NewCircuitPerRequest);
+		HttpClient = httpClientFactory.NewHttpClient(() => new Uri("https://mempool.space/api/"), Tor.Socks5.Pool.Circuits.Mode.NewCircuitPerRequest);
 	}
 
 	public event EventHandler<EventArgs>? RequestedUnconfirmedChainArrived;
 
-	public ConcurrentDictionary<uint256, List<UnconfirmedTransactionChainItem>> UnconfirmedChainCache { get; } = new();
+	public ConcurrentDictionary<uint256, UnconfirmedTransactionChain> UnconfirmedChainCache { get; } = new();
 
 	private IHttpClient HttpClient { get; }
 
@@ -48,7 +48,7 @@ public class UnconfirmedTransactionChainProvider : BackgroundService
 
 				var response = await HttpClient.SendAsync(
 					HttpMethod.Get,
-					$"api/v{Helpers.Constants.BackendMajorVersion}/btc/Blockchain/unconfirmed-transaction-chain?transactionId={txid}",
+					$"v1/cpfp/{txid}",
 					null,
 					linkedCts.Token).ConfigureAwait(false);
 
@@ -57,9 +57,9 @@ public class UnconfirmedTransactionChainProvider : BackgroundService
 					await response.ThrowRequestExceptionFromContentAsync(cancellationToken).ConfigureAwait(false);
 				}
 
-				var unconfirmedChain = await response.Content.ReadAsJsonAsync<UnconfirmedTransactionChainItem[]>().ConfigureAwait(false);
+				var unconfirmedChain = await response.Content.ReadAsJsonAsync<UnconfirmedTransactionChain>().ConfigureAwait(false);
 
-				if (!UnconfirmedChainCache.TryAdd(txid, unconfirmedChain.ToList()))
+				if (!UnconfirmedChainCache.TryAdd(txid, unconfirmedChain))
 				{
 					throw new InvalidOperationException($"Failed to cache unconfirmed tx chain for {txid}");
 				}
@@ -126,7 +126,7 @@ public class UnconfirmedTransactionChainProvider : BackgroundService
 		}
 	}
 
-	public List<UnconfirmedTransactionChainItem> GetUnconfirmedTransactionChain(uint256 txId)
+	public UnconfirmedTransactionChain? GetUnconfirmedTransactionChain(uint256 txId)
 	{
 		return UnconfirmedChainCache.TryGet(txId);
 	}

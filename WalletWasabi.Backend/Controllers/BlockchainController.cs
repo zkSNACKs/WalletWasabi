@@ -474,9 +474,9 @@ public class BlockchainController : ControllerBase
 		return Ok(unconfirmedTxsChainById.Values.ToList());
 	}
 
-	private async Task<Dictionary<uint256, UnconfirmedTransactionChainItem>> BuildUnconfirmedTransactionChainAsync(uint256 requestedTxId, IEnumerable<uint256> mempoolHashes, CancellationToken cancellationToken)
+	private async Task<Dictionary<uint256, UnconfirmedTransactionChainItemLegacy>> BuildUnconfirmedTransactionChainAsync(uint256 requestedTxId, IEnumerable<uint256> mempoolHashes, CancellationToken cancellationToken)
 	{
-		var unconfirmedTxsChainById = new Dictionary<uint256, UnconfirmedTransactionChainItem>();
+		var unconfirmedTxsChainById = new Dictionary<uint256, UnconfirmedTransactionChainItemLegacy>();
 		var toFetchFeeList = new List<uint256> { requestedTxId };
 
 		while (toFetchFeeList.Count > 0)
@@ -508,7 +508,7 @@ public class BlockchainController : ControllerBase
 		return unconfirmedTxsChainById;
 	}
 
-	private async Task<UnconfirmedTransactionChainItem> ComputeUnconfirmedTransactionChainItemAsync(uint256 currentTxId, IEnumerable<uint256> mempoolHashes, CancellationToken cancellationToken)
+	private async Task<UnconfirmedTransactionChainItemLegacy> ComputeUnconfirmedTransactionChainItemAsync(uint256 currentTxId, IEnumerable<uint256> mempoolHashes, CancellationToken cancellationToken)
 	{
 		var currentTx = (await FetchTransactionsAsync([currentTxId], cancellationToken).ConfigureAwait(false)).First();
 
@@ -528,7 +528,7 @@ public class BlockchainController : ControllerBase
 		var unconfirmedParents = parentTxs.Where(x => mempoolHashes.Contains(x.GetHash())).ToHashSet();
 		var unconfirmedChildrenTxs = Mempool.GetSpenderTransactions(currentTx.Outputs.Select((txo, index) => new OutPoint(currentTx, index))).ToHashSet();
 
-		return new UnconfirmedTransactionChainItem(
+		return new UnconfirmedTransactionChainItemLegacy(
 			TxId: currentTxId,
 			Size: currentTx.GetVirtualSize(),
 			Fee: ComputeFee(currentTx, parentTxs, cancellationToken),
