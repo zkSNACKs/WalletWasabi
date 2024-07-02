@@ -131,9 +131,9 @@ public class WabiSabiConfig : ConfigBase
 	[JsonProperty(PropertyName = "RoundDestroyerThreshold", DefaultValueHandling = DefaultValueHandling.Populate)]
 	public int RoundDestroyerThreshold { get; set; } = 375;
 
-	[DefaultValueCoordinationFeeRate(0.003, 0.01)]
+	[DefaultValueCoordinationFeeRate(0.0)]
 	[JsonProperty(PropertyName = "CoordinationFeeRate", DefaultValueHandling = DefaultValueHandling.Populate)]
-	public CoordinationFeeRate CoordinationFeeRate { get; set; } = new CoordinationFeeRate(0.003m, Money.Coins(0.01m));
+	public CoordinationFeeRate CoordinationFeeRate { get; set; } = new(0.0m);
 
 	[JsonProperty(PropertyName = "CoordinatorExtPubKey")]
 	public ExtPubKey CoordinatorExtPubKey { get; private set; } = NBitcoinHelpers.BetterParseExtPubKey(Constants.WabiSabiFallBackCoordinatorExtPubKey);

@@ -15,7 +15,6 @@ public class Alice
 		Coin = coin;
 		OwnershipProof = ownershipProof;
 		Id = id;
-		IsCoordinationFeeExempted = isCoordinationFeeExempted;
 	}
 
 	public Round Round { get; }
@@ -28,12 +27,11 @@ public class Alice
 
 	public bool ConfirmedConnection { get; set; } = false;
 	public bool ReadyToSign { get; set; }
-	public bool IsCoordinationFeeExempted { get; } = false;
 
 	public long CalculateRemainingVsizeCredentials(int maxRegistrableSize) => maxRegistrableSize - TotalInputVsize;
 
 	public Money CalculateRemainingAmountCredentials(FeeRate feeRate, CoordinationFeeRate coordinationFeeRate) =>
-		Coin.EffectiveValue(feeRate, IsCoordinationFeeExempted ? CoordinationFeeRate.Zero : coordinationFeeRate);
+		Coin.EffectiveValue(feeRate, coordinationFeeRate);
 
 	public void SetDeadlineRelativeTo(TimeSpan connectionConfirmationTimeout)
 	{

@@ -32,7 +32,7 @@ public class ArenaClient
 	public string CoordinatorIdentifier { get; }
 	public IWabiSabiApiRequestHandler RequestHandler { get; }
 
-	public async Task<(ArenaResponse<Guid> ArenaResponse, bool IsCoordinationFeeExempted)> RegisterInputAsync(
+	public async Task<ArenaResponse<Guid>> RegisterInputAsync(
 		uint256 roundId,
 		OutPoint outPoint,
 		OwnershipProof ownershipProof,
@@ -53,7 +53,7 @@ public class ArenaClient
 		var realAmountCredentials = AmountCredentialClient.HandleResponse(inputRegistrationResponse.AmountCredentials, zeroAmountCredentialRequestData.CredentialsResponseValidation);
 		var realVsizeCredentials = VsizeCredentialClient.HandleResponse(inputRegistrationResponse.VsizeCredentials, zeroVsizeCredentialRequestData.CredentialsResponseValidation);
 
-		return (new(inputRegistrationResponse.AliceId, realAmountCredentials, realVsizeCredentials), inputRegistrationResponse.IsCoordinationFeeExempted);
+		return new(inputRegistrationResponse.AliceId, realAmountCredentials, realVsizeCredentials);
 	}
 
 	public async Task RemoveInputAsync(uint256 roundId, Guid aliceId, CancellationToken cancellationToken)

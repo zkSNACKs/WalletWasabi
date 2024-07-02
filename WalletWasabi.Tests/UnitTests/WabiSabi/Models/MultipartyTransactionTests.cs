@@ -415,7 +415,7 @@ public class MultipartyTransactionTests
 		Random random = new(12345);
 
 		FeeRate feeRate = new(satoshiPerByte: decimal.Parse(feeRateString));
-		CoordinationFeeRate coordinatorFeeRate = new(0m, Money.Zero);
+		CoordinationFeeRate coordinatorFeeRate = CoordinationFeeRate.Zero;
 
 		var parameters = WabiSabiFactory.CreateRoundParameters(new()
 		{

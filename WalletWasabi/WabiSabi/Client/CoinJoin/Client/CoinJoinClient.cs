@@ -719,7 +719,7 @@ public class CoinJoinClient
 		var inputNetworkFee = Money.Satoshis(registeredAliceClients.Sum(alice => feeRate.GetFee(alice.SmartCoin.Coin.ScriptPubKey.EstimateInputVsize())));
 		var outputNetworkFee = Money.Satoshis(myOutputs.Sum(output => feeRate.GetFee(output.ScriptPubKey.EstimateOutputVsize())));
 		var totalNetworkFee = inputNetworkFee + outputNetworkFee;
-		var totalCoordinationFee = Money.Satoshis(registeredAliceClients.Where(a => !a.IsCoordinationFeeExempted).Sum(a => roundParameters.CoordinationFeeRate.GetFee(a.SmartCoin.Amount)));
+		var totalCoordinationFee = Money.Satoshis(registeredAliceClients.Sum(a => roundParameters.CoordinationFeeRate.GetFee(a.SmartCoin.Amount)));
 
 		string[] summary = new string[]
 		{

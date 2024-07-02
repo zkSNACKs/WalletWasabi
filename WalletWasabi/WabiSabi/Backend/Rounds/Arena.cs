@@ -19,7 +19,6 @@ using WalletWasabi.WabiSabi.Models;
 using WalletWasabi.Extensions;
 using WalletWasabi.Logging;
 using WalletWasabi.WabiSabi.Backend.DoSPrevention;
-using WalletWasabi.Helpers;
 
 namespace WalletWasabi.WabiSabi.Backend.Rounds;
 
@@ -627,7 +626,7 @@ public partial class Arena : PeriodicRunner
 		var sizeToPayFor = coinjoin.EstimatedVsize + coordinatorScriptPubKey.EstimateOutputVsize();
 		var miningFee = round.Parameters.MiningFeeRate.GetFee(sizeToPayFor) + Money.Satoshis(1);
 
-		var expectedCoordinationFee = round.Alices.Where(a => !a.IsCoordinationFeeExempted).Sum(x => round.Parameters.CoordinationFeeRate.GetFee(x.Coin.Amount));
+		var expectedCoordinationFee = round.Alices.Sum(x => round.Parameters.CoordinationFeeRate.GetFee(x.Coin.Amount));
 		var availableCoordinationFee = coinjoin.Balance - miningFee;
 
 		round.LogInfo($"Expected coordination fee: {expectedCoordinationFee} - Available coordination: {availableCoordinationFee}.");
@@ -697,11 +696,6 @@ public partial class Arena : PeriodicRunner
 	{
 		SigningState signingState = constructionState.Finalize();
 		return signingState;
-	}
-
-	public override void Dispose()
-	{
-		base.Dispose();
 	}
 
 	/// <summary>

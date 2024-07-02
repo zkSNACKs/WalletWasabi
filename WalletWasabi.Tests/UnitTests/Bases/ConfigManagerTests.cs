@@ -42,7 +42,7 @@ public class ConfigManagerTests
 		// Change coordination fee rate.
 		{
 			// Double coordination fee rate.
-			config.CoordinationFeeRate = new CoordinationFeeRate(rate: 0.006m, plebsDontPayThreshold: Money.Coins(0.01m));
+			config.CoordinationFeeRate = new CoordinationFeeRate(rate: 0.006m);
 
 			// Change should be detected.
 			Assert.True(ConfigManager.CheckFileChange(configPath, config));
@@ -56,7 +56,7 @@ public class ConfigManagerTests
 			Assert.Equal(expectedFileContents, actualFileContents);
 		}
 
-		static string GetVanillaConfigString(decimal coordinationFeeRate = 0.003m)
+		static string GetVanillaConfigString(decimal coordinationFeeRate = 0.0m)
 				=> $$"""
 			{
 			  "ConfirmationTarget": 108,
@@ -84,8 +84,7 @@ public class ConfigManagerTests
 			  "MinInputCountByBlameRoundMultiplier": 0.4,
 			  "RoundDestroyerThreshold": 375,
 			  "CoordinationFeeRate": {
-			    "Rate": {{coordinationFeeRate}},
-			    "PlebsDontPayThreshold": 1000000
+			    "Rate": {{coordinationFeeRate}}
 			  },
 			  "CoordinatorExtPubKey": "xpub6C13JhXzjAhVRgeTcRSWqKEPe1vHi3Tmh2K9PN1cZaZFVjjSaj76y5NNyqYjc2bugj64LVDFYu8NZWtJsXNYKFb9J94nehLAPAKqKiXcebC",
 			  "CoordinatorExtPubKeyCurrentDepth": 1,
