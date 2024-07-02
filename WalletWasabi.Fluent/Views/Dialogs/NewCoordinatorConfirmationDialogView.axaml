@@ -62,7 +62,10 @@
             <PreviewItem Label="Read more"
                          Icon="{StaticResource read_more}"
                          CopyableContent="{Binding CoordinatorConnection.ReadMore}">
-              <TextBlock Text="{Binding CoordinatorConnection.ReadMore, FallbackValue=https://www.example.com/}" />
+              <Button Classes="activeHyperLink"
+                      ToolTip.Tip="Open the link in the default browser"
+                      Content="{Binding CoordinatorConnection.ReadMore, FallbackValue=https://www.example.com/}"
+                      Command="{Binding OpenReadMoreCommand}" />
             </PreviewItem>
 
           </StackPanel>
