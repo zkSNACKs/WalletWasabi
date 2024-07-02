@@ -2,6 +2,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Avalonia.Controls;
 using Avalonia.Xaml.Interactions.Custom;
+using ReactiveUI;
 using WalletWasabi.Fluent.Extensions;
 using WalletWasabi.Fluent.Helpers;
 using WalletWasabi.Fluent.Models.UI;
@@ -28,36 +29,37 @@ public class CoordinatorConnectionStringBehavior : DisposingBehavior<Window>
 			.Where(_ => !uiContext.ApplicationSettings.Oobe)
 			.SelectMany(async _ =>
 			{
-				var clipboardValue = await ApplicationHelper.GetTextAsync();
-
-				if (uiContext.Navigate().DialogScreen.CurrentPage is not NewCoordinatorConfirmationDialogViewModel currentDialog)
-				{
-					return (clipboardValue, null);
-				}
+				var clipboardValue = await uiContext.Clipboard.GetTextAsync();
 
 				if (!CoordinatorConnectionString.TryParse(clipboardValue, out var coordinatorConnectionString))
 				{
-					return (clipboardValue, null);
+					return null;
 				}
 
-				currentDialog.CancelCommand.ExecuteIfCan();
-				return (clipboardValue, coordinatorConnectionString);
+				await uiContext.Clipboard.ClearAsync();
 
-			})
-			.DoAsync(async result =>
-			{
-				if (result.coordinatorConnectionString is null && !CoordinatorConnectionString.TryParse(result.clipboardValue, out result.coordinatorConnectionString))
+				if (uiContext.Navigate().DialogScreen.CurrentPage is NewCoordinatorConfirmationDialogViewModel currentDialog)
 				{
-					return;
+					if (currentDialog.CoordinatorConnection.ToString() == coordinatorConnectionString.ToString())
+					{
+						return null;
+					}
+
+					currentDialog.CancelCommand.ExecuteIfCan();
 				}
 
-				var accepted = await uiContext.Navigate().To().NewCoordinatorConfirmationDialog(result.coordinatorConnectionString).GetResultAsync();
+				return coordinatorConnectionString;
+			})
+			.WhereNotNull()
+			.DoAsync(async coordinatorConnectionString =>
+			{
+				var accepted = await uiContext.Navigate().To().NewCoordinatorConfirmationDialog(coordinatorConnectionString).GetResultAsync();
 				if (!accepted)
 				{
 					return;
 				}
 
-				if (!uiContext.ApplicationSettings.TryProcessCoordinatorConnectionString(result.coordinatorConnectionString))
+				if (!uiContext.ApplicationSettings.TryProcessCoordinatorConnectionString(coordinatorConnectionString))
 				{
 					uiContext.Navigate().To().ShowErrorDialog(
 						message: "Some of the values were incorrect. See logs for more details.",
